@@ -1,0 +1,3 @@
+Criar sistema em python com:
+
+janela 450x450 janela dinâmica baseada em um menu superior menu superior com as abas: Mensagens, Históricos (desabilitado por enquanto), Coletar Dados (desabilitado por enquanto) Para a aba mensagens: campo para anexação de arquivo txt com contatos, campo para escolher o tipo da mensagem (texto ou imagem). Se for texto, surgirá abaixo um campo para digitação do modelo da mensagem. Se for imagem, surgirá um campo para anexação da mesma. Independente das escolhas, abaixo haverá um botão para início do envio.
