@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, Menu
+import subprocess
 
 class App:
     def __init__(self, root):
         self.root = root
-        self.root.title("Sistema de Mensagens")
+        self.root.title("PedagoBot")
         self.root.geometry("450x450")
 
         # Centralizar a janela
@@ -39,13 +40,13 @@ class App:
         self.root.geometry(f"450x450+{x}+{y}")
 
     def create_mensagens_tab(self):
-        self.label_arquivo = tk.Label(self.frame, text="Anexar arquivo .txt com contatos:")
+        self.label_arquivo = tk.Label(self.frame, text="Lista de contatos:")
         self.label_arquivo.pack()
 
         self.txt_arquivo = tk.Text(self.frame, height=1, width=40)
         self.txt_arquivo.pack(pady=5)
 
-        self.btn_anexar = tk.Button(self.frame, text="Escolher arquivo", command=self.load_file)
+        self.btn_anexar = tk.Button(self.frame, text="Anexar arquivo", command=self.load_file)
         self.btn_anexar.pack()
 
         self.label_tipo_mensagem = tk.Label(self.frame, text="Escolha o tipo da mensagem:")
@@ -84,12 +85,11 @@ class App:
         if self.var_tipo.get() == "texto":
             self.input_mensagem = tk.Text(self.frame, height=10, width=40)
             self.input_mensagem.pack(pady=10)
-            self.input_mensagem.insert(tk.INSERT, "Digite o modelo da mensagem")
             
         else:
             self.txt_imagem = tk.Text(self.frame, height=1, width=40)
             self.txt_imagem.pack()
-            self.input_imagem = tk.Button(self.frame, text="Escolher imagem", command=self.load_image)
+            self.input_imagem = tk.Button(self.frame, text="Anexar imagem", command=self.load_image)
             self.input_imagem.pack(pady=10)
 
         # Cria o botão de enviar
@@ -102,12 +102,16 @@ class App:
         if file_path:
             messagebox.showinfo("Imagem Selecionada", f"Imagem selecionada: {file_path}")
 
+    def executar_script(arquivo):
+        # Substitua pelo nome do seu script externo
+        subprocess.run(["python", arquivo])
+
     def send_message(self):
         if self.var_tipo.get() == "texto":
-            message = self.input_mensagem.get("1.0", "end-1c")
-            messagebox.showinfo("Mensagem Enviada", f"Mensagem enviada: {message}")
+            subprocess.run(["python", "mensagem_texto.py"])
+
         else:
-            messagebox.showinfo("Mensagem Enviada", "Imagem enviada com sucesso!")
+            subprocess.run(["python", "mensagem_imagem.py"])
 
 if __name__ == "__main__":
     root = tk.Tk()
