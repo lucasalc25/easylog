@@ -2,8 +2,7 @@ import pyautogui
 import time
 import pytesseract
 from PIL import Image
-import cv2
-import numpy as np
+from tkinter import messagebox
 
 def abrir_whatsapp():
     # Pressionar Windows para abrir a conversa
@@ -16,13 +15,13 @@ def abrir_whatsapp():
 
     # Pressionar Enter para abrir o app
     pyautogui.press('enter')
-    time.sleep(1)
+    time.sleep(3)
     
 def verifica_existencia():
     
     # Captura a tela e salva como imagem
     screenshot_path = "print.png"
-    pyautogui.screenshot(screenshot_path, region=(64, 149, 335, 110))
+    pyautogui.screenshot(screenshot_path, region=(307, 233, 200, 65))
 
 
     # Use o Tesseract para extrair texto da imagem
@@ -40,6 +39,7 @@ def verifica_existencia():
 
     # Usar o pytesseract para extrair o texto da imagem
     texto_extraido = pytesseract.image_to_string(imagem)
+    print(texto_extraido.strip())
 
     # Verificar se há texto na imagem
     if texto_extraido.strip():  # strip() remove espaços extras
@@ -56,7 +56,7 @@ def enviar_mensagens(contatos):
         # Remover o terceiro elemento, que é o 9
         contato = contato[:2] + contato[3:]  # Remove o índice 2 (que é o terceiro número)
         
-        pyautogui.hotkey('ctrl','f')
+        pyautogui.hotkey('ctrl','n')
         time.sleep(1)
         
         # Usar o pyautogui para digitar o número de telefone do contato
@@ -67,9 +67,15 @@ def enviar_mensagens(contatos):
         time.sleep(1)
         
         if possui_whatsapp:
-             # Clica no contato encontrado
-            pyautogui.click(244, 191) 
+            
+            # Alternar para abrir conversa com contato
+            pyautogui.press('tab')
+            time.sleep(1) 
+            pyautogui.press('tab')
             time.sleep(1)
+
+            pyautogui.press('enter')
+            time.sleep(1)     
             
             # Clica no botão anexar
             pyautogui.click(497, 693)
@@ -106,6 +112,8 @@ def enviar_mensagens(contatos):
             pyautogui.press('backspace')
         
         time.sleep(2)  # Aguarde um tempo antes de enviar para o próximo contato
+
+    messagebox.showinfo("Mensagem enviada para todos os contatos!")
             
 
 # Função para ler os contatos de um arquivo TXT
@@ -115,17 +123,7 @@ def ler_contatos(arquivo):
     # Limpar os espaços em branco (como '\n') ao redor dos contatos
     return [contato.strip() for contato in contatos]
 
-# Caminho para o arquivo de contatos e imagem
-arquivo_contatos = "contatos.txt"  # Substitua pelo caminho correto
-
-# Ler os contatos
-contatos = ler_contatos(arquivo_contatos)
-print(f"Contatos encontrados: {contatos}")
-
 abrir_whatsapp()
-
-# Esperar o WhatsApp abrir
-time.sleep(2)
 
 # Enviar a imagem para os contatos
 enviar_mensagens(contatos)

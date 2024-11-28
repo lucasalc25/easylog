@@ -1,119 +1,246 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox, Menu
+import ttkbootstrap as ttk
+from tkinter import filedialog, messagebox
 import subprocess
+import time
+import pytesseract
+from PIL import Image
+import pyautogui
 
-class App:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("PedagoBot")
-        self.root.geometry("450x450")
+def verifica_existencia():
+    
+    # Captura a tela e salva como imagem
+    screenshot_path = "print.png"
+    pyautogui.screenshot(screenshot_path, region=(307, 233, 200, 65))
 
-        # Centralizar a janela
-        self.center_window()
 
-        # Criar menu
-        self.menu = Menu(root)
-        self.root.config(menu=self.menu)
+    # Use o Tesseract para extrair texto da imagem
+    # Certifique-se de que o Tesseract esteja instalado e configurado no PATH do sistema
+    # Para Windows, configure o caminho abaixo se necessário:
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-        # Adicionar abas ao menu
-        self.menu.add_command(label="Mensagens")
-        self.menu.add_command(label="Históricos", state=tk.DISABLED)  # Desabilitado
-        self.menu.add_command(label="Coletar Dados", state=tk.DISABLED)  # Desabilitado
+    # Abre a imagem completa
+    imagem = Image.open(screenshot_path)
 
-        # Frame principal
-        self.frame = tk.Frame(self.root)
-        self.frame.pack(pady=20)
+    # Use o Tesseract para extrair texto da imagem
+    # Certifique-se de que o Tesseract esteja instalado e configurado no PATH do sistema
+    # Para Windows, configure o caminho abaixo se necessário:
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-        # Elementos da aba Mensagens
-        self.create_mensagens_tab()
+    # Usar o pytesseract para extrair o texto da imagem
+    texto_extraido = pytesseract.image_to_string(imagem)
+    print(texto_extraido.strip())
 
-    def center_window(self):
-        # Obtém as dimensões da tela
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
+    # Verificar se há texto na imagem
+    if texto_extraido.strip():  # strip() remove espaços extras
+        return True
+    else:
+        return False
+        
+    
+# Função para enviar uma imagem para os contatos
+def enviar_mensagens(contatos, mensagem, imagem):
+    print(mensagem)
+    for contato in contatos:
+        #contato = '(92)98422-2186'
+        contato = contato.replace("(", "").replace(")", "").replace(" ", "")
+        # Remover o terceiro elemento, que é o 9
+        contato = contato[:2] + contato[3:]  # Remove o índice 2 (que é o terceiro número)
+        
+        pyautogui.hotkey('ctrl','n')
+        time.sleep(1)
+        
+        # Usar o pyautogui para digitar o número de telefone do contato
+        pyautogui.write(f'{contato}')
+        time.sleep(1)   
+        
+        possui_whatsapp = verifica_existencia()
+        time.sleep(1)
+        
+        if possui_whatsapp:
+            # Alternar para abrir conversa com contato
+            pyautogui.press('tab')
+            pyautogui.press('tab')
+            time.sleep(1)
 
-        # Calcula a posição x e y para centralizar a janela
-        x = (screen_width // 2) - (450 // 2)
-        y = (screen_height // 2) - (450 // 2)
+            pyautogui.press('enter')
+            time.sleep(1)     
+            
+            #Verifica se há imagem
+            if imagem:
+                # Clica no botão anexar
+                pyautogui.click(497, 693)
+                time.sleep(1)
+                
+                # Alternar para abrir fotos
+                pyautogui.press('tab')
+                time.sleep(1) 
+                pyautogui.press('enter')
+                time.sleep(1)          
 
-        # Define a posição da janela
-        self.root.geometry(f"450x450+{x}+{y}")
+                # Clicar para anexar a imagem
+                pyautogui.write(r'C:\Users\Suporte\Documents\GitHub\bot-whatsapp\imagem.png')  # Caminho completo da imagem
+                time.sleep(1)
+                
+                pyautogui.press('enter')
+                time.sleep(1.5)
 
-    def create_mensagens_tab(self):
-        self.label_arquivo = tk.Label(self.frame, text="Lista de contatos:")
-        self.label_arquivo.pack()
+                if mensagem:
+                    # Usar o pyautogui para digitar o número de telefone do contato
+                    pyautogui.write(f'{mensagem}')
+                    time.sleep(3)
+                
+                for i in range(1, 5):
+                    # Clicar no botão de alternar
+                    pyautogui.press('tab')   
+                
+                time.sleep(1)
 
-        self.txt_arquivo = tk.Text(self.frame, height=1, width=40)
-        self.txt_arquivo.pack(pady=5)
+                # Pressionar Enter para enviar a imagem
+                pyautogui.press('enter')
 
-        self.btn_anexar = tk.Button(self.frame, text="Anexar arquivo", command=self.load_file)
-        self.btn_anexar.pack()
+            else:
+                # Usar o pyautogui para digitar o número de telefone do contato
+                pyautogui.write(f'{mensagem}')
+                time.sleep(6)
 
-        self.label_tipo_mensagem = tk.Label(self.frame, text="Escolha o tipo da mensagem:")
-        self.label_tipo_mensagem.pack(pady=(20,0))
+                # Clicar no botão de alternar
+                pyautogui.press('tab')
 
-        self.var_tipo = tk.StringVar(value="texto")
-        self.radio_texto = tk.Radiobutton(self.frame, text="Texto", variable=self.var_tipo, value="texto", command=self.update_message_input)
-        self.radio_imagem = tk.Radiobutton(self.frame, text="Imagem", variable=self.var_tipo, value="imagem", command=self.update_message_input)
-        self.radio_texto.pack()
-        self.radio_imagem.pack()
-
-        self.input_mensagem = None
-        self.txt_imagem = None
-        self.input_imagem = None
-        self.btn_enviar = None  # Inicializa o botão de enviar como None
-
-        self.update_message_input()  # Atualiza a interface com base na seleção inicial
-
-    def load_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
-        if file_path:
-            messagebox.showinfo("Arquivo Selecionado", f"Arquivo selecionado: {file_path}")
-
-    def update_message_input(self):
-         # Remove os campos anteriores, se existirem
-        if self.input_mensagem:
-            self.input_mensagem.destroy()
-        if self.input_imagem:
-            self.input_imagem.destroy()
-        if self.btn_enviar:  # Destrói o botão de enviar se existir
-            self.btn_enviar.destroy()
-        if self.txt_imagem:
-            self.txt_imagem.destroy()
-
-        # Adiciona novo campo baseado na seleção
-        if self.var_tipo.get() == "texto":
-            self.input_mensagem = tk.Text(self.frame, height=10, width=40)
-            self.input_mensagem.pack(pady=10)
+                # Clicar no botão de alternar
+                pyautogui.press('enter')  
             
         else:
-            self.txt_imagem = tk.Text(self.frame, height=1, width=40)
-            self.txt_imagem.pack()
-            self.input_imagem = tk.Button(self.frame, text="Anexar imagem", command=self.load_image)
-            self.input_imagem.pack(pady=10)
+            pyautogui.hotkey('ctrl','a')
+            time.sleep(1)
 
-        # Cria o botão de enviar
-        self.btn_enviar = tk.Button(self.frame, text="Iniciar Envio", command=self.send_message)
-        self.btn_enviar.pack(pady=10)
+            # Pressionar Enter para enviar a imagem
+            pyautogui.press('backspace')
+        
+        time.sleep(2)  # Aguarde um tempo antes de enviar para o próximo contato
 
+    messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
+            
+# Função para ler os contatos de um arquivo TXT
+def ler_contatos(arquivo):
+    with open(arquivo, "r") as file:
+        contatos = file.readlines()
+    # Limpar os espaços em branco (como '\n') ao redor dos contatos
+    return [contato.strip() for contato in contatos]
 
-    def load_image(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
-        if file_path:
-            messagebox.showinfo("Imagem Selecionada", f"Imagem selecionada: {file_path}")
+# Função para anexar contatos
+def anexar_contatos():
+    caminho = filedialog.askopenfilename(
+        title="Selecione um arquivo de contatos",
+        filetypes=[("Arquivos de texto", "*.txt")]
+    )
+    if caminho:
+        entry_contatos.delete(0, ttk.END)  # Limpa o conteúdo atual
+        entry_contatos.insert(0, caminho)  # Exibe o caminho do arquivo
 
-    def executar_script(arquivo):
-        # Substitua pelo nome do seu script externo
-        subprocess.run(["python", arquivo])
+# Função para anexar imagem
+def anexar_imagem():
+    caminho = filedialog.askopenfilename(
+        title="Selecione uma imagem",
+        filetypes=[("Arquivos de imagem", "*.png;*.jpg;*.jpeg")]
+    )
+    if caminho:
+        entry_imagem.delete(0, ttk.END)  # Limpa o conteúdo atual
+        entry_imagem.insert(0, caminho)  # Exibe o caminho do arquivo
 
-    def send_message(self):
-        if self.var_tipo.get() == "texto":
-            subprocess.run(["python", "mensagem_texto.py"])
+# Função para iniciar envio
+def preparar_envio():
+    caminho_contatos = entry_contatos.get()
+    mensagem = text_mensagem.get("1.0", ttk.END)  # Captura o texto do campo
+    imagem = entry_imagem.get()
 
-        else:
-            subprocess.run(["python", "mensagem_imagem.py"])
+    # Caminho para o arquivo de contatos e imagem
+    arquivo_contatos = caminho_contatos  # Substitua pelo caminho correto
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = App(root)
-    root.mainloop()
+    # Ler os contatos
+    contatos = ler_contatos(arquivo_contatos)
+    
+    # Pressionar Windows para abrir a conversa
+    pyautogui.press('win')  
+    time.sleep(1)
+    
+    # Usar o pyautogui para digitar whatsapp
+    pyautogui.write('whatsapp')
+    time.sleep(1)
+
+    # Pressionar Enter para abrir o app
+    pyautogui.press('enter')
+    time.sleep(3)
+
+    enviar_mensagens(contatos, mensagem, imagem)
+
+# Centralizar a janela
+def centralizar_janela(window):
+    window.update_idletasks()  # Atualiza informações da janela
+    largura_tela = window.winfo_screenwidth()
+    altura_tela = window.winfo_screenheight()
+    largura_janela = window.winfo_width()
+    altura_janela = window.winfo_height()
+    x = (largura_tela // 2) - (largura_janela // 2)
+    y = (altura_tela // 2) - (altura_janela // 2)
+    # Define a posição da janela
+    window.geometry(f"+{x}+{y}")
+
+# Criar janela principal
+root = ttk.Window(themename="cosmo")
+root.title("Pedagobot")
+root.geometry("450x450")
+# Adicionar o ícone (.ico)
+root.iconbitmap("./icone.ico")
+
+# Menu superior
+menu = ttk.Menu(root)
+root.config(menu=menu)
+
+# Abas do menu
+menu_mensagens = ttk.Menu(menu, tearoff=0)
+menu_mensagens.add_command(label="Mensagens", state=ttk.ACTIVE)
+menu.add_cascade(label="Mensagens", menu=menu_mensagens)
+
+menu_historicos = ttk.Menu(menu, tearoff=0)
+menu_historicos.add_command(label="Históricos", state=ttk.DISABLED)
+menu.add_cascade(label="Históricos", menu=menu_historicos)
+
+menu_coletar = ttk.Menu(menu, tearoff=0)
+menu_coletar.add_command(label="Coletar Dados", state=ttk.DISABLED)
+menu.add_cascade(label="Coletar Dados", menu=menu_coletar)
+
+# Frame principal
+frame_principal = ttk.Frame(root, padding=10)
+frame_principal.pack(fill=ttk.BOTH, expand=True)
+
+# Campo para anexação de arquivo txt
+frame_contatos = ttk.Labelframe(frame_principal, text="Arquivo de contatos (TXT):", padding=5, bootstyle="primary")
+frame_contatos.pack(fill=ttk.X, pady=5)
+entry_contatos = ttk.Entry(frame_contatos)
+entry_contatos.pack(side=ttk.LEFT, fill=ttk.X, expand=True, padx=5)
+ttk.Button(frame_contatos, text="Anexar", command=lambda: anexar_contatos()).pack(side=ttk.RIGHT, padx=5)
+
+# Campo para digitação do modelo de mensagem
+frame_texto = ttk.Labelframe(frame_principal, text="Modelo da mensagem:", padding=5, bootstyle="primary")
+frame_texto.pack(fill=ttk.BOTH, pady=5, expand=True)
+text_mensagem = ttk.Text(frame_texto, height=7, wrap="word")  # Define altura para 7 linhas
+text_mensagem.pack(fill=ttk.BOTH, padx=5, expand=True)
+
+# Campo para anexar imagem
+frame_imagem = ttk.Labelframe(frame_principal, text="Imagem (opcional):", padding=5, bootstyle="primary")
+frame_imagem.pack(fill=ttk.X, pady=5)
+entry_imagem = ttk.Entry(frame_imagem)
+entry_imagem.pack(side=ttk.LEFT, fill=ttk.X, expand=True, padx=5)
+ttk.Button(frame_imagem, text="Anexar", command=anexar_imagem).pack(side=ttk.RIGHT, padx=5)
+
+# Botão para início do envio
+frame_enviar = ttk.Frame(frame_principal)
+frame_enviar.pack(fill=ttk.X, pady=20)
+ttk.Button(frame_enviar, text="Enviar Mensagens", command=preparar_envio, bootstyle="success").pack()
+
+# Configurações finais e centralização
+root.update()  # Garante que todos os widgets estão renderizados
+centralizar_janela(root)
+
+# Loop principal
+root.mainloop()
