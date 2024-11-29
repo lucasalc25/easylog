@@ -1,10 +1,9 @@
 import ttkbootstrap as ttk
 from tkinter import filedialog, messagebox
-import subprocess
+import pandas as pd
 import time
-import pytesseract
-from PIL import Image
 import pyautogui
+import pytesseract
 
 def verifica_existencia():
     
@@ -127,31 +126,11 @@ def ler_contatos(arquivo):
     # Limpar os espaços em branco (como '\n') ao redor dos contatos
     return [contato.strip() for contato in contatos]
 
-# Função para anexar contatos
-def anexar_contatos():
-    caminho = filedialog.askopenfilename(
-        title="Selecione um arquivo de contatos",
-        filetypes=[("Arquivos de texto", "*.txt")]
-    )
-    if caminho:
-        entry_contatos.delete(0, ttk.END)  # Limpa o conteúdo atual
-        entry_contatos.insert(0, caminho)  # Exibe o caminho do arquivo
-
-# Função para anexar imagem
-def anexar_imagem():
-    caminho = filedialog.askopenfilename(
-        title="Selecione uma imagem",
-        filetypes=[("Arquivos de imagem", "*.png;*.jpg;*.jpeg")]
-    )
-    if caminho:
-        entry_imagem.delete(0, ttk.END)  # Limpa o conteúdo atual
-        entry_imagem.insert(0, caminho)  # Exibe o caminho do arquivo
-
 # Função para iniciar envio
-def preparar_envio():
-    caminho_contatos = entry_contatos.get()
-    mensagem = text_mensagem.get("1.0", ttk.END)  # Captura o texto do campo
-    imagem = entry_imagem.get()
+def preparar_envio(campo_planilha, campo_mensagem, campo_imagem):
+    caminho_contatos = campo_planilha.get()
+    mensagem = campo_mensagem.get("1.0", ttk.END)  # Captura o texto do campo
+    imagem = campo_imagem.get()
 
     # Caminho para o arquivo de contatos e imagem
     arquivo_contatos = caminho_contatos  # Substitua pelo caminho correto
@@ -173,74 +152,200 @@ def preparar_envio():
 
     enviar_mensagens(contatos, mensagem, imagem)
 
-# Centralizar a janela
+# Função para centralizar a janela
 def centralizar_janela(window):
-    window.update_idletasks()  # Atualiza informações da janela
+    window.update_idletasks()
     largura_tela = window.winfo_screenwidth()
     altura_tela = window.winfo_screenheight()
     largura_janela = window.winfo_width()
     altura_janela = window.winfo_height()
     x = (largura_tela // 2) - (largura_janela // 2)
     y = (altura_tela // 2) - (altura_janela // 2)
-    # Define a posição da janela
     window.geometry(f"+{x}+{y}")
 
-# Criar janela principal
-root = ttk.Window(themename="cosmo")
-root.title("Pedagobot")
-root.geometry("450x450")
-# Adicionar o ícone (.ico)
-root.iconbitmap("./icone.ico")
+# Tela Inicial
+def exibir_tela_inicial():
+    root = ttk.Window(themename="cosmo")
+    root.title("Pedagobot")
 
-# Menu superior
-menu = ttk.Menu(root)
-root.config(menu=menu)
+    # Funções para redirecionar para cada aba
+    def abrir_faltosos():
+        root.withdraw()  # Esconde a janela de boas-vindas
+        exibir_faltosos(root)
 
-# Abas do menu
-menu_mensagens = ttk.Menu(menu, tearoff=0)
-menu_mensagens.add_command(label="Mensagens", state=ttk.ACTIVE)
-menu.add_cascade(label="Mensagens", menu=menu_mensagens)
+    def abrir_comunicados():
+        root.withdraw()  # Esconde a janela de boas-vindas
+        exibir_comunicados(root)
+    
+    # Função para exibir a funcionalidade Históricos
+    def abrir_historicos():
+        messagebox.showinfo("Históricos", "Funcionalidade em desenvolvimento.")
 
-menu_historicos = ttk.Menu(menu, tearoff=0)
-menu_historicos.add_command(label="Históricos", state=ttk.DISABLED)
-menu.add_cascade(label="Históricos", menu=menu_historicos)
+    # Função para exibir a funcionalidade Planilhas
+    def abrir_planilhas():
+        messagebox.showinfo("Planilhas", "Funcionalidade em desenvolvimento.")
 
-menu_coletar = ttk.Menu(menu, tearoff=0)
-menu_coletar.add_command(label="Coletar Dados", state=ttk.DISABLED)
-menu.add_cascade(label="Coletar Dados", menu=menu_coletar)
+    # Layout da tela inicial
+    frame_principal = ttk.Frame(root, padding=20)
+    frame_principal.pack(fill=ttk.BOTH, expand=True)
 
-# Frame principal
-frame_principal = ttk.Frame(root, padding=10)
-frame_principal.pack(fill=ttk.BOTH, expand=True)
+    ttk.Label(
+        frame_principal,
+        text="Bem-vindo ao Pedagobot!",
+        font=("Helvetica", 16, "bold")
+    ).pack(pady=20)
 
-# Campo para anexação de arquivo txt
-frame_contatos = ttk.Labelframe(frame_principal, text="Arquivo de contatos (TXT):", padding=5, bootstyle="primary")
-frame_contatos.pack(fill=ttk.X, pady=5)
-entry_contatos = ttk.Entry(frame_contatos)
-entry_contatos.pack(side=ttk.LEFT, fill=ttk.X, expand=True, padx=5)
-ttk.Button(frame_contatos, text="Anexar", command=lambda: anexar_contatos()).pack(side=ttk.RIGHT, padx=5)
+    # Botões para cada funcionalidade
+    ttk.Button(
+        frame_principal, text="Faltosos", 
+        command=abrir_faltosos, 
+        bootstyle="primary-outline", 
+        width=20
+    ).pack(pady=10)
 
-# Campo para digitação do modelo de mensagem
-frame_texto = ttk.Labelframe(frame_principal, text="Modelo da mensagem:", padding=5, bootstyle="primary")
-frame_texto.pack(fill=ttk.BOTH, pady=5, expand=True)
-text_mensagem = ttk.Text(frame_texto, height=7, wrap="word")  # Define altura para 7 linhas
-text_mensagem.pack(fill=ttk.BOTH, padx=5, expand=True)
+    ttk.Button(
+        frame_principal, text="Comunicados", 
+        command=abrir_comunicados, 
+        bootstyle="success-outline", 
+        width=20
+    ).pack(pady=10)
 
-# Campo para anexar imagem
-frame_imagem = ttk.Labelframe(frame_principal, text="Imagem (opcional):", padding=5, bootstyle="primary")
-frame_imagem.pack(fill=ttk.X, pady=5)
-entry_imagem = ttk.Entry(frame_imagem)
-entry_imagem.pack(side=ttk.LEFT, fill=ttk.X, expand=True, padx=5)
-ttk.Button(frame_imagem, text="Anexar", command=anexar_imagem).pack(side=ttk.RIGHT, padx=5)
+    ttk.Button(
+        frame_principal, text="Históricos", 
+        command=abrir_historicos, 
+        bootstyle="info-outline", 
+        width=20
+    ).pack(pady=10)
 
-# Botão para início do envio
-frame_enviar = ttk.Frame(frame_principal)
-frame_enviar.pack(fill=ttk.X, pady=20)
-ttk.Button(frame_enviar, text="Enviar Mensagens", command=preparar_envio, bootstyle="success").pack()
+    ttk.Button(
+        frame_principal, text="Planilhas", 
+        command=abrir_planilhas, 
+        bootstyle="warning-outline", 
+        width=20
+    ).pack(pady=10)
 
-# Configurações finais e centralização
-root.update()  # Garante que todos os widgets estão renderizados
-centralizar_janela(root)
+    centralizar_janela(root)
+    root.update()
+    root.mainloop()
 
-# Loop principal
-root.mainloop()
+# Função para anexar arquivo
+def anexar_planilha(planilha):
+    caminho = filedialog.askopenfilename(filetypes=[("Planilhas Excel", "*.xlsx")])
+    if caminho:
+        planilha.delete(0, ttk.END)
+        planilha.insert(0, caminho)
+
+
+# Função para anexar imagem
+def anexar_imagem(imagem):
+    caminho = filedialog.askopenfilename(
+        title="Selecione uma imagem",
+        filetypes=[("Arquivos de imagem", "*.png;*.jpg;*.jpeg")]
+    )
+    if caminho:
+        imagem.delete(0, ttk.END)  # Limpa o conteúdo atual
+        imagem.insert(0, caminho)  # Exibe o caminho do arquivo
+
+def reexibir_tela_inicial(window, tela_inicial):
+    window.withdraw()
+    tela_inicial.deiconify()
+
+# Tela Faltosos
+def exibir_faltosos(tela_inicial):
+    root = ttk.Window(themename="cosmo")
+    root.title("Faltosos")
+
+    # Layout da aba Faltosos
+    frame_principal = ttk.Frame(root, padding=20)
+    frame_principal.pack(fill=ttk.BOTH, expand=True)
+
+    # Campo para anexação de planilha
+    frame_contatos = ttk.Labelframe(frame_principal, text="Planilha de contatos:", padding=5, bootstyle="primary")
+    frame_contatos.pack(fill=ttk.X, pady=5)
+    entry_planilha = ttk.Entry(frame_contatos)
+    entry_planilha.pack(side=ttk.LEFT, fill=ttk.X, expand=True, padx=5)
+    ttk.Button(frame_contatos, text="Anexar", command=lambda:anexar_planilha(entry_planilha), bootstyle="success").pack(side=ttk.RIGHT, padx=5)
+
+    # Campos para dados adicionais
+    frame_dados = ttk.Labelframe(frame_principal, text="Informações Adicionais:", padding=5, bootstyle="primary")
+    frame_dados.pack(fill=ttk.X, pady=5)
+
+    ttk.Label(frame_dados, text="Professor:").pack(side=ttk.LEFT, padx=5)
+    entry_professor = ttk.Entry(frame_dados, width=20)
+    entry_professor.pack(side=ttk.LEFT, padx=5)
+
+    ttk.Label(frame_dados, text="Dia da Falta:").pack(side=ttk.LEFT, padx=5)
+    entry_dia_falta = ttk.Entry(frame_dados, width=15)
+    entry_dia_falta.pack(side=ttk.LEFT, padx=5)
+
+    # Mensagem padrão
+    mensagem_padrao = """Olá, tudo bem? Aqui é o professor {nome_professor} da Microlins.
+
+Verifiquei que {nome_aluno} não compareceu à aula do dia {data}. Para que isso não gere atrasos no contrato, você precisa nos informar o motivo desta falta para registro em nosso sistema, tá bom? Depois é só marcar sua reposição.
+
+Fico no seu aguardo. 
+Obrigado desde já!"""
+
+     # Campo para digitação do modelo de mensagem
+    frame_texto = ttk.Labelframe(frame_principal, text="Modelo da mensagem (opcional):", padding=5, bootstyle="primary")
+    frame_texto.pack(fill=ttk.BOTH, pady=5, expand=True)
+    text_mensagem = ttk.Text(frame_texto, height=7, wrap="word")
+    text_mensagem.insert("1.0", mensagem_padrao)
+    text_mensagem.pack(fill=ttk.BOTH, padx=5, expand=True)
+
+    # Campo para anexar imagem
+    frame_imagem = ttk.Labelframe(frame_principal, text="Imagem (opcional):", padding=5, bootstyle="primary")
+    frame_imagem.pack(fill=ttk.X, pady=5)
+    entry_imagem = ttk.Entry(frame_imagem)
+    entry_imagem.pack(side=ttk.LEFT, fill=ttk.X, expand=True, padx=5)
+    ttk.Button(frame_imagem, text="Anexar", command=lambda:anexar_imagem(entry_imagem)).pack(side=ttk.RIGHT, padx=5)
+
+    # Botão para enviar mensagens
+    ttk.Button(frame_principal, text="Enviar", command=lambda:preparar_envio(entry_planilha, text_mensagem, entry_imagem), bootstyle="success-outline").pack(pady=10)
+
+    # Botão para voltar
+    ttk.Button(
+        frame_principal, text="Voltar", 
+        command=lambda: (reexibir_tela_inicial(root, tela_inicial)), 
+        bootstyle="danger-outline"
+    ).pack(pady=10)
+
+    centralizar_janela(root)
+    root.mainloop()
+
+# Tela Comunicados
+def exibir_comunicados(tela_inicial):
+    root = ttk.Window(themename="cosmo")
+    root.title("Comunicados")
+
+    # Layout da aba Comunicados
+    frame_principal = ttk.Frame(root, padding=20)
+    frame_principal.pack(fill=ttk.BOTH, expand=True)
+
+    # Campo para anexação de planilha
+    frame_contatos = ttk.Labelframe(frame_principal, text="Planilha de contatos:", padding=5, bootstyle="primary")
+    frame_contatos.pack(fill=ttk.X, pady=5)
+    entry_planilha = ttk.Entry(frame_contatos)
+    entry_planilha.pack(side=ttk.LEFT, fill=ttk.X, expand=True, padx=5)
+    ttk.Button(frame_contatos, text="Anexar", command=lambda:anexar_planilha(entry_planilha), bootstyle="success").pack(side=ttk.RIGHT, padx=5)
+    
+    # Campo para mensagem
+    ttk.Label(frame_principal, text="Modelo de mensagem:").pack(anchor="w", pady=5)
+    text_mensagem = ttk.Text(frame_principal, height=8)
+    text_mensagem.pack(fill=ttk.BOTH, pady=5)
+
+    # Botão para enviar mensagens
+    ttk.Button(frame_principal, text="Enviar", bootstyle="success-outline").pack(pady=10)
+
+    # Botão para voltar
+    ttk.Button(                                                                                                                                          
+        frame_principal, text="Voltar", 
+        command=lambda: (reexibir_tela_inicial(root, tela_inicial)), 
+        bootstyle="danger-outline"
+    ).pack(pady=10)
+
+    centralizar_janela(root)
+    root.mainloop()
+
+# Iniciar a aplicação
+exibir_tela_inicial()
