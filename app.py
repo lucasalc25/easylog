@@ -4,6 +4,7 @@ import pandas as pd
 import time
 import pyautogui
 import pytesseract
+from PIL import Image
 
 def verifica_existencia():
     
@@ -208,7 +209,7 @@ def exibir_tela_inicial():
         command=abrir_comunicados, 
         bootstyle="success-outline", 
         width=20
-    ).pack(pady=10)
+    ).pack(pady=10) 
 
     ttk.Button(
         frame_principal, text="Históricos", 
@@ -225,11 +226,12 @@ def exibir_tela_inicial():
     ).pack(pady=10)
 
     centralizar_janela(root)
-    root.update()
     root.mainloop()
 
 # Função para anexar arquivo
 def anexar_planilha(planilha):
+    messagebox.showinfo("Atenção!", "Envie uma planilha com os nomes e contatos dos alunos.")
+
     caminho = filedialog.askopenfilename(filetypes=[("Planilhas Excel", "*.xlsx")])
     if caminho:
         planilha.delete(0, ttk.END)
@@ -346,6 +348,11 @@ def exibir_comunicados(tela_inicial):
 
     centralizar_janela(root)
     root.mainloop()
+
+# Função para encerrar o programa ao fechar a janela inicial
+def encerrar_programa(root):
+    if messagebox.askokcancel("Sair", "Você deseja realmente encerrar o programa?"):
+        root.destroy()  # Encerra o programa principal
 
 # Iniciar a aplicação
 exibir_tela_inicial()
