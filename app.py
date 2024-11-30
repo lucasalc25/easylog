@@ -1,10 +1,12 @@
 import ttkbootstrap as ttk
 from tkinter import filedialog, messagebox
-import pandas as pd
+import pandas
 import time
 import pyautogui
 import pytesseract
 from PIL import Image
+import openpyxl
+import re
 
 def verifica_existencia():
     
@@ -85,14 +87,19 @@ def enviar_mensagens(contatos, mensagem, imagem):
                 time.sleep(1.5)
 
                 if mensagem:
-                    # Usar o pyautogui para digitar o número de telefone do contato
-                    pyautogui.write(f'{mensagem}')
-                    time.sleep(3)
+                    # Usar o pyautogui para digitar a mensagem
+                    for frase in mensagem:
+                        pyautogui.write(f'{frase}')
+                        time.sleep(3)
+                    
+                        for i in range(1, 5):
+                            # Clicar no botão de alternar
+                            pyautogui.press('tab')
+                        
+                        time.sleep(1) 
                 
-                for i in range(1, 5):
-                    # Clicar no botão de alternar
-                    pyautogui.press('tab')   
-                
+                # Clicar no botão de alternar
+                pyautogui.press('tab') 
                 time.sleep(1)
 
                 # Pressionar Enter para enviar a imagem
@@ -122,8 +129,9 @@ def enviar_mensagens(contatos, mensagem, imagem):
             
 # Função para ler os contatos de um arquivo TXT
 def ler_contatos(arquivo):
-    with open(arquivo, "r") as file:
+    with open(arquivo, "r", encoding="utf-8") as file:
         contatos = file.readlines()
+        
     # Limpar os espaços em branco (como '\n') ao redor dos contatos
     return [contato.strip() for contato in contatos]
 
@@ -168,6 +176,7 @@ def centralizar_janela(window):
 def exibir_tela_inicial():
     root = ttk.Window(themename="cosmo")
     root.title("Pedagobot")
+    root.iconbitmap("./icone.ico")
 
     # Funções para redirecionar para cada aba
     def abrir_faltosos():
@@ -192,9 +201,15 @@ def exibir_tela_inicial():
 
     ttk.Label(
         frame_principal,
-        text="Bem-vindo ao Pedagobot!",
+        text="Bem-vindo(a) ao Pedagobot",
         font=("Helvetica", 16, "bold")
-    ).pack(pady=20)
+    ).pack(pady=10)         
+        
+    ttk.Label(
+        frame_principal,
+        text="Deixando seu trabalho diário mais rápido e leve",
+        font=("Helvetica", 11,)
+    ).pack(pady=(10, 20))
 
     # Botões para cada funcionalidade
     ttk.Button(
@@ -227,22 +242,51 @@ def exibir_tela_inicial():
 
     centralizar_janela(root)
     root.mainloop()
+    
+def ler_contatos(caminho_planilha):
+    try:
+        wb = openpyxl.load_workbook(caminho_planilha)
+        sheet = wb.active
+
+        contatos = []
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            nome, telefone = row
+            contatos.append({
+                "nome": nome.strip() if nome else "",
+                "telefone": sanitizar_telefone(telefone)
+            })
+        
+        return contatos
+    except Exception as e:
+        messagebox.showerror("Erro", f"Erro ao ler o arquivo: {e}")
+        return []
+
+def sanitizar_telefone(telefone):
+    if telefone:
+        return re.sub(r'\D', '', telefone)  # Remove tudo que não for número
+    return ""
 
 # Função para anexar arquivo
-def anexar_planilha(planilha):
-    messagebox.showinfo("Atenção!", "Envie uma planilha com os nomes e contatos dos alunos.")
+def anexar_planilha(txtBox_planilha):
+    caminho_planilha = filedialog.askopenfilename(title="Selecione uma planilha", filetypes=[("Excel files", "*.xlsx")])
+    if caminho_planilha:
+        txtBox_planilha.delete(0, ttk.END)
+        txtBox_planilha.insert(0, caminho_planilha)
+        contatos = ler_contatos(caminho_planilha)
 
-    caminho = filedialog.askopenfilename(filetypes=[("Planilhas Excel", "*.xlsx")])
-    if caminho:
-        planilha.delete(0, ttk.END)
-        planilha.insert(0, caminho)
+        if contatos:
+            mostrar_contatos(contatos)
+            
+def mostrar_contatos(contatos):
+    print("Contatos Carregados")
+    
+    for contato in enumerate(contatos):
+        print(f"{contato['nome']} - {contato['telefone']}")
 
 
 # Função para anexar imagem
 def anexar_imagem(imagem):
-    caminho = filedialog.askopenfilename(
-        title="Selecione uma imagem",
-        filetypes=[("Arquivos de imagem", "*.png;*.jpg;*.jpeg")]
+    caminho = filedialog.askopenfilename(title="Selecione uma imagem", filetypes=[("Arquivos de imagem", "*.png;*.jpg;*.jpeg")]
     )
     if caminho:
         imagem.delete(0, ttk.END)  # Limpa o conteúdo atual
@@ -256,6 +300,7 @@ def reexibir_tela_inicial(window, tela_inicial):
 def exibir_faltosos(tela_inicial):
     root = ttk.Window(themename="cosmo")
     root.title("Faltosos")
+    root.iconbitmap("./icone.ico")
 
     # Layout da aba Faltosos
     frame_principal = ttk.Frame(root, padding=20)
@@ -319,6 +364,7 @@ Obrigado desde já!"""
 def exibir_comunicados(tela_inicial):
     root = ttk.Window(themename="cosmo")
     root.title("Comunicados")
+    root.iconbitmap("./icone.ico")
 
     # Layout da aba Comunicados
     frame_principal = ttk.Frame(root, padding=20)
