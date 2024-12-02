@@ -19,6 +19,7 @@ def esperar_elemento(elemento):
         elif elemento == 'whatsapp_encontrado':
             localizacao = pyautogui.locateOnScreen('./imagens/whatsapp_encontrado.png', confidence=0.8)  # Ajuste a confiança, se necessário
         elif elemento == 'whatsapp_aberto':
+            time.sleep(2)
             localizacao = pyautogui.locateOnScreen('./imagens/whatsapp_aberto.png')  # Ajuste a confiança, se necessário
         elif elemento == 'nova_conversa':
             localizacao = pyautogui.locateOnScreen('./imagens/nova_conversa.png', confidence=0.8)  # Ajuste a confiança, se necessário
@@ -75,7 +76,26 @@ def ler_contatos(caminho_planilha):
 
 
 # Função para iniciar envio
-def preparar_envio(campo_planilha, campo_mensagem, campo_imagem):
+def preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_mensagem, campo_imagem):
+    arquivo_contatos = campo_planilha.get()
+    imagem = campo_imagem.get()
+    mensagem_template = campo_mensagem.get("1.0", "end")
+    nome_professor = campo_nome_professor.get()
+    dia_falta = campo_dia_falta.get()
+    
+    if len(arquivo_contatos) == 0:
+        messagebox.showinfo("Ops!", "Insira uma planilha de contatos para o envio das mensagens!")
+        return
+    elif len(nome_professor) == 0 or len(dia_falta) == 0:
+        messagebox.showinfo("Ops!", "Insira as variáveis para elaborar a mensagem!")
+        return
+    elif len(imagem) == 0 and len(mensagem_template) == 0:
+        messagebox.showinfo("Ops!", "Insira uma mensagem ou imagem para o envio!")
+        return
+    
+    if len(imagem) > 0:
+        imagem = os.path.normpath(imagem)
+    
     # Pressionar Windows para abrir a conversa
     pyautogui.press('win')  
     esperar_elemento('menu_iniciar')
@@ -88,13 +108,13 @@ def preparar_envio(campo_planilha, campo_mensagem, campo_imagem):
     pyautogui.press('enter')
     esperar_elemento('whatsapp_aberto')
 
-    enviar_mensagens(campo_planilha, campo_mensagem, campo_imagem)
+    enviar_mensagens(arquivo_contatos, imagem, mensagem_template)
 
 
 def mensagem_para_verificacao(nome_professor, dia_falta, text_mensagem):
     mensagem = f"""Olá, tudo bem? Aqui é o(a) professor(a) {nome_professor.get()} da Microlins.
 
-Verifiquei que o(a) aluno(a) <nome_aluno> não compareceu à aula do dia {dia_falta.get()}. Para que isso não gere atrasos no contrato, você precisa nos informar o motivo desta falta para registro em nosso sistema, tá bom? Depois é só marcar sua reposição.
+Verifiquei que o(a) aluno(a) <nome_aluno> não compareceu à aula de {dia_falta.get()}. Poderia nos informar o motivo da falta pra registro em sistema? Lembrando, para que isso não gere atrasos, deve ser feita a reposição ta bom?
 
 Fico no seu aguardo. 
 Obrigado desde já!"""
@@ -107,12 +127,7 @@ def mensagem_final(mensagem_template, nome_aluno):
     return mensagem
         
 # Função para enviar uma imagem para os contatos
-def enviar_mensagens(campo_planilha, campo_mensagem, campo_imagem):
-    arquivo_contatos = campo_planilha.get()
-    imagem = campo_imagem.get()
-    imagem = os.path.normpath(imagem)
-    mensagem_template = campo_mensagem.get("1.0", "end")
-
+def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     # Ler os contatos
     contatos = ler_contatos(arquivo_contatos)
     
@@ -123,6 +138,7 @@ def enviar_mensagens(campo_planilha, campo_mensagem, campo_imagem):
             numero_telefone = contato['telefone'].replace("(", "").replace(")", "").replace(" ", "")
             numero_telefone = numero_telefone[:2] + numero_telefone[3:]  # Remove o índice 2 (que é o terceiro número)
             mensagem_personalizada = mensagem_template.replace("<nome_aluno>", nome_aluno)
+            pyperclip.copy(mensagem_personalizada)
 
             # Clicar no botão de alternar
             pyautogui.press('enter')
@@ -145,8 +161,7 @@ def enviar_mensagens(campo_planilha, campo_mensagem, campo_imagem):
                 time.sleep(1)
                 
                 #Verifica se há imagem
-                if imagem:
-                    pyperclip.copy(imagem)  # Copia uma string vazia para a área de transferência
+                if len(imagem) > 0:
                     botao_anexar = esperar_elemento('anexar')
                     pyautogui.click(botao_anexar)
 
@@ -164,21 +179,23 @@ def enviar_mensagens(campo_planilha, campo_mensagem, campo_imagem):
                     esperar_elemento('aba_anexar')
 
                     if mensagem_template:
-                        # Usar o pyautogui para digitar a mensagem
-                        keyboard.write(f'{mensagem_personalizada}')
-                        time.sleep(3)
+                        # Usar o pyautogui para colar a mensagem
+                        pyautogui.hotkey('ctrl','v')
+                        time.sleep(1)
                     
                     time.sleep(1)
                     # Pressionar Enter para enviar a imagem
                     pyautogui.press('enter')
+                    mensagens_enviadas += 1
 
                 else:
-                    # Usar o pyautogui para digitar a mensagem
-                    keyboard.write(f'{mensagem_personalizada}')
-                    time.sleep(4)
+                    # Usar o pyautogui para colar a mensagem
+                    pyautogui.hotkey('ctrl','v')
+                    time.sleep(2)
 
                     # Clicar no botão de alternar
                     pyautogui.press('enter')
+                    mensagens_enviadas += 1
                 
             else:
                 pyautogui.hotkey('ctrl','a')
@@ -187,10 +204,13 @@ def enviar_mensagens(campo_planilha, campo_mensagem, campo_imagem):
                 # Pressionar Enter para enviar a imagem
                 pyautogui.press('backspace')
             
-            mensagens_enviadas += 1
             time.sleep(2)  # Aguarde um tempo antes de enviar para o próximo contato
         except:
-            messagebox.showerror("Oops!", f"Desculpe, só consegui enviar {mensagens_enviadas} mensagens :(")
+            if mensagens_enviadas == 0:
+                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui enviar nenhuma mensagem :(")
+            else:
+                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui enviar {mensagens_enviadas} mensagens :(")
+                            
 
 
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")

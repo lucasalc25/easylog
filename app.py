@@ -45,34 +45,34 @@ def frame_faltosos(janela, frame):
     centralizar_janela(janela)
 
     # Campo para anexação de planilha
-    frame_contatos = ttk.Labelframe(frame, text="Planilha de contatos:", padding=5, bootstyle="primary")
+    frame_contatos = ttk.Labelframe(frame, text=" Planilha de contatos: * ", padding=5, bootstyle="primary")
     frame_contatos.pack(fill=tk.X, pady=5)
     campo_planilha = ttk.Entry(frame_contatos)
     campo_planilha.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
     ttk.Button(frame_contatos, text="Anexar", command=lambda:anexar_planilha(campo_planilha), bootstyle="success").pack(side=tk.RIGHT, padx=5)
 
     # Campos para dados adicionais
-    frame_dados = ttk.Labelframe(frame, text="Informações Adicionais:", padding=5, bootstyle="primary")
+    frame_dados = ttk.Labelframe(frame, text=" Variáveis ", padding=5, bootstyle="primary")
     frame_dados.pack(fill=tk.X, pady=5)
 
-    ttk.Label(frame_dados, text="Professor:").pack(side=tk.LEFT, padx=(5,0))
+    ttk.Label(frame_dados, text="Professor: * ").pack(side=tk.LEFT, padx=(5,0))
     campo_nome_professor = ttk.Entry(frame_dados, width=20)
     campo_nome_professor.pack(side=tk.LEFT, padx=5)
 
-    ttk.Label(frame_dados, text="Dia da Falta:").pack(side=tk.LEFT, padx=(5,0))
+    ttk.Label(frame_dados, text="Dia da Falta: * ").pack(side=tk.LEFT, padx=(5,0))
     campo_dia_falta = ttk.Entry(frame_dados, width=10)
     campo_dia_falta.pack(side=tk.LEFT, padx=5)
     
-    ttk.Button(frame_dados, text="Aplicar", command=lambda:mensagem_para_verificacao(campo_nome_professor, campo_dia_falta, campo_mensagem), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
+    ttk.Button(frame_dados, text="Gerar", command=lambda:mensagem_para_verificacao(campo_nome_professor, campo_dia_falta, campo_mensagem), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
 
      # Campo para digitação do modelo de mensagem
-    frame_texto = ttk.Labelframe(frame, text="Modelo da mensagem (opcional):", padding=5, bootstyle="primary")
+    frame_texto = ttk.Labelframe(frame, text=" Modelo da mensagem: * ", padding=5, bootstyle="primary")
     frame_texto.pack(fill=tk.BOTH, pady=5)
     campo_mensagem = tk.Text(frame_texto, height=7, wrap="word")
     campo_mensagem.pack(fill=tk.BOTH, padx=5)
 
     # Campo para anexar imagem
-    frame_imagem = ttk.Labelframe(frame, text="Imagem (opcional):", padding=5, bootstyle="primary")
+    frame_imagem = ttk.Labelframe(frame, text=" Imagem: ", padding=5, bootstyle="primary")
     frame_imagem.pack(fill=tk.X, pady=5)
     campo_imagem = ttk.Entry(frame_imagem)
     campo_imagem.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
@@ -83,7 +83,7 @@ def frame_faltosos(janela, frame):
     frame_botoes.pack(pady=10)
 
     # Adicionando botões lado a lado usando grid()
-    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha, campo_mensagem, campo_imagem),bootstyle="success-outline").grid(row=0, column=0, padx=40)
+    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_mensagem, campo_imagem),bootstyle="success-outline").grid(row=0, column=0, padx=40)
     ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline").grid(row=0, column=1, padx=40)
 
 # Função para configurar a área de "Comunicados"
@@ -91,20 +91,20 @@ def frame_comunicados(janela,frame):
     janela.geometry("500x520")
     centralizar_janela(janela)
     # Campo para anexação de planilha
-    frame_contatos = ttk.Labelframe(frame, text="Planilha de contatos:", padding=5, bootstyle="primary")
+    frame_contatos = ttk.Labelframe(frame, text=" Planilha de contatos: * ", padding=5, bootstyle="primary")
     frame_contatos.pack(fill=tk.X, pady=5)
     campo_planilha = ttk.Entry(frame_contatos)
     campo_planilha.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
     ttk.Button(frame_contatos, text="Anexar", command=lambda:anexar_planilha(campo_planilha), bootstyle="success").pack(side=tk.RIGHT, padx=5)
 
     # Campo para digitação do modelo de mensagem
-    frame_texto = ttk.Labelframe(frame, text="Modelo da mensagem (opcional):", padding=5, bootstyle="primary")
+    frame_texto = ttk.Labelframe(frame, text=" Modelo da mensagem: ", padding=5, bootstyle="primary")
     frame_texto.pack(fill=tk.BOTH, pady=5)
     campo_mensagem = tk.Text(frame_texto, height=7, wrap="word")
     campo_mensagem.pack(fill=tk.BOTH, padx=5)
 
     # Criando o frame para o tipo de comunicado
-    frame_comunicado = ttk.Labelframe(frame, text="Tipo de Comunicado", padding=5)
+    frame_comunicado = ttk.Labelframe(frame, text=" Tipo de Comunicado * ", padding=5)
     frame_comunicado.pack(fill=tk.X, padx=5, pady=5)
 
     # Variável para armazenar o tipo de comunicado selecionado
@@ -129,7 +129,7 @@ def frame_comunicados(janela,frame):
     ttk.Button(frame, text="Gerar mensagem", command=lambda:aplicar_comunicado(tipo_comunicado_var, campo_mensagem)).pack(pady=10)
 
     # Campo para anexar imagem
-    frame_imagem = ttk.Labelframe(frame, text="Imagem (opcional):", padding=5, bootstyle="primary")
+    frame_imagem = ttk.Labelframe(frame, text=" Imagem: ", padding=5, bootstyle="primary")
     frame_imagem.pack(fill=tk.X, pady=5)
     campo_imagem = ttk.Entry(frame_imagem)
     campo_imagem.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
@@ -140,7 +140,7 @@ def frame_comunicados(janela,frame):
     frame_botoes.pack(pady=10)
 
     # Adicionando botões lado a lado usando grid()
-    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha, campo_mensagem, campo_imagem),bootstyle="success-outline").grid(row=0, column=0, padx=40)
+    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha,  campo_mensagem, campo_imagem),bootstyle="success-outline").grid(row=0, column=0, padx=40)
     ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline").grid(row=0, column=1, padx=40)
 
 # Função para configurar a área de "Históricos"
@@ -162,15 +162,15 @@ def frame_planilhas(janela, frame):
 # Função para exibir a tela inicial
 def exibir_janela_inicial():
     root = Window(themename="cosmo")
-    root.title("Pedagobot")
+    root.title("EasyLog")
     root.iconbitmap("./imagens/icone.ico")
 
     frame_principal = ttk.Frame(root, padding=20)
     frame_principal.pack(fill=tk.BOTH, expand=True)
 
     # Título e subtítulo
-    ttk.Label(frame_principal, text="Bem-vindo(a) ao Pedagobot", font=("Helvetica", 16, "bold")).pack(pady=10)
-    ttk.Label(frame_principal, text="Tornando seu trabalho mais leve", font=("Helvetica", 11)).pack(pady=(10, 20))
+    ttk.Label(frame_principal, text="Bem-vindo(a) ao EasyLog", font=("Helvetica", 16, "bold")).pack(pady=10)
+    ttk.Label(frame_principal, text="Tornando seu trabalho mais eficiente", font=("Helvetica", 11)).pack(pady=(10, 20))
 
     # Botões
     ttk.Button(frame_principal, text="FALTOSOS", command=lambda:abrir_janela(root, "Faltosos"), bootstyle="primary-outline", width=20).pack(pady=10)
