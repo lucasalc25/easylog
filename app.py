@@ -126,7 +126,7 @@ def frame_comunicados(janela,frame):
         ttk.Radiobutton(frame_comunicado, text=texto, value=valor, variable=tipo_comunicado_var).grid(row=row, column=column, sticky="w", padx=30, pady=5)
 
     # Botão para aplicar a seleção e inserir a mensagem
-    ttk.Button(frame, text="Gerar mensagem", command=lambda:aplicar_comunicado(tipo_comunicado_var, campo_mensagem)).pack(pady=10)
+    ttk.Button(frame, text="Gerar mensagem", command=lambda:gerar_comunicado(tipo_comunicado_var, campo_mensagem)).pack(pady=10)
 
     # Campo para anexar imagem
     frame_imagem = ttk.Labelframe(frame, text=" Imagem: ", padding=5, bootstyle="primary")
@@ -145,9 +145,60 @@ def frame_comunicados(janela,frame):
 
 # Função para configurar a área de "Históricos"
 def frame_historicos(janela, frame):
-    janela.geometry("500x650")
+    janela.geometry("500x570")
     centralizar_janela(janela)
-    ttk.Label(frame, text="Em desenvolvimento", font=("Helvetica", 14, "bold")).pack(pady=10)
+
+    # Campo para anexação de planilha
+    frame_contatos = ttk.Labelframe(frame, text=" Planilha de alunos: * ", padding=5, bootstyle="primary")
+    frame_contatos.pack(fill=tk.X, pady=5)
+    campo_planilha = ttk.Entry(frame_contatos)
+    campo_planilha.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+    ttk.Button(frame_contatos, text="Anexar", command=lambda:anexar_planilha(campo_planilha), bootstyle="success").pack(side=tk.RIGHT, padx=5)
+
+    # Criando o frame para o tipo de comunicado
+    frame_comunicado = ttk.Labelframe(frame, text=" Tipo de Ocorrência * ", padding=5, bootstyle="primary")
+    frame_comunicado.pack(fill=tk.X, padx=5, pady=5)
+
+    # Variável para armazenar o tipo de comunicado selecionado
+    tipo_ocorrencia_var = tk.StringVar(value="falta")
+
+    # Definindo as opções dos RadioButtons
+    opcoes = [
+        ("Falta", "falta"),
+        ("Multirao", "multirao"),
+        ("Acompanhamento", "acompanhamento"),
+        ("Prova", "prova"),
+        ("Atividades", "atividades")
+    ]
+
+    # Colocando os RadioButtons em uma grade
+    for index, (texto, valor) in enumerate(opcoes):
+        row = index // 3  # Calcula em qual linha deve colocar
+        column = index % 3  # Calcula a coluna (de 0 a 2)
+        ttk.Radiobutton(frame_comunicado, text=texto, value=valor, variable=tipo_ocorrencia_var).grid(row=row, column=column, sticky="w", padx=30, pady=5)
+
+    # Botão para aplicar a seleção e inserir a mensagem
+    ttk.Button(frame, text="Gerar Ocorrência", command=lambda:gerar_ocorrencia(tipo_ocorrencia_var, campo_titulo, campo_descricao)).pack(pady=10)
+
+    # Campo para digitação do título da ocorrência
+    frame_texto_tipo = ttk.Labelframe(frame, text=" Título: * ", padding=5, bootstyle="primary")
+    frame_texto_tipo.pack(fill=tk.BOTH, pady=5)
+    campo_titulo = tk.Text(frame_texto_tipo, height=1, wrap="word")
+    campo_titulo.pack(fill=tk.BOTH, padx=5)
+
+    # Campo para digitação da descrição da ocorrência
+    frame_texto_descricao = ttk.Labelframe(frame, text=" Descrição: * ", padding=5, bootstyle="primary")
+    frame_texto_descricao.pack(fill=tk.BOTH, pady=5)
+    campo_descricao = tk.Text(frame_texto_descricao, height=7, wrap="word")
+    campo_descricao.pack(fill=tk.BOTH, padx=5)
+
+    # Criando um frame para organizar os botões
+    frame_botoes = ttk.Frame(frame)
+    frame_botoes.pack(pady=10)
+
+    # Adicionando botões lado a lado usando grid()
+    ttk.Button(frame_botoes, text="Registrar", command=lambda:preparar_registros(campo_planilha, campo_titulo, campo_descricao),bootstyle="success-outline").grid(row=0, column=0, padx=40)
+    ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline").grid(row=0, column=1, padx=40)
 
 
 # Função para configurar a área de "Planilhas"
@@ -175,7 +226,7 @@ def exibir_janela_inicial():
     # Botões
     ttk.Button(frame_principal, text="FALTOSOS", command=lambda:abrir_janela(root, "Faltosos"), bootstyle="primary-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="COMUNICADOS", command=lambda:abrir_janela(root, "Comunicados"), bootstyle="success-outline", width=20).pack(pady=10)
-    ttk.Button(frame_principal, text="HISTÓRICOS",command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="info-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="HISTÓRICOS",command=lambda:abrir_janela(root, "Históricos"), bootstyle="info-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="PLANILHAS", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="warning-outline", width=20).pack(pady=10)
 
     # Rodapé com versão

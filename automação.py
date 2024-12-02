@@ -1,6 +1,5 @@
 import time
 import pyautogui
-import keyboard
 from tkinter import filedialog, messagebox
 from ttkbootstrap import ttk
 import tkinter as tk
@@ -82,15 +81,16 @@ def preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_
     mensagem_template = campo_mensagem.get("1.0", "end")
     nome_professor = campo_nome_professor.get()
     dia_falta = campo_dia_falta.get()
+    print("Mensagem:", mensagem_template)
     
     if len(arquivo_contatos) == 0:
-        messagebox.showinfo("Ops!", "Insira uma planilha de contatos para o envio das mensagens!")
+        messagebox.showinfo("Oops!", "Insira uma planilha de contatos para o envio das mensagens!")
         return
     elif len(nome_professor) == 0 or len(dia_falta) == 0:
-        messagebox.showinfo("Ops!", "Insira as variáveis para elaborar a mensagem!")
+        messagebox.showinfo("Oops!", "Insira as variáveis para elaborar a mensagem!")
         return
-    elif len(imagem) == 0 and len(mensagem_template) == 0:
-        messagebox.showinfo("Ops!", "Insira uma mensagem ou imagem para o envio!")
+    elif len(imagem.strip()) == 0 and len(mensagem_template.strip()) == 0:
+        messagebox.showinfo("Oops!", "Insira uma mensagem ou imagem para o envio!")
         return
     
     if len(imagem) > 0:
@@ -215,7 +215,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
 
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
 
-def aplicar_comunicado(tipo_comunicado_var, campo_mensagem):
+def gerar_comunicado(tipo_comunicado_var, campo_mensagem):
     tipo_comunicado = tipo_comunicado_var.get()  # Pega a opção selecionada
 
     # Mensagens para cada tipo de comunicado
@@ -234,4 +234,49 @@ def aplicar_comunicado(tipo_comunicado_var, campo_mensagem):
     campo_mensagem.delete("1.0", tk.END)  # Limpa a área de texto antes de inserir
     campo_mensagem.insert(tk.END, mensagem)
 
+def gerar_ocorrencia(tipo_ocorrencia_var, campo_titulo, campo_descricao):
+    tipo_ocorrencia = tipo_ocorrencia_var.get()  # Pega a opção selecionada
+
+    # Mensagens para cada tipo de comunicado
+    if tipo_ocorrencia == "falta":
+        titulo = "Falta - <Data>"
+        descricao = "Feito contato, aguardando retorno."
+    elif tipo_ocorrencia == "multirao":
+        titulo = "Multirão de reposição"
+        descricao = "Enviado Convite para o(a) aluno(a) para participar do mutirão de reposição, explicando o objetivo da iniciativa, a gratuidade e as datas disponíveis. Solicitamos que informassem a data e horário de preferência para organizarmos a programação."
+    elif tipo_ocorrencia == "acompanhamento":
+        titulo = "Acompanhamento pedagógico"
+        descricao = "Aluno(a) anda conversando bastante em sala, o que acaba gerando atraso em suas aulas e dificuldade do mesmo em realizar os testes, já que ele acaba não prestando atenção em suas aulas teóricas. Na maioria das vezes, ele acaba realizando apenas uma aula em vez de duas."
+    elif tipo_ocorrencia == "prova":
+        titulo = "Prova - <Módulo>"
+        descricao = "Nota: x"
+    elif tipo_ocorrencia == "atividades":
+        titulo = "Atividades - <Módulo>"
+        descricao = "Nota: x"
+
+    # Exibe o título no campo de texto
+    campo_titulo.delete("1.0", tk.END)  # Limpa a área de texto antes de inserir
+    campo_titulo.insert(tk.END, titulo)
+
+    # Exibe a descrição no campo de texto
+    campo_descricao.delete("1.0", tk.END)  # Limpa a área de texto antes de inserir
+    campo_descricao.insert(tk.END, descricao)
+
+def preparar_registros(campo_planilha, campo_titulo, campo_descricao):
+    arquivo_alunos = campo_planilha.get()
+    campo_titulo = campo_titulo.get("1.0", "end")
+    campo_descricao = campo_descricao.get("1.0", "end")
+
+    
+    if len(arquivo_alunos) == 0:
+        messagebox.showinfo("Oops!", "Insira uma planilha de nomes para o envio das mensagens!")
+        return
+    elif len(campo_titulo.strip()) == 0:
+        messagebox.showinfo("Oops!", "Insira o título da ocorrência!")
+        return
+    elif len(campo_descricao.strip()) == 0:
+        messagebox.showinfo("Oops!", "Insira a descrição da ocorrência!")
+        return
+    
+    print("Iniciando registros...")
 
