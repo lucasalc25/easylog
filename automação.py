@@ -39,16 +39,9 @@ def localizar_elemento(app, elemento):
             elif elemento == 'hub_aberto':
                 time.sleep(4)
                 localizacao = pyautogui.locateOnScreen('./imagens/hub_aberto.png')  # Ajuste a confiança, se necessário
-            elif elemento == 'comercial':
-                time.sleep(2)
-                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
-            elif elemento == 'contrato':
-                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
-            elif elemento == 'pesquisa':
-                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
-            elif elemento == 'histórico':
-                time.sleep(2)
-                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'pesquisa_aluno':
+                time.sleep(3)
+                localizacao = pyautogui.locateOnScreen('./imagens/pesquisa_aluno.png')  # Ajuste a confiança, se necessário
             elif elemento == 'título':
                 localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
             elif elemento == 'descrição':
@@ -327,11 +320,19 @@ def registrar_ocorrencias(arquivo_alunos, titulo, descricao):
     alunos = ler_contatos(arquivo_alunos)
     ocorrencias_registradas = 0
 
-    comercial = localizar_elemento('hub','comercial')
-    pyautogui.click(comercial)
+    pyautogui.press('alt')
+    time.sleep(1)
+    pyautogui.press('tab')
+    time.sleep(1)
+    pyautogui.press('tab')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
 
-    contrato = localizar_elemento('hub','contrato')
-    pyautogui.click(contrato)
+    pesquisa_aluno = localizar_elemento('hub','pesquisa_aluno')
+    pyautogui.click(pesquisa_aluno)
     
     for aluno in alunos:
         try:
