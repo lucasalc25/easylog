@@ -8,30 +8,56 @@ import pandas as pd
 import os
 import pyperclip
 
-def esperar_elemento(elemento):
+def localizar_elemento(app, elemento):
     localizacao = None
     while True:
         time.sleep(2)  # Aguarda 2 segundos antes de tentar novamente
 
         if elemento == 'menu_iniciar':
             localizacao = pyautogui.locateOnScreen('./imagens/menu_iniciar.png', confidence=0.8)  # Ajuste a confiança, se necessário
-        elif elemento == 'whatsapp_encontrado':
-            localizacao = pyautogui.locateOnScreen('./imagens/whatsapp_encontrado.png', confidence=0.8)  # Ajuste a confiança, se necessário
-        elif elemento == 'whatsapp_aberto':
-            time.sleep(2)
-            localizacao = pyautogui.locateOnScreen('./imagens/whatsapp_aberto.png')  # Ajuste a confiança, se necessário
-        elif elemento == 'nova_conversa':
-            localizacao = pyautogui.locateOnScreen('./imagens/nova_conversa.png', confidence=0.8)  # Ajuste a confiança, se necessário
-        elif elemento == 'pesquisa':
-            localizacao = pyautogui.locateOnScreen('./imagens/campo_pesquisa.png', confidence=0.5)  # Ajuste a confiança, se necessário
-        elif elemento == 'mensagem':
-            localizacao = pyautogui.locateOnScreen('./imagens/campo_mensagem.png', confidence=0.8)  # Ajuste a confiança, se necessário
-        elif elemento == 'anexar':
-            localizacao = pyautogui.locateOnScreen('./imagens/anexar.png', confidence=0.8)  # Ajuste a confiança, se necessário
-        elif elemento == 'aba_anexar':
-            localizacao = pyautogui.locateOnScreen('./imagens/aba_anexar.png', confidence=0.8)  # Ajuste a confiança, se necessário
+
+        if app == 'whatsapp':
+            if elemento == 'whatsapp_encontrado':
+                localizacao = pyautogui.locateOnScreen('./imagens/whatsapp_encontrado.png', confidence=0.8)  # Ajuste a confiança, se necessário
+            elif elemento == 'whatsapp_aberto':
+                time.sleep(2)
+                localizacao = pyautogui.locateOnScreen('./imagens/whatsapp_aberto.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'nova_conversa':
+                localizacao = pyautogui.locateOnScreen('./imagens/nova_conversa.png', confidence=0.8)  # Ajuste a confiança, se necessário
+            elif elemento == 'pesquisa':
+                localizacao = pyautogui.locateOnScreen('./imagens/campo_pesquisa.png', confidence=0.5)  # Ajuste a confiança, se necessário
+            elif elemento == 'mensagem':
+                localizacao = pyautogui.locateOnScreen('./imagens/campo_mensagem.png', confidence=0.8)  # Ajuste a confiança, se necessário
+            elif elemento == 'anexar':
+                localizacao = pyautogui.locateOnScreen('./imagens/anexar.png', confidence=0.8)  # Ajuste a confiança, se necessário
+            elif elemento == 'aba_anexar':
+                localizacao = pyautogui.locateOnScreen('./imagens/aba_anexar.png', confidence=0.8)  # Ajuste a confiança, se necessário
+
+        elif app == 'hub':
+            if elemento == 'hub_encontrado':
+                localizacao = pyautogui.locateOnScreen('./imagens/hub_encontrado.png', confidence=0.8)  # Ajuste a confiança, se necessário
+            elif elemento == 'hub_aberto':
+                time.sleep(4)
+                localizacao = pyautogui.locateOnScreen('./imagens/hub_aberto.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'comercial':
+                time.sleep(2)
+                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'contrato':
+                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'pesquisa':
+                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'histórico':
+                time.sleep(2)
+                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'título':
+                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'descrição':
+                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'salvar_e_fechar':
+                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
+        
         if localizacao:
-            break
+                break
     
     return localizacao
 
@@ -98,15 +124,15 @@ def preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_
     
     # Pressionar Windows para abrir a conversa
     pyautogui.press('win')  
-    esperar_elemento('menu_iniciar')
+    localizar_elemento('whatsapp', 'menu_iniciar')
     
     # Usar o pyautogui para digitar whatsapp
     pyautogui.write('whatsapp')
-    esperar_elemento('whatsapp_encontrado')
+    localizar_elemento('whatsapp', 'whatsapp_encontrado')
 
     # Pressionar Enter para abrir o app
     pyautogui.press('enter')
-    esperar_elemento('whatsapp_aberto')
+    localizar_elemento('whatsapp', 'whatsapp_aberto')
 
     enviar_mensagens(arquivo_contatos, imagem, mensagem_template)
 
@@ -144,7 +170,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
             pyautogui.press('enter')
             time.sleep(2)  
             pyautogui.hotkey('ctrl','n')
-            esperar_elemento('nova_conversa')
+            localizar_elemento('whatsapp', 'nova_conversa')
             
             # Usar o pyautogui para digitar o número de telefone do contato
             pyautogui.write(f'{numero_telefone}')
@@ -162,7 +188,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                 
                 #Verifica se há imagem
                 if len(imagem) > 0:
-                    botao_anexar = esperar_elemento('anexar')
+                    botao_anexar = localizar_elemento('whatsapp', 'anexar')
                     pyautogui.click(botao_anexar)
 
                     pyautogui.press('tab')
@@ -176,7 +202,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
 
                     pyautogui.press('enter')
 
-                    esperar_elemento('aba_anexar')
+                    localizar_elemento('whatsapp', 'aba_anexar')
 
                     if mensagem_template:
                         # Usar o pyautogui para colar a mensagem
@@ -211,8 +237,6 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
             else:
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui enviar {mensagens_enviadas} mensagens :(")
                             
-
-
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
 
 def gerar_comunicado(tipo_comunicado_var, campo_mensagem):
@@ -243,8 +267,8 @@ def gerar_ocorrencia(tipo_ocorrencia_var, campo_titulo, campo_descricao):
         descricao = "Feito contato, aguardando retorno."
     elif tipo_ocorrencia == "multirao":
         titulo = "Multirão de reposição"
-        descricao = "Enviado Convite para o(a) aluno(a) para participar do mutirão de reposição, explicando o objetivo da iniciativa, a gratuidade e as datas disponíveis. Solicitamos que informassem a data e horário de preferência para organizarmos a programação."
-    elif tipo_ocorrencia == "acompanhamento":
+        descricao = "Enviado Convite para o(a) aluno(a) para participar do multirão de reposição, explicando o objetivo da iniciativa, a gratuidade e as datas disponíveis. Solicitamos que informassem a data e horário de preferência para organizarmos a programação."
+    elif tipo_ocorrencia == "comportamento":
         titulo = "Acompanhamento pedagógico"
         descricao = "Aluno(a) anda conversando bastante em sala, o que acaba gerando atraso em suas aulas e dificuldade do mesmo em realizar os testes, já que ele acaba não prestando atenção em suas aulas teóricas. Na maioria das vezes, ele acaba realizando apenas uma aula em vez de duas."
     elif tipo_ocorrencia == "prova":
@@ -253,6 +277,12 @@ def gerar_ocorrencia(tipo_ocorrencia_var, campo_titulo, campo_descricao):
     elif tipo_ocorrencia == "atividades":
         titulo = "Atividades - <Módulo>"
         descricao = "Nota: x"
+    elif tipo_ocorrencia == "1_dia_de_aula":
+        titulo = "Acompanhamento - 1° dia de aula"
+        descricao = "Aluno iniciou seu curso na unidade Manaus Zona Oeste, onde conheceu os professores e a plataforma, realizou a aula inaugural e linha da vida. Foi observado que o aluno possui uma certa dificuldade com..."
+    elif tipo_ocorrencia == "plantao":
+        titulo = "Plantão de dúvidas"
+        descricao = "Foi identificado uma certa dificuldade do aluno(a) em realizar a prova prática, sendo então oferecido o plantão de dúvidas. Em contato com responsável para informar a situação e horários disponíveis, aguardando retorno."
 
     # Exibe o título no campo de texto
     campo_titulo.delete("1.0", tk.END)  # Limpa a área de texto antes de inserir
@@ -264,8 +294,8 @@ def gerar_ocorrencia(tipo_ocorrencia_var, campo_titulo, campo_descricao):
 
 def preparar_registros(campo_planilha, campo_titulo, campo_descricao):
     arquivo_alunos = campo_planilha.get()
-    campo_titulo = campo_titulo.get("1.0", "end")
-    campo_descricao = campo_descricao.get("1.0", "end")
+    titulo = campo_titulo.get("1.0", "end")
+    descricao = campo_descricao.get("1.0", "end")
 
     
     if len(arquivo_alunos) == 0:
@@ -278,5 +308,74 @@ def preparar_registros(campo_planilha, campo_titulo, campo_descricao):
         messagebox.showinfo("Oops!", "Insira a descrição da ocorrência!")
         return
     
-    print("Iniciando registros...")
+    # Pressionar Windows para abrir a conversa
+    pyautogui.press('win')  
+    localizar_elemento('hub', 'menu_iniciar')
+    
+    # Usar o pyautogui para digitar whatsapp
+    pyautogui.write('hub')
+    localizar_elemento('hub','hub_encontrado')
 
+    # Pressionar Enter para abrir o app
+    pyautogui.press('enter')
+    localizar_elemento('hub','hub_aberto')
+
+    registrar_ocorrencias(arquivo_alunos, titulo, descricao)
+
+def registrar_ocorrencias(arquivo_alunos, titulo, descricao):
+    # Ler os contatos
+    alunos = ler_contatos(arquivo_alunos)
+    ocorrencias_registradas = 0
+
+    comercial = localizar_elemento('hub','comercial')
+    pyautogui.click(comercial)
+
+    contrato = localizar_elemento('hub','contrato')
+    pyautogui.click(contrato)
+    
+    for aluno in alunos:
+        try:
+            nome_aluno = aluno['nome']  # Nome do aluno
+            pyperclip.copy(nome_aluno)
+
+            pesquisa = localizar_elemento('hub','pesquisa')
+            pyautogui.click(pesquisa)
+
+            pyautogui.hotkey('ctrl','a')
+            time.sleep(1)
+
+            # Pressionar Enter para enviar a imagem
+            pyautogui.press('backspace')
+            time.sleep(1)
+
+            pyautogui.hotkey('ctrl','v')
+            pyautogui.press('enter')
+            pyautogui.press('enter')
+            time.sleep(3)
+
+            pyautogui.press('enter')
+            pyautogui.press('enter')
+            time.sleep(1)
+
+            pyperclip.copy(titulo)
+
+            histórico = localizar_elemento('hub','histórico')
+            pyautogui.click(histórico)
+
+            campo_titulo = localizar_elemento('hub','título')
+            pyautogui.click(campo_titulo)
+            pyautogui.hotkey('ctrl','v')
+
+            pyperclip.copy(descricao)
+            campo_descricao = localizar_elemento('hub','descrição')
+            pyautogui.click(campo_descricao)
+            pyautogui.hotkey('ctrl','v')
+
+            salvar_e_fechar = localizar_elemento('hub','salvar_e_fechar')
+            pyautogui.click(salvar_e_fechar)
+
+        except:
+            if ocorrencias_registradas == 0:
+                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui registrar nenhuma ocorrência :(")
+            else:
+                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui registrar {ocorrencias_registradas} ocorrências :(")

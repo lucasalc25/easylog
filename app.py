@@ -1,9 +1,34 @@
 import tkinter as tk  # Importando tkinter para acesso a constantes
 from ttkbootstrap import Window, ttk  # Importando ttkbootstrap para personalização do tema
 from automação import *
-from ttkbootstrap import Style
 
+# Função para exibir a tela inicial
+def exibir_janela_inicial():
+    root = Window(themename="cosmo")
+    root.title("EasyLog")
+    root.iconbitmap("./imagens/icone.ico")
+    root.resizable(False, False)
 
+    frame_principal = ttk.Frame(root, padding=(70,20))
+    frame_principal.pack(fill=tk.BOTH, expand=True)
+
+    # Título e subtítulo
+    ttk.Label(frame_principal, text="Bem-vindo(a) ao EasyLog", font=("Helvetica", 16, "bold")).pack(pady=10)
+    ttk.Label(frame_principal, text="Tornando seu trabalho mais eficiente", font=("Helvetica", 11)).pack(pady=(10, 20))
+
+    # Botões
+    ttk.Button(frame_principal, text="FALTOSOS", command=lambda:abrir_janela(root, "Faltosos"), bootstyle="primary-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="COMUNICADOS", command=lambda:abrir_janela(root, "Comunicados"), bootstyle="success-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="HISTÓRICOS",command=lambda:abrir_janela(root, "Históricos"), bootstyle="info-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="PLANILHAS", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="warning-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="SUPORTE", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="danger-outline", width=20).pack(pady=10)
+
+    # Rodapé com versão
+    ttk.Label(frame_principal, text="Versão 1.0", font=("Helvetica", 9)).pack(pady=(20, 0))
+
+    centralizar_janela(root)
+    root.mainloop()
+    
 # Função para centralizar a janela
 def centralizar_janela(window):
     window.update_idletasks()
@@ -41,7 +66,7 @@ def abrir_janela(janela_inicial, titulo):
 
 # Função para configurar a área de "Faltosos"
 def frame_faltosos(janela, frame):
-    janela.geometry("500x450")
+    janela.geometry("500x470")
     centralizar_janela(janela)
 
     # Campo para anexação de planilha
@@ -80,15 +105,15 @@ def frame_faltosos(janela, frame):
 
     # Criando um frame para organizar os botões
     frame_botoes = ttk.Frame(frame)
-    frame_botoes.pack(pady=10)
+    frame_botoes.pack(pady=(25,0))
 
     # Adicionando botões lado a lado usando grid()
-    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_mensagem, campo_imagem),bootstyle="success-outline").grid(row=0, column=0, padx=40)
-    ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline").grid(row=0, column=1, padx=40)
+    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_mensagem, campo_imagem),bootstyle="success-outline", width=10).grid(row=0, column=0, padx=40)
+    ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=0, column=1, padx=40)
 
 # Função para configurar a área de "Comunicados"
 def frame_comunicados(janela,frame):
-    janela.geometry("500x520")
+    janela.geometry("500x530")
     centralizar_janela(janela)
     # Campo para anexação de planilha
     frame_contatos = ttk.Labelframe(frame, text=" Planilha de contatos: * ", padding=5, bootstyle="primary")
@@ -137,15 +162,15 @@ def frame_comunicados(janela,frame):
 
     # Criando um frame para organizar os botões
     frame_botoes = ttk.Frame(frame)
-    frame_botoes.pack(pady=10)
+    frame_botoes.pack(pady=(25,0))
 
     # Adicionando botões lado a lado usando grid()
-    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha,  campo_mensagem, campo_imagem),bootstyle="success-outline").grid(row=0, column=0, padx=40)
-    ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline").grid(row=0, column=1, padx=40)
+    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha,  campo_mensagem, campo_imagem),bootstyle="success-outline", width=10).grid(row=0, column=0, padx=40)
+    ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=0, column=1, padx=40)
 
 # Função para configurar a área de "Históricos"
 def frame_historicos(janela, frame):
-    janela.geometry("500x570")
+    janela.geometry("500x540")
     centralizar_janela(janela)
 
     # Campo para anexação de planilha
@@ -165,17 +190,20 @@ def frame_historicos(janela, frame):
     # Definindo as opções dos RadioButtons
     opcoes = [
         ("Falta", "falta"),
-        ("Multirao", "multirao"),
-        ("Acompanhamento", "acompanhamento"),
+        ("Multirão", "multirao"),
+        ("Comportamento", "comportamento"),
         ("Prova", "prova"),
-        ("Atividades", "atividades")
+        ("Atividades", "atividades"),
+        ("1° dia de aula", "1_dia_de_aula"),
+        ("Plantão", "plantao"),
+
     ]
 
     # Colocando os RadioButtons em uma grade
     for index, (texto, valor) in enumerate(opcoes):
-        row = index // 3  # Calcula em qual linha deve colocar
-        column = index % 3  # Calcula a coluna (de 0 a 2)
-        ttk.Radiobutton(frame_comunicado, text=texto, value=valor, variable=tipo_ocorrencia_var).grid(row=row, column=column, sticky="w", padx=30, pady=5)
+        row = index // 4  # Calcula em qual linha deve colocar
+        column = index % 4  # Calcula a coluna (de 0 a 2)
+        ttk.Radiobutton(frame_comunicado, text=texto, value=valor, variable=tipo_ocorrencia_var).grid(row=row, column=column, sticky="w", padx=15, pady=5)
 
     # Botão para aplicar a seleção e inserir a mensagem
     ttk.Button(frame, text="Gerar Ocorrência", command=lambda:gerar_ocorrencia(tipo_ocorrencia_var, campo_titulo, campo_descricao)).pack(pady=10)
@@ -194,11 +222,11 @@ def frame_historicos(janela, frame):
 
     # Criando um frame para organizar os botões
     frame_botoes = ttk.Frame(frame)
-    frame_botoes.pack(pady=10)
+    frame_botoes.pack(pady=(25,0))
 
     # Adicionando botões lado a lado usando grid()
-    ttk.Button(frame_botoes, text="Registrar", command=lambda:preparar_registros(campo_planilha, campo_titulo, campo_descricao),bootstyle="success-outline").grid(row=0, column=0, padx=40)
-    ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline").grid(row=0, column=1, padx=40)
+    ttk.Button(frame_botoes, text="Registrar", command=lambda:preparar_registros(campo_planilha, campo_titulo, campo_descricao),bootstyle="success-outline", width=10).grid(row=0, column=0, padx=40)
+    ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=0, column=1, padx=40)
 
 
 # Função para configurar a área de "Planilhas"
@@ -209,31 +237,6 @@ def frame_planilhas(janela, frame):
     ttk.Label(frame, text="Selecione a planilha desejada:", font=("Helvetica", 10)).pack(pady=(5, 10))
     ttk.Combobox(frame, values=["Planilha 1", "Planilha 2", "Planilha 3"]).pack(pady=5)
     ttk.Button(frame, text="Abrir", bootstyle="primary-outline").pack(pady=10)
-
-# Função para exibir a tela inicial
-def exibir_janela_inicial():
-    root = Window(themename="cosmo")
-    root.title("EasyLog")
-    root.iconbitmap("./imagens/icone.ico")
-
-    frame_principal = ttk.Frame(root, padding=20)
-    frame_principal.pack(fill=tk.BOTH, expand=True)
-
-    # Título e subtítulo
-    ttk.Label(frame_principal, text="Bem-vindo(a) ao EasyLog", font=("Helvetica", 16, "bold")).pack(pady=10)
-    ttk.Label(frame_principal, text="Tornando seu trabalho mais eficiente", font=("Helvetica", 11)).pack(pady=(10, 20))
-
-    # Botões
-    ttk.Button(frame_principal, text="FALTOSOS", command=lambda:abrir_janela(root, "Faltosos"), bootstyle="primary-outline", width=20).pack(pady=10)
-    ttk.Button(frame_principal, text="COMUNICADOS", command=lambda:abrir_janela(root, "Comunicados"), bootstyle="success-outline", width=20).pack(pady=10)
-    ttk.Button(frame_principal, text="HISTÓRICOS",command=lambda:abrir_janela(root, "Históricos"), bootstyle="info-outline", width=20).pack(pady=10)
-    ttk.Button(frame_principal, text="PLANILHAS", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="warning-outline", width=20).pack(pady=10)
-
-    # Rodapé com versão
-    ttk.Label(frame_principal, text="Versão 1.0", font=("Helvetica", 9)).pack(pady=(20, 10))
-
-    centralizar_janela(root)
-    root.mainloop()
 
 # Execução do programa
 if __name__ == "__main__":
