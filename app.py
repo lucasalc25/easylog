@@ -17,7 +17,7 @@ def exibir_janela_inicial():
     ttk.Label(frame_principal, text="Tornando seu trabalho mais eficiente", font=("Helvetica", 11)).pack(pady=(10, 20))
 
     # Botões
-    ttk.Button(frame_principal, text="FALTOSOS", command=lambda:abrir_janela(root, "Faltosos"), bootstyle="primary-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="FALTAS", command=lambda:abrir_janela(root, "Faltas"), bootstyle="primary-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="COMUNICADOS", command=lambda:abrir_janela(root, "Comunicados"), bootstyle="success-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="HISTÓRICOS",command=lambda:abrir_janela(root, "Históricos"), bootstyle="info-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="PLANILHAS", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="warning-outline", width=20).pack(pady=10)
@@ -53,8 +53,8 @@ def abrir_janela(janela_inicial, titulo):
     frame.pack(fill=tk.BOTH, expand=True)
 
     # Configurar conteúdo da área central com base no título
-    if titulo == "Faltosos":
-        frame_faltosos(janela, frame)
+    if titulo == "Faltas":
+        frame_faltas(janela, frame)
     elif titulo == "Comunicados":
         frame_comunicados(janela,frame)
     elif titulo == "Históricos":
@@ -64,8 +64,8 @@ def abrir_janela(janela_inicial, titulo):
     else:
         ttk.Label(frame, text="Conteúdo não configurado.", font=("Helvetica", 12)).pack(pady=10)
 
-# Função para configurar a área de "Faltosos"
-def frame_faltosos(janela, frame):
+# Função para configurar a área de "faltas"
+def frame_faltas(janela, frame):
     janela.geometry("500x470")
     centralizar_janela(janela)
 

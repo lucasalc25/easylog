@@ -104,13 +104,23 @@ def preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_
 
 
 def mensagem_para_verificacao(nome_professor, dia_falta, text_mensagem):
-    mensagem = f"""Olá, tudo bem? Aqui é o(a) professor(a) {nome_professor.get()} da Microlins.
+    if nome_professor.get() == 'Yasmim':
+        mensagem = f"""Olá, tudo bem? Aqui é a instrutora {nome_professor.get()} da Microlins.
 
 Verifiquei que o(a) aluno(a) <nome_aluno> não compareceu à aula de {dia_falta.get()}. Poderia nos informar o motivo da falta pra registro em sistema? Lembrando, para que isso não gere atrasos, deve ser feita a reposição ta bom?
 
 Fico no seu aguardo. 
 Obrigado desde já!"""
 
+    else:
+        mensagem = f"""Olá, tudo bem? Aqui é o instrutor {nome_professor.get()} da Microlins.
+
+Verifiquei que o(a) aluno(a) <nome_aluno> não compareceu à aula de {dia_falta.get()}. Poderia nos informar o motivo da falta pra registro em sistema? Lembrando, para que isso não gere atrasos, deve ser feita a reposição ta bom?
+
+Fico no seu aguardo. 
+Obrigado desde já!"""
+
+    text_mensagem.delete("1.0", tk.END)
     text_mensagem.insert("1.0", mensagem)
 
 # Função para gerar mensagem final substituindo placeholders
