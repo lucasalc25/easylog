@@ -66,25 +66,6 @@ def anexar_imagem(imagem):
         imagem.insert(0, caminho)  # Exibe o caminho do arquivo
 
 
-# Função para ler os contatos de um arquivo TXT
-def ler_contatos(caminho_planilha):
-    try:
-        # Lê a planilha usando pandas
-        df = pd.read_excel(caminho_planilha)
-        
-        # Certifique-se de que os nomes das colunas estão corretos
-        contatos = []
-        for _, row in df.iterrows():
-            contatos.append({
-                "nome": row["Aluno"],         # Nome do aluno
-                "telefone": str(row["Celular"])  # Número de telefone
-            })
-        return contatos
-    except Exception as e:
-        print(f"Erro ao ler a planilha: {e}")
-        return []
-
-
 # Função para iniciar envio
 def preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_mensagem, campo_imagem):
     arquivo_contatos = campo_planilha.get()
@@ -145,8 +126,8 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     for contato in contatos:
         try:
             mensagens_enviadas = 0
-            nome_aluno = contato['nome']  # Nome do aluno
-            numero_telefone = contato['telefone'].replace("(", "").replace(")", "").replace(" ", "")
+            nome_aluno = contato['aluno']  # Nome do aluno
+            numero_telefone = contato['celular'].replace("(", "").replace(")", "").replace(" ", "")
             numero_telefone = numero_telefone[:2] + numero_telefone[3:]  # Remove o índice 2 (que é o terceiro número)
             mensagem_personalizada = mensagem_template.replace("<nome_aluno>", nome_aluno)
             pyperclip.copy(mensagem_personalizada)
@@ -224,6 +205,26 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                             
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
 
+# Função para ler os contatos de um arquivo TXT
+def ler_contatos(caminho_planilha):
+    try:
+        # Lê a planilha usando pandas
+        df = pd.read_excel(caminho_planilha, header=2)
+
+        # Certifique-se de que os nomes das colunas estão corretos
+        contatos = []
+        for _, row in df.iterrows():
+            contatos.append({
+                "aluno": row["Aluno"],         # Nome do aluno
+                "celular": str(row["Celular"])  # Número de telefone
+            })
+        
+        print(contatos)
+        return contatos
+    except Exception as e:
+        print(f"Erro ao ler a planilha: {e}")
+        return []
+    
 def gerar_comunicado(tipo_comunicado_var, campo_mensagem):
     tipo_comunicado = tipo_comunicado_var.get()  # Pega a opção selecionada
 
