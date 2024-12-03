@@ -2,11 +2,15 @@ import pyautogui
 import pytesseract
 from PIL import Image
    
-def verificar_existencia():
+def verificar_existencia(elemento):
+    if elemento == 'pesquisa_whatsapp':
+        coordenadas = (307, 233, 200, 65)
+    elif elemento == 'pesquisa_aluno':
+        coordenadas = (443,210,737,18)
     
     # Captura a tela e salva como imagem
-    caminho_print = "./imagens/pesquisa_contato.png"
-    pyautogui.screenshot(caminho_print, region=(307, 233, 200, 65))
+    caminho_print = "./imagens/print.png"
+    pyautogui.screenshot(caminho_print, region=coordenadas)
 
 
     # Use o Tesseract para extrair texto da imagem

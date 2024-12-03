@@ -165,7 +165,7 @@ def frame_comunicados(janela,frame):
     frame_botoes.pack(pady=(25,0))
 
     # Adicionando botões lado a lado usando grid()
-    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha,  campo_mensagem, campo_imagem),bootstyle="success-outline", width=10).grid(row=0, column=0, padx=40)
+    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha, campo_mensagem, campo_imagem),bootstyle="success-outline", width=10).grid(row=0, column=0, padx=40)
     ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=0, column=1, padx=40)
 
 # Função para configurar a área de "Históricos"

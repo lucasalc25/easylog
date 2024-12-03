@@ -34,20 +34,12 @@ def localizar_elemento(app, elemento):
                 localizacao = pyautogui.locateOnScreen('./imagens/aba_anexar.png', confidence=0.8)  # Ajuste a confiança, se necessário
 
         elif app == 'hub':
-            if elemento == 'hub_encontrado':
-                localizacao = pyautogui.locateOnScreen('./imagens/hub_encontrado.png', confidence=0.8)  # Ajuste a confiança, se necessário
-            elif elemento == 'hub_aberto':
-                time.sleep(4)
-                localizacao = pyautogui.locateOnScreen('./imagens/hub_aberto.png')  # Ajuste a confiança, se necessário
-            elif elemento == 'pesquisa_aluno':
-                time.sleep(3)
+            if elemento == 'pesquisa_aluno':
+                time.sleep(5)
                 localizacao = pyautogui.locateOnScreen('./imagens/pesquisa_aluno.png')  # Ajuste a confiança, se necessário
-            elif elemento == 'título':
-                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
-            elif elemento == 'descrição':
-                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
-            elif elemento == 'salvar_e_fechar':
-                localizacao = pyautogui.locateOnScreen('./imagens/.png')  # Ajuste a confiança, se necessário
+            elif elemento == 'aluno_encontrado':
+                time.sleep(3)
+                localizacao = pyautogui.locateOnScreen('./imagens/aluno_encontrado.png')  # Ajuste a confiança, se necessário
         
         if localizacao:
                 break
@@ -57,7 +49,7 @@ def localizar_elemento(app, elemento):
 
 # Função para anexar arquivo
 def anexar_planilha(campo_planilha):
-    caminho_planilha = filedialog.askopenfilename(title="Selecione uma planilha", filetypes=[("Arquivo do Excel", "*.xlsx")])
+    caminho_planilha = filedialog.askopenfilename(title="Selecione uma planilha", filetypes=[("Arquivos do Excel", "*.xls")])
     if caminho_planilha:
         campo_planilha.delete(0, tk.END)
         campo_planilha.insert(0, caminho_planilha)
@@ -84,8 +76,8 @@ def ler_contatos(caminho_planilha):
         contatos = []
         for _, row in df.iterrows():
             contatos.append({
-                "nome": row["Nome"],         # Nome do aluno
-                "telefone": str(row["Telefone"])  # Número de telefone
+                "nome": row["Aluno"],         # Nome do aluno
+                "telefone": str(row["Celular"])  # Número de telefone
             })
         return contatos
     except Exception as e:
@@ -169,7 +161,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
             pyautogui.write(f'{numero_telefone}')
             time.sleep(1)   
             
-            whatsapp_existe = verificar_existencia()
+            whatsapp_existe = verificar_existencia('pesquisa_whatsapp')
 
             if whatsapp_existe:
                 pyautogui.press('tab')
@@ -287,37 +279,29 @@ def gerar_ocorrencia(tipo_ocorrencia_var, campo_titulo, campo_descricao):
 
 def preparar_registros(campo_planilha, campo_titulo, campo_descricao):
     arquivo_alunos = campo_planilha.get()
-    titulo = campo_titulo.get("1.0", "end")
-    descricao = campo_descricao.get("1.0", "end")
+    titulo = campo_titulo.get("1.0", tk.END)
+    descricao = campo_descricao.get("1.0", tk.END)
 
-    
     if len(arquivo_alunos) == 0:
         messagebox.showinfo("Oops!", "Insira uma planilha de nomes para o envio das mensagens!")
         return
-    elif len(campo_titulo.strip()) == 0:
+    elif len(titulo.strip()) == 0:
         messagebox.showinfo("Oops!", "Insira o título da ocorrência!")
         return
-    elif len(campo_descricao.strip()) == 0:
+    elif len(descricao.strip()) == 0:
         messagebox.showinfo("Oops!", "Insira a descrição da ocorrência!")
         return
     
-    # Pressionar Windows para abrir a conversa
-    pyautogui.press('win')  
-    localizar_elemento('hub', 'menu_iniciar')
+    messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto e atrás do easyLog!")
     
-    # Usar o pyautogui para digitar whatsapp
-    pyautogui.write('hub')
-    localizar_elemento('hub','hub_encontrado')
-
-    # Pressionar Enter para abrir o app
-    pyautogui.press('enter')
-    localizar_elemento('hub','hub_aberto')
+    pyautogui.hotkey('alt','tab')
+    time.sleep(1)
 
     registrar_ocorrencias(arquivo_alunos, titulo, descricao)
 
-def registrar_ocorrencias(arquivo_alunos, titulo, descricao):
+def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrencia):
     # Ler os contatos
-    alunos = ler_contatos(arquivo_alunos)
+    alunos = ler_alunos(arquivo_alunos)
     ocorrencias_registradas = 0
 
     pyautogui.press('alt')
@@ -331,17 +315,14 @@ def registrar_ocorrencias(arquivo_alunos, titulo, descricao):
     pyautogui.press('enter')
     time.sleep(1)
 
-    pesquisa_aluno = localizar_elemento('hub','pesquisa_aluno')
-    pyautogui.click(pesquisa_aluno)
-    
     for aluno in alunos:
         try:
             nome_aluno = aluno['nome']  # Nome do aluno
             pyperclip.copy(nome_aluno)
 
-            pesquisa = localizar_elemento('hub','pesquisa')
-            pyautogui.click(pesquisa)
-
+            pesquisa_aluno = localizar_elemento('hub','pesquisa_aluno')
+            pyautogui.click(pesquisa_aluno)
+    
             pyautogui.hotkey('ctrl','a')
             time.sleep(1)
 
@@ -354,29 +335,55 @@ def registrar_ocorrencias(arquivo_alunos, titulo, descricao):
             pyautogui.press('enter')
             time.sleep(3)
 
-            pyautogui.press('enter')
-            pyautogui.press('enter')
-            time.sleep(1)
-
-            pyperclip.copy(titulo)
-
-            histórico = localizar_elemento('hub','histórico')
-            pyautogui.click(histórico)
-
-            campo_titulo = localizar_elemento('hub','título')
-            pyautogui.click(campo_titulo)
+            aluno_existe = verificar_existencia('pesquisa_aluno')
+            
+            if aluno_existe:
+                aluno_encontrado = localizar_elemento('hub','aluno_encontrado')
+                pyautogui.doubleClick(aluno_encontrado)
+                time.sleep(7)
+                
+            pyautogui.hotkey('ctrl','tab')
+            time.sleep(2)
+            
+            pyperclip.copy(titulo_ocorrencia)
+            for i in range(1,6):
+                pyautogui.hotkey('shift','tab')
+                time.sleep(0.5)
             pyautogui.hotkey('ctrl','v')
+            time.sleep(2)
 
-            pyperclip.copy(descricao)
-            campo_descricao = localizar_elemento('hub','descrição')
-            pyautogui.click(campo_descricao)
+            pyperclip.copy(descricao_ocorrencia)
+            for i in range(1,3):
+                pyautogui.hotkey('shift','tab')
+                time.sleep(0.5)
             pyautogui.hotkey('ctrl','v')
+            time.sleep(2)
 
-            salvar_e_fechar = localizar_elemento('hub','salvar_e_fechar')
-            pyautogui.click(salvar_e_fechar)
+            pyautogui.hotkey('alt','s')
+            
+            ocorrencias_registradas += 1
+            
+            time.sleep(4)
 
         except:
             if ocorrencias_registradas == 0:
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui registrar nenhuma ocorrência :(")
             else:
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui registrar {ocorrencias_registradas} ocorrências :(")
+                
+# Função para ler os contatos de um arquivo TXT
+def ler_alunos(caminho_planilha):
+    try:
+        # Lê a planilha usando pandas
+        df = pd.read_excel(caminho_planilha)
+        
+        # Certifique-se de que os nomes das colunas estão corretos
+        alunos = []
+        for _, row in df.iterrows():
+            alunos.append({
+                "nome": row["Nome"],         # Nome do aluno
+            })
+        return alunos
+    except Exception as e:
+        print(f"Erro ao ler a planilha: {e}")
+        return []
