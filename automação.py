@@ -8,7 +8,46 @@ import pandas as pd
 import os
 import pyperclip
 
-def localizar_elemento(app, elemento):
+def criar_pastas():
+    # Obtém o caminho da pasta Documentos do usuário
+    caminho_documentos = os.path.join(os.path.expanduser("~"), "Documents")
+    
+    # Define o caminho completo da nova pasta
+    caminho_pasta_easylog = os.path.join(caminho_documentos, 'EasyLog')
+    caminho_pasta_planilhas = os.path.join(caminho_pasta_easylog, 'Planilhas')
+    
+    pasta_easylog = 'EasyLog'
+    pasta_planilhas = 'Planilhas'
+    
+    # Cria a pasta, se ela não existir
+    if not os.path.exists(caminho_pasta_easylog):
+        os.makedirs(caminho_pasta_easylog)
+        print(f"Pasta '{pasta_easylog}' criada em {caminho_documentos}")
+    else:
+        print(f"A pasta '{pasta_easylog}' já existe em {caminho_documentos}")
+        
+    # Cria a pasta, se ela não existir
+    if not os.path.exists(caminho_pasta_planilhas):
+        os.makedirs(caminho_pasta_planilhas)
+        print(f"Pasta '{pasta_planilhas}' criada em {caminho_pasta_easylog}")
+    else:
+        print(f"A pasta '{pasta_planilhas}' já existe em {caminho_pasta_easylog}")
+
+def repetir_tecla(*teclas, total_repeticoes):
+    """
+    Pressiona uma ou mais teclas repetidamente.
+    
+    :param teclas: Teclas a serem pressionadas (pode ser uma ou mais).
+    :param total_repeticoes: Número de vezes que as teclas serão pressionadas.
+    """
+    for _ in range(total_repeticoes):
+        if len(teclas) == 1:  # Apenas uma tecla
+            pyautogui.press(teclas[0])
+        else:  # Mais de uma tecla
+            pyautogui.hotkey(*teclas)
+        time.sleep(1)
+        
+def localizar_elemento_antigo(app, elemento):
     localizacao = None
     while True:
         time.sleep(2)  # Aguarda 2 segundos antes de tentar novamente
@@ -49,7 +88,7 @@ def localizar_elemento(app, elemento):
 
 # Função para anexar arquivo
 def anexar_planilha(campo_planilha):
-    caminho_planilha = filedialog.askopenfilename(title="Selecione uma planilha", filetypes=[("Arquivos do Excel", "*.xls")])
+    caminho_planilha = filedialog.askopenfilename(title="Selecione uma planilha", filetypes=[("Arquivos do Excel", "*.xlsx")])
     if caminho_planilha:
         campo_planilha.delete(0, tk.END)
         campo_planilha.insert(0, caminho_planilha)
@@ -90,15 +129,15 @@ def preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_
     
     # Pressionar Windows para abrir a conversa
     pyautogui.press('win')  
-    localizar_elemento('whatsapp', 'menu_iniciar')
+    esperar_elemento('./imagens/menu_iniciar.png')
     
     # Usar o pyautogui para digitar whatsapp
     pyautogui.write('whatsapp')
-    localizar_elemento('whatsapp', 'whatsapp_encontrado')
+    esperar_elemento('./imagens/whatsapp_encontrado.png')
 
     # Pressionar Enter para abrir o app
     pyautogui.press('enter')
-    localizar_elemento('whatsapp', 'whatsapp_aberto')
+    esperar_elemento('./imagens/whatsapp_aberto.png')
 
     enviar_mensagens(arquivo_contatos, imagem, mensagem_template)
 
@@ -142,11 +181,8 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
             mensagem_personalizada = mensagem_template.replace("<nome_aluno>", nome_aluno)
             pyperclip.copy(mensagem_personalizada)
 
-            # Clicar no botão de alternar
-            pyautogui.press('enter')
-            time.sleep(2)  
             pyautogui.hotkey('ctrl','n')
-            localizar_elemento('whatsapp', 'nova_conversa')
+            esperar_elemento('./imagens/nova_conversa.png')
             
             # Usar o pyautogui para digitar o número de telefone do contato
             pyautogui.write(f'{numero_telefone}')
@@ -164,7 +200,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                 
                 #Verifica se há imagem
                 if len(imagem) > 0:
-                    botao_anexar = localizar_elemento('whatsapp', 'anexar')
+                    botao_anexar = localizar_elemento('./imagens/anexar.png')
                     pyautogui.click(botao_anexar)
 
                     pyautogui.press('tab')
@@ -178,7 +214,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
 
                     pyautogui.press('enter')
 
-                    localizar_elemento('whatsapp', 'aba_anexar')
+                    localizar_elemento('./imagens/aba_anexar.png')
 
                     if mensagem_template:
                         # Usar o pyautogui para colar a mensagem
@@ -219,7 +255,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
 def ler_contatos(caminho_planilha):
     try:
         # Lê a planilha usando pandas
-        df = pd.read_excel(caminho_planilha, header=2)
+        df = pd.read_excel(caminho_planilha)
 
         # Certifique-se de que os nomes das colunas estão corretos
         contatos = []
@@ -307,6 +343,8 @@ def preparar_registros(campo_planilha, campo_titulo, campo_descricao):
     
     pyautogui.hotkey('alt','tab')
     time.sleep(1)
+    
+    esperar_elemento("./imagens/hub_aberto.png")
 
     registrar_ocorrencias(arquivo_alunos, titulo, descricao)
 
@@ -331,7 +369,7 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
             nome_aluno = aluno['nome']  # Nome do aluno
             pyperclip.copy(nome_aluno)
 
-            pesquisa_aluno = localizar_elemento('hub','pesquisa_aluno')
+            pesquisa_aluno = localizar_elemento('./imagens/pesquisa_aluno.png')
             pyautogui.click(pesquisa_aluno)
     
             pyautogui.hotkey('ctrl','a')
@@ -349,7 +387,7 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
             aluno_existe = verificar_existencia('pesquisa_aluno')
             
             if aluno_existe:
-                aluno_encontrado = localizar_elemento('hub','aluno_encontrado')
+                aluno_encontrado = localizar_elemento('./imagens/aluno encontrado.png')
                 pyautogui.doubleClick(aluno_encontrado)
                 time.sleep(7)
                 
@@ -357,16 +395,12 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
             time.sleep(2)
             
             pyperclip.copy(titulo_ocorrencia)
-            for i in range(1,6):
-                pyautogui.hotkey('shift','tab')
-                time.sleep(0.5)
+            repetir_tecla('shift','tab',5)
             pyautogui.hotkey('ctrl','v')
             time.sleep(2)
 
             pyperclip.copy(descricao_ocorrencia)
-            for i in range(1,3):
-                pyautogui.hotkey('shift','tab')
-                time.sleep(0.5)
+            repetir_tecla('shift','tab', 2)
             pyautogui.hotkey('ctrl','v')
             time.sleep(2)
 
@@ -398,3 +432,74 @@ def ler_alunos(caminho_planilha):
     except Exception as e:
         print(f"Erro ao ler a planilha: {e}")
         return []
+    
+def preparar_data_faltosos(campo_data_inicial, campo_data_final):
+    data_inicial = campo_data_inicial.get()
+    data_final = campo_data_final.get()
+    
+    data_inicial = data_inicial.replace("/","")
+    data_final = data_final.replace("/","")
+    
+    messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto atrás do EasyLog!")
+    
+    pyautogui.hotkey('alt','tab')
+    time.sleep(1)
+    
+    esperar_elemento("./imagens/hub_aberto.png")
+    
+    gerar_faltosos(data_inicial, data_final) 
+    
+    
+def gerar_faltosos(data_inicial, data_final):  
+    pyautogui.press('alt')
+    time.sleep(1)
+    
+    pyautogui.press('tab')
+    time.sleep(1)
+    
+    pyautogui.press('enter')
+    time.sleep(1)
+    
+    repetir_tecla('tab', 3)
+    
+    pyautogui.press('enter')
+    time.sleep(1)
+    
+    esperar_elemento('./imagens/faltas_por_periodo.png')
+    
+    pyautogui.write(data_inicial)
+    pyautogui.press('tab')
+    time.sleep(1)
+    
+    pyautogui.write(data_final)
+    pyautogui.press('tab')
+    time.sleep(1)
+    
+    visualizar = localizar_elemento('./imagens/pesquisar_faltosos.png')
+    pyautogui.click(visualizar)
+    
+    faltosos_carregados = verificar_existencia('lista_faltosos')
+    
+    if faltosos_carregados:
+        exportar = localizar_elemento('./imagens/exportar_faltosos.png')
+        pyautogui.click(exportar)
+        pyautogui.press('tab')
+        time.sleep(1)
+        pyautogui.press('enter')
+        time.sleep(1)
+
+        caminho_planilhas = 'Documents\EasyLog\Planilhas'
+        caminho_planilhas = os.path.normpath(caminho_planilhas)
+        mudar_caminho = localizar_elemento('./imagens/mudar_caminho.png')
+        pyautogui.click(mudar_caminho)
+        time.sleep(1)
+        pyautogui.write(caminho_planilhas)
+        time.sleep(1)
+        
+        campo_nome_planilha = localizar_elemento('./imagens/campo_nome_planilha.png')
+        
+        
+        
+        
+    
+    

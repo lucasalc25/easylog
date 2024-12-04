@@ -20,7 +20,7 @@ def exibir_janela_inicial():
     ttk.Button(frame_principal, text="FALTAS", command=lambda:abrir_janela(root, "Faltas"), bootstyle="primary-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="COMUNICADOS", command=lambda:abrir_janela(root, "Comunicados"), bootstyle="success-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="HISTÓRICOS",command=lambda:abrir_janela(root, "Históricos"), bootstyle="info-outline", width=20).pack(pady=10)
-    ttk.Button(frame_principal, text="PLANILHAS", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="warning-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="PLANILHAS", command=lambda:abrir_janela(root, "Planilhas"), bootstyle="warning-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="SUPORTE", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="danger-outline", width=20).pack(pady=10)
 
     # Rodapé com versão
@@ -79,15 +79,12 @@ def frame_faltas(janela, frame):
     # Campos para dados adicionais
     frame_dados = ttk.Labelframe(frame, text=" Variáveis ", padding=5, bootstyle="primary")
     frame_dados.pack(fill=tk.X, pady=5)
-
     ttk.Label(frame_dados, text="Professor: * ").pack(side=tk.LEFT, padx=(5,0))
     campo_nome_professor = ttk.Entry(frame_dados, width=20)
     campo_nome_professor.pack(side=tk.LEFT, padx=5)
-
     ttk.Label(frame_dados, text="Dia da Falta: * ").pack(side=tk.LEFT, padx=(5,0))
     campo_dia_falta = ttk.Entry(frame_dados, width=10)
     campo_dia_falta.pack(side=tk.LEFT, padx=5)
-    
     ttk.Button(frame_dados, text="Gerar", command=lambda:mensagem_para_verificacao(campo_nome_professor, campo_dia_falta, campo_mensagem), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
 
      # Campo para digitação do modelo de mensagem
@@ -233,11 +230,19 @@ def frame_historicos(janela, frame):
 def frame_planilhas(janela, frame):
     janela.geometry("500x500")
     centralizar_janela(janela)
-    ttk.Label(frame, text="Gerenciamento de Planilhas", font=("Helvetica", 14, "bold")).pack(pady=10)
-    ttk.Label(frame, text="Selecione a planilha desejada:", font=("Helvetica", 10)).pack(pady=(5, 10))
-    ttk.Combobox(frame, values=["Planilha 1", "Planilha 2", "Planilha 3"]).pack(pady=5)
-    ttk.Button(frame, text="Abrir", bootstyle="primary-outline").pack(pady=10)
+    
+    # Campo para anexação de planilha
+    frame_faltas = ttk.Labelframe(frame, text=" Faltas ", padding=5, bootstyle="primary")
+    frame_faltas.pack(fill=tk.X, pady=5)
+    ttk.Label(frame_faltas, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(5,0))
+    campo_data_inicial = ttk.Entry(frame_faltas, width=15)
+    campo_data_inicial.pack(side=tk.LEFT, padx=5)
+    ttk.Label(frame_faltas, text="Data Final: * ").pack(side=tk.LEFT, padx=(5,0))
+    campo_data_final = ttk.Entry(frame_faltas, width=15)
+    campo_data_final.pack(side=tk.LEFT, padx=5)
+    ttk.Button(frame_faltas, text="Gerar", command=lambda:preparar_data_faltosos(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
 
 # Execução do programa
 if __name__ == "__main__":
+    criar_pastas()
     exibir_janela_inicial()
