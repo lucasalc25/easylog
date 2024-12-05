@@ -1,7 +1,7 @@
 import pandas as pd
-from openpyxl import load_workbook
+import os
 import openpyxl
-from automação import *
+from automação import atualizar_alunos_ativos
 
 def filtrar_faltosos(df):
     # 1. Remover linhas onde a coluna 'Curso' tenha "Annual Book - Multimídia"
@@ -42,7 +42,7 @@ def relacionar_educador(df_faltosos):
     df_alunos_ativos = pd.read_excel(os.path.expanduser("~"), "Documents\EasyLog\Planilhas\alunos_ativos.xls")
 
     # Garantir que as colunas necessárias estão disponíveis
-    colunas_faltosos = ['Aluno', 'Curso', 'Tel Residencial','Celular']  # Colunas essenciais da planilha 'faltosos'
+    colunas_faltosos = ['Aluno', 'Tel Residencial', 'Celular']  # Colunas essenciais da planilha 'faltosos'
     colunas_ativos = ['Aluno', 'Educador']
 
     if not all(col in df_faltosos.columns for col in colunas_faltosos):
@@ -83,7 +83,7 @@ def ajustar_largura_colunas(arquivo):
 
     # Definir larguras específicas para as colunas
     colunas_largura = {
-        "A": 15.0,
+        "A": 30.0,
         "B": 40.0,
         "C": 32.0,
         "D": 40.0,

@@ -6,12 +6,12 @@ import tkinter as tk
 from ocr import *
 import pandas as pd
 import os
+from pathlib import Path
 import pyperclip
-from planilhas import *
 
 def criar_pastas():
     # Obtém o caminho da pasta Documentos do usuário
-    caminho_documentos = os.path.join(os.path.expanduser("~"), "Documents")
+    caminho_documentos = Path.home() / "Documents"
     
     # Define o caminho completo da nova pasta
     caminho_pasta_easylog = os.path.join(caminho_documentos, 'EasyLog')
@@ -46,7 +46,7 @@ def repetir_tecla(*teclas, total_repeticoes):
             pyautogui.press(teclas[0])
         else:  # Mais de uma tecla
             pyautogui.hotkey(*teclas)
-        time.sleep(1)
+        time.sleep(0.2)
         
 def localizar_elemento_antigo(app, elemento):
     localizacao = None
@@ -399,12 +399,12 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
             time.sleep(2)
             
             pyperclip.copy(titulo_ocorrencia)
-            repetir_tecla('shift','tab',5)
+            repetir_tecla('shift','tab',total_repeticoes=5)
             pyautogui.hotkey('ctrl','v')
             time.sleep(2)
 
             pyperclip.copy(descricao_ocorrencia)
-            repetir_tecla('shift','tab', 2)
+            repetir_tecla('shift','tab', total_repeticoes=2)
             pyautogui.hotkey('ctrl','v')
             time.sleep(2)
 
@@ -464,7 +464,7 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
     
-    repetir_tecla('tab', 3)
+    repetir_tecla('tab',total_repeticoes=3)
     
     pyautogui.press('enter')
     time.sleep(1)
@@ -494,7 +494,7 @@ def gerar_faltosos(data_inicial, data_final):
         pyautogui.press('enter')
         time.sleep(1)
 
-        caminho_planilhas = (os.path.expanduser("~"), "Documents\EasyLog\Planilhas")
+        caminho_planilhas = Path.home() / "Documents" / "EasyLog" / "Planilhas"
         caminho_planilhas = os.path.normpath(caminho_planilhas)
         esperar_elemento('./imagens/mudar_caminho.png')
         mudar_caminho = localizar_elemento('./imagens/mudar_caminho.png')
@@ -519,7 +519,7 @@ def atualizar_alunos_ativos():
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(1)
-    repetir_tecla('tab', 8)
+    repetir_tecla('tab', total_repeticoes=8)
     pyautogui.press('enter')
     time.sleep(1)
 
@@ -531,18 +531,19 @@ def atualizar_alunos_ativos():
     pyautogui.press('enter')
     time.sleep(1)
 
-    caminho_planilhas = (os.path.expanduser("~"), "Documents\EasyLog\Planilhas")
+    caminho_planilhas = Path.home() / "Documents" / "EasyLog" / "Planilhas"
     caminho_planilhas = os.path.normpath(caminho_planilhas)
-    esperar_elemento('./imagens/mudar_caminho.png')
-    mudar_caminho = localizar_elemento('./imagens/mudar_caminho.png')
-    pyautogui.click(mudar_caminho)
-    time.sleep(1)
-    pyautogui.write(caminho_planilhas)
-    time.sleep(1)
     campo_nome_planilha = localizar_elemento('./imagens/campo_nome_planilha.png')
     pyautogui.click(campo_nome_planilha)
-    pyautogui.write('alunos_ativos')
+    pyautogui.write(caminho_planilhas)
     pyautogui.press('enter')
+    time.sleep(1)
+    pyautogui.write('alunos_ativos')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
     
 
 
