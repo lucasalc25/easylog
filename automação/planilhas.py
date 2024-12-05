@@ -2,7 +2,23 @@ import pandas as pd
 import os
 from pathlib import Path
 import openpyxl
-from automação import atualizar_faltosos_e_educadores
+
+# Função para ler os contatos de um arquivo TXT
+def ler_alunos(caminho_planilha):
+    try:
+        # Lê a planilha usando pandas
+        df = pd.read_excel(caminho_planilha)
+        
+        # Certifique-se de que os nomes das colunas estão corretos
+        alunos = []
+        for _, row in df.iterrows():
+            alunos.append({
+                "nome": row["Nome"],         # Nome do aluno
+            })
+        return alunos
+    except Exception as e:
+        print(f"Erro ao ler a planilha: {e}")
+        return []
 
 def filtrar_faltosos(df):
     # 1. Remover linhas onde a coluna 'Curso' tenha "Annual Book - Multimídia"
@@ -27,7 +43,7 @@ def filtrar_faltosos(df):
     df = relacionar_educador(df)
 
     # Salvar o arquivo final
-    output_file_path = './planilhas/faltosos_filtrados.xlsx'
+    output_file_path = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos_filtrados.xls"
     df.to_excel(output_file_path)
     ajustar_largura_colunas(output_file_path)
 

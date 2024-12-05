@@ -1,6 +1,6 @@
 import tkinter as tk  # Importando tkinter para acesso a constantes
 from ttkbootstrap import Window, ttk  # Importando ttkbootstrap para personalização do tema
-from automação import *
+from automação.automação import *
 
 # Função para exibir a tela inicial
 def exibir_janela_inicial():

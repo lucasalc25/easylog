@@ -8,7 +8,7 @@ def verificar_existencia(elemento):
     elif elemento == 'pesquisa_aluno':
         coordenadas = (443,210,737,18)
     elif elemento == 'lista_faltosos':
-        coordenadas = (346,472,675,82)
+        coordenadas = (375,423,675,82)
     
     # Captura a tela e salva como imagem
     caminho_print = "./imagens/print_verificaçao.png"
@@ -33,10 +33,9 @@ def verificar_existencia(elemento):
     print(texto_extraido.strip())
 
     # Verificar se há texto na imagem
-    if texto_extraido.strip():  # strip() remove espaços extras
-        return True
-    else:
-        return False
+    while True:
+        if texto_extraido.strip():  # strip() remove espaços extras
+            return True
     
 import cv2
 import numpy as np
