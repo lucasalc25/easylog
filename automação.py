@@ -506,7 +506,7 @@ def gerar_faltosos(data_inicial, data_final):
         pyautogui.click(campo_nome_planilha)
 
         
-def atualizar_alunos_ativos():
+def atualizar_faltosos_e_educadores():
     messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto e atrás do easyLog!")
     
     pyautogui.hotkey('alt','tab')
@@ -541,9 +541,16 @@ def atualizar_alunos_ativos():
     pyautogui.write('alunos_ativos')
     time.sleep(1)
     pyautogui.press('enter')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
+    time.sleep(2)
+    
+    if esperar_elemento('./imagens/substituir_arquivo.png'):
+        pyautogui.press('tab')
+        time.sleep(1)
+        pyautogui.press('enter')
+        time.sleep(1)
+    else:
+        pyautogui.press('enter')
+        time.sleep(1)
     
 
 

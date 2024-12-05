@@ -43,7 +43,6 @@ import numpy as np
 import pyautogui
 import pytesseract
 import time
-import keyboard
 
 # Configurar Pytesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
