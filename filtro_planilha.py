@@ -7,26 +7,29 @@ file_path = './planilhas/rptPresencaFaltaPeriodo.xls'  # Substitua pelo nome cor
 sheet_name = 'Sheet'  # Substitua pelo nome correto da aba, caso necessário
 df = pd.read_excel(file_path, sheet_name=sheet_name, header=3)
 
-# 1. Remover linhas onde a coluna 'Curso' tenha "Annual Book - Multimídia"
+# Remover linhas onde a coluna 'Curso' tenha "Annual Book - Multimídia"
 df = df[df['Curso'] != 'Annual Book - Multimídia']
 
-# 2. Remover a linha 3 (index 2)
-df = df.drop(index=2, errors='ignore')  # Ignora se a linha não existir
+# Manter apenas as colunas "aluno", "tel residencial" e "celular"
+df = df[['Aluno', 'Educador', 'Falta', 'Celular']]
 
-# 3. Manter apenas as colunas "aluno", "tel residencial" e "celular"
-df = df[['Aluno', 'Tel Residencial', 'Celular']]
+# Remover linhas onde a coluna "Falta" tem valor 0
+df = df[df['Falta'] != 0]
 
-# 4. Remover colunas "B", "E" e "F"
+# Remover duplicatas na coluna "Celular"
+df = df.drop_duplicates(subset='Celular', keep='first')
+
+# Remover colunas "B", "E" e "F"
 cols_to_remove = ['B', 'E', 'F']
 df = df.drop(columns=cols_to_remove, errors='ignore')
 
-# 5. Preencher células vazias na coluna "Celular" (C) com valores da coluna "Tel Residencial" (B)
+# Preencher células vazias na coluna "Celular" (C) com valores da coluna "Tel Residencial" (B)
 df['Celular'] = df['Celular'].fillna(df['Tel Residencial'])
 
-# 6. Remove a coluna "B"
+# Remove a coluna "B"
 df = df.drop('Tel Residencial', axis=1, errors='ignore')
 
-# 7. Remover linhas duplicadas
+# Remover linhas duplicadas
 df = df.drop_duplicates()
 
 # Salvar as alterações para ajustar a largura das colunas
