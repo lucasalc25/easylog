@@ -7,6 +7,7 @@ from ocr import *
 import pandas as pd
 import os
 import pyperclip
+from planilhas import *
 
 def criar_pastas():
     # Obtém o caminho da pasta Documentos do usuário
@@ -200,6 +201,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                 
                 #Verifica se há imagem
                 if len(imagem) > 0:
+                    esperar_elemento('./imagens/botao_anexar.png')
                     botao_anexar = localizar_elemento('./imagens/anexar.png')
                     pyautogui.click(botao_anexar)
 
@@ -213,8 +215,8 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                     time.sleep(2)
 
                     pyautogui.press('enter')
-
-                    localizar_elemento('./imagens/aba_anexar.png')
+                    
+                    esperar_elemento('./imagens/aba_anexar.png')
 
                     if mensagem_template:
                         # Usar o pyautogui para colar a mensagem
@@ -369,6 +371,7 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
             nome_aluno = aluno['nome']  # Nome do aluno
             pyperclip.copy(nome_aluno)
 
+            esperar_elemento('./imagens/pesquisa_aluno.png')
             pesquisa_aluno = localizar_elemento('./imagens/pesquisa_aluno.png')
             pyautogui.click(pesquisa_aluno)
     
@@ -387,7 +390,8 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
             aluno_existe = verificar_existencia('pesquisa_aluno')
             
             if aluno_existe:
-                aluno_encontrado = localizar_elemento('./imagens/aluno encontrado.png')
+                esperar_elemento('./imagens/aluno_encontrado.png')
+                aluno_encontrado = localizar_elemento('./imagens/aluno_encontrado.png')
                 pyautogui.doubleClick(aluno_encontrado)
                 time.sleep(7)
                 
@@ -475,29 +479,75 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.press('tab')
     time.sleep(1)
     
+    esperar_elemento('./imagens/pesquisar_faltosos.png')
     visualizar = localizar_elemento('./imagens/pesquisar_faltosos.png')
     pyautogui.click(visualizar)
     
     faltosos_carregados = verificar_existencia('lista_faltosos')
     
     if faltosos_carregados:
-        exportar = localizar_elemento('./imagens/exportar_faltosos.png')
-        pyautogui.click(exportar)
+        esperar_elemento('./imagens/exportar.png')
+        exportar_faltosos = localizar_elemento('./imagens/exportar.png')
+        pyautogui.click(exportar_faltosos)
         pyautogui.press('tab')
         time.sleep(1)
         pyautogui.press('enter')
         time.sleep(1)
 
-        caminho_planilhas = 'Documents\EasyLog\Planilhas'
+        caminho_planilhas = (os.path.expanduser("~"), "Documents\EasyLog\Planilhas")
         caminho_planilhas = os.path.normpath(caminho_planilhas)
+        esperar_elemento('./imagens/mudar_caminho.png')
         mudar_caminho = localizar_elemento('./imagens/mudar_caminho.png')
         pyautogui.click(mudar_caminho)
         time.sleep(1)
         pyautogui.write(caminho_planilhas)
         time.sleep(1)
-        
         campo_nome_planilha = localizar_elemento('./imagens/campo_nome_planilha.png')
+        pyautogui.click(campo_nome_planilha)
+
         
+def atualizar_alunos_ativos():
+    messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto e atrás do easyLog!")
+    
+    pyautogui.hotkey('alt','tab')
+    time.sleep(1) 
+    esperar_elemento("./imagens/hub_aberto.png")
+
+    pyautogui.press('alt')
+    time.sleep(1)
+    pyautogui.press('tab')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+    repetir_tecla('tab', 8)
+    pyautogui.press('enter')
+    time.sleep(1)
+
+    esperar_elemento('./imagens/exportar.png')
+    exportar_alunos_ativos = localizar_elemento('./imagens/exportar.png')
+    pyautogui.click(exportar_alunos_ativos)
+    pyautogui.press('tab')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+
+    caminho_planilhas = (os.path.expanduser("~"), "Documents\EasyLog\Planilhas")
+    caminho_planilhas = os.path.normpath(caminho_planilhas)
+    esperar_elemento('./imagens/mudar_caminho.png')
+    mudar_caminho = localizar_elemento('./imagens/mudar_caminho.png')
+    pyautogui.click(mudar_caminho)
+    time.sleep(1)
+    pyautogui.write(caminho_planilhas)
+    time.sleep(1)
+    campo_nome_planilha = localizar_elemento('./imagens/campo_nome_planilha.png')
+    pyautogui.click(campo_nome_planilha)
+    pyautogui.write('alunos_ativos')
+    pyautogui.press('enter')
+    
+
+
+
+
         
         
         
