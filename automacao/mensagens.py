@@ -2,10 +2,12 @@ import time
 import pyautogui
 from tkinter import messagebox
 import tkinter as tk
-from automação.ocr import *
+from automacao.ocr import *
 import pandas as pd
 import os
 import pyperclip
+
+from automacao.planilhas import ler_contatos
 
 # Função para iniciar envio
 def preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_mensagem, campo_imagem):
@@ -153,26 +155,6 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui enviar {mensagens_enviadas} mensagens :(")
                             
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
-
-# Função para ler os contatos de um arquivo TXT
-def ler_contatos(caminho_planilha):
-    try:
-        # Lê a planilha usando pandas
-        df = pd.read_excel(caminho_planilha)
-
-        # Certifique-se de que os nomes das colunas estão corretos
-        contatos = []
-        for _, row in df.iterrows():
-            contatos.append({
-                "aluno": row["Aluno"],         # Nome do aluno
-                "celular": str(row["Celular"])  # Número de telefone
-            })
-        
-        print(contatos)
-        return contatos
-    except Exception as e:
-        print(f"Erro ao ler a planilha: {e}")
-        return []
     
 def gerar_comunicado(tipo_comunicado_var, campo_mensagem):
     tipo_comunicado = tipo_comunicado_var.get()  # Pega a opção selecionada

@@ -3,8 +3,9 @@ import pyautogui
 from tkinter import filedialog, messagebox
 import tkinter as tk
 import os
+from automacao.planilhas import filtrar_faltosos
+from automacao.ocr import esperar_elemento, localizar_elemento
 from pathlib import Path
-from ocr import esperar_elemento, localizar_elemento
 
 def criar_pastas():
     # Obtém o caminho da pasta Documentos do usuário
@@ -69,7 +70,7 @@ def preparar_data_faltosos(campo_data_inicial, campo_data_final):
     data_inicial = data_inicial.replace("/","")
     data_final = data_final.replace("/","")
     
-    messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto atrás do EasyLog!")
+    messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
     
     pyautogui.hotkey('alt','tab')
     time.sleep(1)
@@ -80,10 +81,19 @@ def preparar_data_faltosos(campo_data_inicial, campo_data_final):
 
        
 def gerar_faltosos_e_educadores(data_inicial, data_final):
-    messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto e atrás do easyLog!")
+    messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
     
+    repeticoes = 0
     while not localizar_elemento("./imagens/hub_aberto.png"):
-        pyautogui.hotkey('alt','tab')
+        if repeticoes > 1:
+            # Pressiona 'Alt' e 'Tab' duas vezes mantendo 'Alt' pressionado
+            pyautogui.keyDown('alt')  # Mantém a tecla 'Alt' pressionada
+            repetir_tecla('tab', total_repeticoes=repeticoes)
+            pyautogui.keyUp('alt')  # Mantém a tecla 'Alt' pressionada
+        else:
+            pyautogui.hotkey('alt','tab')
+
+        repeticoes += 1
         time.sleep(2) 
 
     pyautogui.press('alt')
@@ -114,18 +124,16 @@ def gerar_faltosos_e_educadores(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
 
-    caminho_planilhas = Path.home() / "Documents" / "EasyLog" / "Planilhas"
+    caminho_planilhas = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "alunos_e_educadores.png"
     caminho_planilhas = os.path.normpath(caminho_planilhas)
     campo_nome_planilha = localizar_elemento('./imagens/campo_nome_planilha.png')
     pyautogui.click(campo_nome_planilha)
-    pyautogui.write(caminho_planilhas)
-    time.sleep(2)
-    pyautogui.press('enter')
-    time.sleep(2)
-    pyautogui.write('faltosos_e_educadores')
     time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(3)
+    pyautogui.write(caminho_planilhas)
+    time.sleep(1)
+    salvar = localizar_elemento('./imagens/salvar.png')
+    pyautogui.click(salvar)
+    time.sleep(2)
     
     if localizar_elemento('./imagens/substituir_arquivo.png'):
         pyautogui.press('tab')
@@ -133,15 +141,10 @@ def gerar_faltosos_e_educadores(data_inicial, data_final):
         pyautogui.press('enter')
         time.sleep(1)
     
-    messagebox.showinfo("Aviso", "Planilha de faltosos e educadores gerada!")
-
-    gerar_faltosos(data_inicial, data_final)
+    messagebox.showinfo("Atenção!", "Planilha de alunos e educadores gerada!")
         
 def gerar_faltosos(data_inicial, data_final):  
-
-    while not localizar_elemento("./imagens/hub_aberto.png"):
-        pyautogui.hotkey('alt','tab')
-        time.sleep(2) 
+    gerar_faltosos_e_educadores(data_inicial, data_final)
         
     pyautogui.press('alt')
     time.sleep(1)
@@ -185,18 +188,15 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
     
-    caminho_planilhas = Path.home() / "Documents" / "EasyLog" / "Planilhas"
-    caminho_planilhas = os.path.normpath(caminho_planilhas)
+    caminho_planilha = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos.xls"
+    caminho_planilha = os.path.normpath(caminho_planilha)
     campo_nome_planilha = localizar_elemento('./imagens/campo_nome_planilha.png')
     pyautogui.click(campo_nome_planilha)
-    pyautogui.write(caminho_planilhas)
+    time.sleep(1)
+    pyautogui.write(caminho_planilha)
     time.sleep(1)
     salvar = localizar_elemento('./imagens/salvar.png')
     pyautogui.click(salvar)
-    time.sleep(2)
-    pyautogui.write('faltosos')
-    time.sleep(1)
-    pyautogui.press('enter')
     time.sleep(2)
     
     if localizar_elemento('./imagens/substituir_arquivo.png'):
@@ -211,9 +211,12 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
 
-    messagebox.showinfo("Aviso", "Planilha de faltosos gerada!")
+    messagebox.showinfo("Atenção!", "Planilha de faltosos gerada!")
+    
+    filtrar_faltosos(caminho_planilha)
 
-gerar_faltosos_e_educadores('05', '05')       
+gerar_faltosos('3', '3')
+     
         
         
     
