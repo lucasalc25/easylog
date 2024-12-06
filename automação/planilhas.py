@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 import openpyxl
 
+from automação.automação import gerar_faltosos_e_educadores
+
 # Função para ler os contatos de um arquivo TXT
 def ler_alunos(caminho_planilha):
     try:
@@ -50,7 +52,7 @@ def filtrar_faltosos(df):
     print(f"Arquivo salvo como {output_file_path}")
 
 def relacionar_educador(df_faltosos):
-    #atualizar_faltosos_e_educadores()
+    #gerar_faltosos_e_educadores()
 
     caminho_arquivo = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos_e_educadores.xls"
     

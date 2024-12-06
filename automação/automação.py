@@ -77,38 +77,36 @@ def preparar_data_faltosos(campo_data_inicial, campo_data_final):
     esperar_elemento("./imagens/hub_aberto.png")
     
     gerar_faltosos_e_educadores(data_inicial, data_final) 
+
+       
+def gerar_faltosos_e_educadores(data_inicial, data_final):
+    messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto e atrás do easyLog!")
     
-    
-def gerar_faltosos_e_educadores(data_inicial, data_final):  
+    while not localizar_elemento("./imagens/hub_aberto.png"):
+        pyautogui.hotkey('alt','tab')
+        time.sleep(2) 
+
     pyautogui.press('alt')
     time.sleep(1)
-    
     pyautogui.press('tab')
     time.sleep(1)
-    
     pyautogui.press('enter')
     time.sleep(1)
-    
-    repetir_tecla('tab',total_repeticoes=3)
-    
+    repetir_tecla('tab', total_repeticoes=3)
     pyautogui.press('enter')
     time.sleep(1)
-    
+
     esperar_elemento('./imagens/faltas_por_periodo.png')
-    
     pyautogui.write(data_inicial)
+    time.sleep(1)
     pyautogui.press('tab')
     time.sleep(1)
-    
     pyautogui.write(data_final)
-    pyautogui.press('tab')
-    time.sleep(1)
-    
-    visualizar = localizar_elemento('./imagens/pesquisar.png')
-    pyautogui.click(visualizar)
-    
+
+    pesquisar_faltosos = localizar_elemento('./imagens/pesquisar.png')
+    pyautogui.click(pesquisar_faltosos)
+
     esperar_elemento('./imagens/lista_faltosos.png')
-    
     exportar_faltosos = localizar_elemento('./imagens/exportar.png')
     pyautogui.click(exportar_faltosos)
     pyautogui.press('tab')
@@ -121,73 +119,26 @@ def gerar_faltosos_e_educadores(data_inicial, data_final):
     campo_nome_planilha = localizar_elemento('./imagens/campo_nome_planilha.png')
     pyautogui.click(campo_nome_planilha)
     pyautogui.write(caminho_planilhas)
-    time.sleep(1)
+    time.sleep(2)
     pyautogui.press('enter')
     time.sleep(2)
-    pyautogui.write('faltosos')
+    pyautogui.write('faltosos_e_educadores')
     time.sleep(1)
     pyautogui.press('enter')
-    time.sleep(2)
+    time.sleep(3)
     
     if localizar_elemento('./imagens/substituir_arquivo.png'):
         pyautogui.press('tab')
         time.sleep(1)
         pyautogui.press('enter')
         time.sleep(1)
-        
+    
+    messagebox.showinfo("Aviso", "Planilha de faltosos e educadores gerada!")
+
     gerar_faltosos(data_inicial, data_final)
-
-        
-def gerar_faltosos_e_educadores():
-    messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto e atrás do easyLog!")
-    
-    pyautogui.hotkey('alt','tab')
-    time.sleep(1) 
-    esperar_elemento("./imagens/hub_aberto.png")
-
-    pyautogui.press('alt')
-    time.sleep(1)
-    pyautogui.press('tab')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-    repetir_tecla('tab', total_repeticoes=8)
-    pyautogui.press('enter')
-    time.sleep(1)
-
-    esperar_elemento('./imagens/exportar.png')
-    exportar_alunos_ativos = localizar_elemento('./imagens/exportar.png')
-    pyautogui.click(exportar_alunos_ativos)
-    pyautogui.press('tab')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-
-    caminho_planilhas = Path.home() / "Documents" / "EasyLog" / "Planilhas"
-    caminho_planilhas = os.path.normpath(caminho_planilhas)
-    campo_nome_planilha = localizar_elemento('./imagens/campo_nome_planilha.png')
-    pyautogui.click(campo_nome_planilha)
-    pyautogui.write(caminho_planilhas)
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(2)
-    pyautogui.write('alunos_ativos')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(2)
-    
-    if esperar_elemento('./imagens/substituir_arquivo.png'):
-        pyautogui.press('tab')
-        time.sleep(1)
-        pyautogui.press('enter')
-        time.sleep(1)
-    else:
-        pyautogui.press('enter')
-        time.sleep(1)
         
 def gerar_faltosos(data_inicial, data_final):  
-    messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto e conectado em um login!")
-    
+
     while not localizar_elemento("./imagens/hub_aberto.png"):
         pyautogui.hotkey('alt','tab')
         time.sleep(2) 
@@ -240,19 +191,17 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.click(campo_nome_planilha)
     pyautogui.write(caminho_planilhas)
     time.sleep(1)
-    pyautogui.press('enter')
+    salvar = localizar_elemento('./imagens/salvar.png')
+    pyautogui.click(salvar)
     time.sleep(2)
     pyautogui.write('faltosos')
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(2)
     
-    if esperar_elemento('./imagens/substituir_arquivo.png'):
+    if localizar_elemento('./imagens/substituir_arquivo.png'):
         pyautogui.press('tab')
         time.sleep(1)
-        pyautogui.press('enter')
-        time.sleep(1)
-    else:
         pyautogui.press('enter')
         time.sleep(1)
         
@@ -262,8 +211,9 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
 
+    messagebox.showinfo("Aviso", "Planilha de faltosos gerada!")
 
-        
+gerar_faltosos_e_educadores('05', '05')       
         
         
     
