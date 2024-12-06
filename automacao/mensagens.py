@@ -79,8 +79,8 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     for contato in contatos:
         try:
             mensagens_enviadas = 0
-            nome_aluno = contato['aluno']  # Nome do aluno
-            numero_telefone = contato['celular'].replace("(", "").replace(")", "").replace(" ", "")
+            nome_aluno = contato['Aluno']  # Nome do aluno
+            numero_telefone = contato['Celular'].replace("(", "").replace(")", "").replace(" ", "")
             numero_telefone = numero_telefone[:2] + numero_telefone[3:]  # Remove o índice 2 (que é o terceiro número)
             mensagem_personalizada = mensagem_template.replace("<nome_aluno>", nome_aluno)
             pyperclip.copy(mensagem_personalizada)

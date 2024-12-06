@@ -242,7 +242,7 @@ def frame_planilhas(janela, frame):
     ttk.Label(frame_faltas, text="Data Final: * ").pack(side=tk.LEFT, padx=(5,0))
     campo_data_final = ttk.Entry(frame_faltas, width=15)
     campo_data_final.pack(side=tk.LEFT, padx=5)
-    ttk.Button(frame_faltas, text="Gerar", command=lambda:preparar_data_faltosos(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
+    ttk.Button(frame_faltas, text="Gerar", command=lambda:gerar_faltosos_e_educadores(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
 
 # Execução do programa
 if __name__ == "__main__":

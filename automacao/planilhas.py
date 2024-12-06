@@ -161,9 +161,3 @@ def ajustar_largura_colunas(arquivo):
     wb.save(arquivo)
 
 
-caminho_arquivo = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos.xls"
-filtrar_faltosos(caminho_arquivo)
-faltosos = ler_contatos(Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos_filtrados.xlsx")
-df = pd.DataFrame(faltosos)
-print(df.to_string(index=False))
-

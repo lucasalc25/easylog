@@ -215,7 +215,6 @@ def gerar_faltosos(data_inicial, data_final):
     
     filtrar_faltosos(caminho_planilha)
 
-gerar_faltosos('3', '3')
      
         
         
