@@ -2,7 +2,7 @@ import time
 import pyautogui
 from tkinter import messagebox
 import tkinter as tk
-from main import repetir_tecla
+from bot import repetir_tecla
 from automacao.ocr import *
 from automacao.planilhas import ler_alunos
 

@@ -1,4 +1,5 @@
 import time
+import keyboard
 import pyautogui
 from tkinter import filedialog, messagebox
 import tkinter as tk
@@ -64,11 +65,8 @@ def anexar_imagem(imagem):
         imagem.insert(0, caminho)  # Exibe o caminho do arquivo
                 
 def preparar_data_faltosos(campo_data_inicial, campo_data_final):
-    data_inicial = campo_data_inicial.get()
-    data_final = campo_data_final.get()
-    
-    data_inicial = data_inicial.replace("/","")
-    data_final = data_final.replace("/","")
+    data_inicial = campo_data_inicial.get("1.0", tk.END)
+    data_final = campo_data_final.get("1.0", tk.END)
     
     messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
     
@@ -107,11 +105,11 @@ def gerar_faltosos_e_educadores(data_inicial, data_final):
     time.sleep(1)
 
     esperar_elemento('./imagens/faltas_por_periodo.png')
-    pyautogui.write(data_inicial)
+    keyboard.write(str(data_inicial))
     time.sleep(1)
     pyautogui.press('tab')
     time.sleep(1)
-    pyautogui.write(data_final)
+    keyboard.write(str(data_final))
 
     pesquisar_faltosos = localizar_elemento('./imagens/pesquisar.png')
     pyautogui.click(pesquisar_faltosos)

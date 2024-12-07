@@ -1,6 +1,7 @@
 import tkinter as tk  # Importando tkinter para acesso a constantes
 from ttkbootstrap import Window, ttk  # Importando ttkbootstrap para personalização do tema
-from main import *
+from datetime import datetime
+from bot import *
 from automacao.historicos import gerar_ocorrencia, preparar_registros
 from automacao.mensagens import gerar_comunicado, mensagem_para_verificacao, preparar_envio
 
@@ -152,6 +153,7 @@ def frame_comunicados(janela,frame):
     # Botão para aplicar a seleção e inserir a mensagem
     ttk.Button(frame, text="Gerar mensagem", command=lambda:gerar_comunicado(tipo_comunicado_var, campo_mensagem)).pack(pady=10)
 
+
     # Campo para anexar imagem
     frame_imagem = ttk.Labelframe(frame, text=" Imagem: ", padding=5, bootstyle="primary")
     frame_imagem.pack(fill=tk.X, pady=5)
@@ -232,17 +234,20 @@ def frame_historicos(janela, frame):
 def frame_planilhas(janela, frame):
     janela.geometry("500x500")
     centralizar_janela(janela)
+    data_atual = datetime.now().strftime("%d/%m/%Y")
     
     # Campo para anexação de planilha
     frame_faltas = ttk.Labelframe(frame, text=" Faltas ", padding=5, bootstyle="primary")
     frame_faltas.pack(fill=tk.X, pady=5)
-    ttk.Label(frame_faltas, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(5,0))
+    ttk.Label(frame_faltas, text="Data Inicial: * ", name=data_atual).pack(side=tk.LEFT, padx=(5,0))
     campo_data_inicial = ttk.Entry(frame_faltas, width=15)
     campo_data_inicial.pack(side=tk.LEFT, padx=5)
-    ttk.Label(frame_faltas, text="Data Final: * ").pack(side=tk.LEFT, padx=(5,0))
+    campo_data_inicial.insert(0, data_atual)
+    ttk.Label(frame_faltas, text="Data Final: * ", name=data_atual).pack(side=tk.LEFT, padx=(5,0))
     campo_data_final = ttk.Entry(frame_faltas, width=15)
     campo_data_final.pack(side=tk.LEFT, padx=5)
-    ttk.Button(frame_faltas, text="Gerar", command=lambda:gerar_faltosos_e_educadores(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
+    campo_data_final.insert(0, data_atual)
+    ttk.Button(frame_faltas, text="Gerar", command=lambda:preparar_data_faltosos(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
 
 # Execução do programa
 if __name__ == "__main__":
