@@ -3,7 +3,7 @@ from ttkbootstrap import Window, ttk  # Importando ttkbootstrap para personaliza
 from datetime import datetime
 from bot import *
 from automacao.historicos import gerar_ocorrencia, preparar_registros
-from automacao.mensagens import gerar_mensagem, personalizar_mensagem, preparar_envio
+from automacao.mensagens import gerar_mensagem, preparar_envio
 
 # Função para exibir a tela inicial
 def exibir_janela_inicial():
@@ -67,7 +67,7 @@ def abrir_janela(janela_inicial, titulo):
 
 # Função para configurar a área de "Comunicados"
 def frame_mensagens(janela,frame):
-    janela.geometry("500x530")
+    janela.geometry("500x600")
     centralizar_janela(janela)
     # Campo para anexação de planilha
     frame_contatos = ttk.Labelframe(frame, text=" Planilha de contatos: * ", padding=5, bootstyle="primary")
@@ -130,7 +130,7 @@ def frame_mensagens(janela,frame):
     frame_botoes.pack(pady=(25,0))
 
     # Adicionando botões lado a lado usando grid()
-    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha, campo_mensagem, campo_imagem),bootstyle="success-outline", width=10).grid(row=0, column=0, padx=40)
+    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_mensagem, campo_imagem),bootstyle="success-outline", width=10).grid(row=0, column=0, padx=40)
     ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=0, column=1, padx=40)
 
 # Função para configurar a área de "Históricos"
@@ -201,17 +201,20 @@ def frame_planilhas(janela, frame):
     data_atual = datetime.now().strftime("%d/%m/%Y")
     
     # Campo para anexação de planilha
-    frame_faltas = ttk.Labelframe(frame, text=" Faltas ", padding=5, bootstyle="primary")
-    frame_faltas.pack(fill=tk.X, pady=5)
-    ttk.Label(frame_faltas, text="Data Inicial: * ", name=data_atual).pack(side=tk.LEFT, padx=(5,0))
-    campo_data_inicial = ttk.Entry(frame_faltas, width=15)
+    frame_planilhas = ttk.Labelframe(frame, text=" Faltas ", padding=5, bootstyle="primary")
+    frame_planilhas.pack(fill=tk.X, pady=5)
+    ttk.Label(frame_planilhas, text="Data Inicial: * ", name=data_atual).pack(side=tk.LEFT, padx=(5,0))
+    campo_data_inicial = ttk.Entry(frame_planilhas, width=15)
     campo_data_inicial.pack(side=tk.LEFT, padx=5)
     campo_data_inicial.insert(0, data_atual)
-    ttk.Label(frame_faltas, text="Data Final: * ", name=data_atual).pack(side=tk.LEFT, padx=(5,0))
-    campo_data_final = ttk.Entry(frame_faltas, width=15)
+    ttk.Label(frame_planilhas, text="Data Final: * ", name=data_atual).pack(side=tk.LEFT, padx=(5,0))
+    campo_data_final = ttk.Entry(frame_planilhas, width=15)
     campo_data_final.pack(side=tk.LEFT, padx=5)
     campo_data_final.insert(0, data_atual)
-    ttk.Button(frame_faltas, text="Gerar", command=lambda:preparar_data_faltosos(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
+
+    ttk.Button(frame_planilhas, text="Gerar", command=lambda:preparar_data_faltosos(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
+
+    ttk.Button(frame, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).pack(pady=10)
 
 # Execução do programa
 if __name__ == "__main__":

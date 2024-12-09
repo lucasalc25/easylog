@@ -61,83 +61,66 @@ def manter_primeiro_nome(nome):
     return nome  # Retorna o valor original se não for string
 
 def filtrar_faltosos(caminho_arquivo):
-    df = pd.read_excel(caminho_arquivo, sheet_name='Sheet', header=3)
-    print(df.columns)
+    df_faltosos = pd.read_excel(caminho_arquivo, sheet_name='Sheet', header=3)
 
-    # 1. Remover linhas onde a coluna 'Curso' tenha "Annual Book - Multimídia"
-    df = df[df['Curso'] != 'Annual Book - Multimídia']
-
-    # 4. Preencher células vazias na coluna "Celular" (C) com valores da coluna "Tel Residencial" (B)
-    df['Celular'] = df['Celular'].fillna(df['Tel Residencial'])
-
-    # 5. Remove a coluna "B"
-    df = df.drop('Tel Residencial', axis=1, errors='ignore')
-
-    # 6. Remover linhas duplicadas
-    df = df.drop_duplicates()
-
-    df = relacionar_educador(df)
-
-    colunas_necessarias = {'Aluno', 'Celular'}
-    colunas_disponiveis = set(df.columns)
-
-    if not colunas_necessarias.issubset(colunas_disponiveis):
-        colunas_faltantes = colunas_necessarias - colunas_disponiveis
-        raise ValueError(
-            f"A planilha 'faltosos' não contém as colunas necessárias: {', '.join(colunas_faltantes)}"
+    # Renomear colunas para consistência
+    df_faltosos = df_faltosos.rename(
+        columns={
+            "Unnamed: 1": "Aluno",
+            "Unnamed: 7": "Observação",
+            "Unnamed: 8": "Tel Residencial",
+            "Unnamed: 9": "Celular",
+            "Unnamed: 0": "Contrato"
+        }
     )
 
-    # Salvar o arquivo final
-    caminho_saida = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos_filtrados.xlsx"
-    df.to_excel(caminho_saida)
-    ajustar_largura_colunas(caminho_saida)
+    # Selecionar colunas relevantes
+    df_faltosos = df_faltosos[["Contrato", "Aluno", "Observação", "Tel Residencial", "Celular"]]
 
-    print(f"Arquivo salvo como {caminho_saida}")
+    relacionar_educador(df_faltosos)
 
 def relacionar_educador(df_faltosos):
-    caminho_arquivo = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "alunos_e_educadores.xls"
-    
-    # Carregar as planilhas
-    df_alunos_e_educadores = pd.read_excel(caminho_arquivo)
-    df_alunos_e_educadores.rename(columns={"Nome Aluno": "Aluno"}, inplace=True)
+    # Caminho para os arquivos
+    caminho_educadores = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "alunos_e_educadores.xls"
 
-    colunas_necessarias = {'Aluno', 'Educador'}
-    colunas_disponiveis = set(df_alunos_e_educadores.columns)
+    # Carregar planilhas
+    df_educadores = pd.read_excel(caminho_educadores)
 
-    if not colunas_necessarias.issubset(colunas_disponiveis):
-        colunas_faltantes = colunas_necessarias - colunas_disponiveis
-        raise ValueError(
-            f"A planilha 'alunos_e_educadores' não contém as colunas necessárias: {', '.join(colunas_faltantes)}"
-        )
-
-    # Realizar a mesclagem dos dados
-    df_resultado = pd.merge(
-        df_faltosos,
-        df_alunos_e_educadores,
-        on='Aluno',  # Coluna em comum para combinar os dados
-        how='inner'  # Apenas alunos presentes nas duas planilhas
+    # Renomear colunas para consistência
+    df_educadores = df_educadores.rename(
+        columns={
+            "Contrato": "Contrato",
+            "Nome Aluno": "Aluno",
+            "Educador": "Educador",
+            "Telefone Responsável": "Celular"
+        }
     )
 
-    # Filtrar para manter apenas as colunas desejadas
-    colunas_desejadas = ["Código", "Aluno", "Educador", "Celular"]
-    df_resultado = df_resultado[[coluna for coluna in colunas_desejadas if coluna in df_resultado.columns]]
+    # Selecionar colunas relevantes
+    df_educadores = df_educadores[["Contrato", "Aluno", "Educador", "Celular"]]
 
-    
-    # Adicionar a coluna "Observação" vazia ou com valor padrão
-    df_resultado['Observação'] = None  # ou use `None` para deixar vazio
+    # Mesclar dataframes com base no contrato
+    df_mesclado = pd.merge(df_faltosos, df_educadores, on="Aluno", how="left")
 
-    # Reorganizar as colunas conforme solicitado: "Aluno", "Observação", "Educador", "Celular"
-    df_resultado = df_resultado[['Aluno', 'Observação', 'Educador', 'Celular']]
+    # Preencher "Celular" vazio com "Tel Residencial"
+    df_mesclado['Celular'] = df_mesclado['Celular_x'].combine_first(df_mesclado['Celular_y'])
 
-    # Adicionar "Funcionário" na coluna "Observação" onde o valor da coluna "Educador" for "Sangela"
-    df_resultado.loc[df_resultado['Educador'] == 'Sangela Amaro Gomes de Souza', 'Observação'] = 'Funcionário'
+    # Remover colunas desnecessárias
+    df_mesclado = df_mesclado.drop(columns=["Tel Residencial", "Celular_x", "Celular_y"])
 
-    # Salvar o resultado ou exibi-lo
-    caminho_saida = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos_filtrados.xlsx"
-    df_resultado.to_excel(caminho_saida, index=False)
+    # Limpar a coluna Observação e remover duplicados
+    df_mesclado['Observação'] = None
+    df_mesclado = df_mesclado.drop_duplicates()
 
-    print(f"Dados dos faltosos coletados e salvos em: {caminho_saida}")
-    return df_resultado
+    print(df_mesclado.columns)
+
+    # Reorganizar colunas
+    df_final = df_mesclado[["Contrato", "Aluno", "Observação", "Educador", "Celular"]]
+
+    # Salvar o resultado
+    df_final.to_excel("faltosos_filtrados.xlsx", index=False)
+
+    print("Processamento concluído. O arquivo 'faltosos_filtrados.xlsx' foi gerado.")
 
 
 def ajustar_largura_colunas(arquivo):
@@ -147,10 +130,10 @@ def ajustar_largura_colunas(arquivo):
 
     # Definir larguras específicas para as colunas
     colunas_largura = {
-        "B": 35.0,
-        "C": 50.0,
-        "D": 32.0,
-        "E": 16.0,
+        "B": 12.0,
+        "C": 42.0,
+        "D": 50.0,
+        "E": 16.0
     }
 
     # Ajustar a largura das colunas conforme o dicionário
@@ -161,3 +144,4 @@ def ajustar_largura_colunas(arquivo):
     wb.save(arquivo)
 
 
+filtrar_faltosos(Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos.xls")

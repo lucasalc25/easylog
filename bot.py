@@ -4,8 +4,9 @@ import pyautogui
 from tkinter import filedialog, messagebox
 import tkinter as tk
 import os
-from automacao.planilhas import filtrar_faltosos
-from automacao.ocr import esperar_elemento, localizar_elemento
+import pyperclip
+from automacao.planilhas import filtrar_faltosos, ler_contatos
+from automacao.ocr import esperar_elemento, localizar_elemento, verificar_existencia
 from pathlib import Path
 
 def criar_pastas():
@@ -63,25 +64,108 @@ def anexar_imagem(imagem):
     if caminho:
         imagem.delete(0, tk.END)  # Limpa o conteúdo atual
         imagem.insert(0, caminho)  # Exibe o caminho do arquivo
+
+# Função para enviar uma imagem para os contatos
+def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
+    # Ler os contatos
+    contatos = ler_contatos(arquivo_contatos)
+    
+    for contato in contatos:
+        try:
+            mensagens_enviadas = 0
+            nome_aluno = contato['Aluno']  # Nome do aluno
+            numero_telefone = contato['Celular'].replace("(", "").replace(")", "").replace(" ", "")
+            numero_telefone = numero_telefone[:2] + numero_telefone[3:]  # Remove o índice 2 (que é o terceiro número)
+            mensagem_personalizada = mensagem_template.replace("<nome_aluno>", nome_aluno)
+            pyperclip.copy(mensagem_personalizada)
+
+            pyautogui.hotkey('ctrl','n')
+            esperar_elemento('./imagens/nova_conversa.png')
+            
+            # Usar o pyautogui para digitar o número de telefone do contato
+            pyautogui.write(f'{numero_telefone}')
+            time.sleep(1)   
+            
+            whatsapp_existe = verificar_existencia('pesquisa_whatsapp')
+
+            if whatsapp_existe:
+                pyautogui.press('tab')
+                pyautogui.press('tab')  
+                time.sleep(1)
+
+                pyautogui.press('enter')  
+                time.sleep(1)
+                
+                #Verifica se há imagem
+                if len(imagem) > 0:
+                    esperar_elemento('./imagens/botao_anexar.png')
+                    botao_anexar = localizar_elemento('./imagens/anexar.png')
+                    pyautogui.click(botao_anexar)
+
+                    pyautogui.press('tab')
+                    time.sleep(1)
+                    pyautogui.press('enter')  
+                    time.sleep(2)
+
+                    # Colar o caminho da imagem
+                    pyautogui.hotkey('ctrl', 'v')  # Colar o caminho da imagem no campo
+                    time.sleep(2)
+
+                    pyautogui.press('enter')
+                    
+                    esperar_elemento('./imagens/aba_anexar.png')
+
+                    if mensagem_template:
+                        # Usar o pyautogui para colar a mensagem
+                        pyautogui.hotkey('ctrl','v')
+                        time.sleep(1)
+                    
+                    time.sleep(1)
+                    # Pressionar Enter para enviar a imagem
+                    pyautogui.press('enter')
+                    mensagens_enviadas += 1
+
+                else:
+                    # Usar o pyautogui para colar a mensagem
+                    pyautogui.hotkey('ctrl','v')
+                    time.sleep(2)
+
+                    # Clicar no botão de alternar
+                    pyautogui.press('enter')
+                    mensagens_enviadas += 1
+                
+            else:
+                pyautogui.hotkey('ctrl','a')
+                time.sleep(1)
+
+                # Pressionar Enter para enviar a imagem
+                pyautogui.press('backspace')
+            
+            time.sleep(2)  # Aguarde um tempo antes de enviar para o próximo contato
+        except:
+            if mensagens_enviadas == 0:
+                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui enviar nenhuma mensagem :(")
+            else:
+                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui enviar {mensagens_enviadas} mensagens :(")
+                            
+    messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
                 
 def preparar_data_faltosos(campo_data_inicial, campo_data_final):
-    data_inicial = campo_data_inicial.get("1.0", tk.END)
-    data_final = campo_data_final.get("1.0", tk.END)
+    data_inicial = campo_data_inicial.get()
+    data_final = campo_data_final.get()
+
+    data_inicial = data_inicial.replace("/", "")
+
+    print(data_inicial)
     
     messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
     
-    pyautogui.hotkey('alt','tab')
-    time.sleep(1)
-    
-    esperar_elemento("./imagens/hub_aberto.png")
-    
-    gerar_faltosos_e_educadores(data_inicial, data_final) 
+    gerar_faltosos(data_inicial, data_final) 
 
        
 def gerar_faltosos_e_educadores(data_inicial, data_final):
-    messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
-    
     repeticoes = 0
+
     while not localizar_elemento("./imagens/hub_aberto.png"):
         if repeticoes > 1:
             # Pressiona 'Alt' e 'Tab' duas vezes mantendo 'Alt' pressionado
@@ -138,8 +222,6 @@ def gerar_faltosos_e_educadores(data_inicial, data_final):
         time.sleep(1)
         pyautogui.press('enter')
         time.sleep(1)
-    
-    messagebox.showinfo("Atenção!", "Planilha de alunos e educadores gerada!")
         
 def gerar_faltosos(data_inicial, data_final):  
     gerar_faltosos_e_educadores(data_inicial, data_final)
