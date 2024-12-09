@@ -46,7 +46,7 @@ def preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_
     enviar_mensagens(arquivo_contatos, imagem, mensagem_template)
 
 
-def mensagem_para_verificacao(nome_professor, dia_falta, text_mensagem):
+def personalizar_mensagem(nome_professor, dia_falta, campo_mensagem):
     if nome_professor.get() == 'Yasmim':
         mensagem = f"""Olá, tudo bem? Aqui é a instrutora {nome_professor.get()} da Microlins.
 
@@ -63,8 +63,10 @@ Verifiquei que o(a) aluno(a) <nome_aluno> não compareceu à aula de {dia_falta.
 Fico no seu aguardo. 
 Obrigado desde já!"""
 
-    text_mensagem.delete("1.0", tk.END)
-    text_mensagem.insert("1.0", mensagem)
+    campo_mensagem.delete("1.0", tk.END)
+    campo_mensagem.insert("1.0", mensagem)
+
+    return mensagem
 
 # Função para gerar mensagem final substituindo placeholders
 def mensagem_final(mensagem_template, nome_aluno):
@@ -156,11 +158,13 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                             
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
     
-def gerar_comunicado(tipo_comunicado_var, campo_mensagem):
+def gerar_mensagem(tipo_comunicado_var, campo_mensagem, nome_professor, dia_falta):
     tipo_comunicado = tipo_comunicado_var.get()  # Pega a opção selecionada
 
     # Mensagens para cada tipo de comunicado
-    if tipo_comunicado == "multirão":
+    if tipo_comunicado == "falta":
+        mensagem = personalizar_mensagem(nome_professor, dia_falta, campo_mensagem)
+    elif tipo_comunicado == "multirão":
         mensagem = "Estamos organizando um multirão de reposições gratuitas até o dia x para faltas dentro do mês de yx"
     elif tipo_comunicado == "reuniao_de_pais":
         mensagem = "No dia x acontecerá a reunião de pais e professores do curso de x."

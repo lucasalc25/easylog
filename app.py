@@ -3,7 +3,7 @@ from ttkbootstrap import Window, ttk  # Importando ttkbootstrap para personaliza
 from datetime import datetime
 from bot import *
 from automacao.historicos import gerar_ocorrencia, preparar_registros
-from automacao.mensagens import gerar_comunicado, mensagem_para_verificacao, preparar_envio
+from automacao.mensagens import gerar_mensagem, personalizar_mensagem, preparar_envio
 
 # Função para exibir a tela inicial
 def exibir_janela_inicial():
@@ -20,8 +20,8 @@ def exibir_janela_inicial():
     ttk.Label(frame_principal, text="Tornando seu trabalho mais eficiente", font=("Helvetica", 11)).pack(pady=(10, 20))
 
     # Botões
-    ttk.Button(frame_principal, text="FALTAS", command=lambda:abrir_janela(root, "Faltas"), bootstyle="primary-outline", width=20).pack(pady=10)
-    ttk.Button(frame_principal, text="COMUNICADOS", command=lambda:abrir_janela(root, "Comunicados"), bootstyle="success-outline", width=20).pack(pady=10)
+
+    ttk.Button(frame_principal, text="MENSAGENS", command=lambda:abrir_janela(root, "Mensagens"), bootstyle="success-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="HISTÓRICOS",command=lambda:abrir_janela(root, "Históricos"), bootstyle="info-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="PLANILHAS", command=lambda:abrir_janela(root, "Planilhas"), bootstyle="warning-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="SUPORTE", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="danger-outline", width=20).pack(pady=10)
@@ -56,10 +56,8 @@ def abrir_janela(janela_inicial, titulo):
     frame.pack(fill=tk.BOTH, expand=True)
 
     # Configurar conteúdo da área central com base no título
-    if titulo == "Faltas":
-        frame_faltas(janela, frame)
-    elif titulo == "Comunicados":
-        frame_comunicados(janela,frame)
+    if titulo == "Mensagens":
+        frame_mensagens(janela, frame)
     elif titulo == "Históricos":
         frame_historicos(janela,frame)
     elif titulo == "Planilhas":
@@ -67,52 +65,8 @@ def abrir_janela(janela_inicial, titulo):
     else:
         ttk.Label(frame, text="Conteúdo não configurado.", font=("Helvetica", 12)).pack(pady=10)
 
-# Função para configurar a área de "faltas"
-def frame_faltas(janela, frame):
-    janela.geometry("500x470")
-    centralizar_janela(janela)
-
-    # Campo para anexação de planilha
-    frame_contatos = ttk.Labelframe(frame, text=" Planilha de contatos: * ", padding=5, bootstyle="primary")
-    frame_contatos.pack(fill=tk.X, pady=5)
-    campo_planilha = ttk.Entry(frame_contatos)
-    campo_planilha.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-    ttk.Button(frame_contatos, text="Anexar", command=lambda:anexar_planilha(campo_planilha), bootstyle="success").pack(side=tk.RIGHT, padx=5)
-
-    # Campos para dados adicionais
-    frame_dados = ttk.Labelframe(frame, text=" Variáveis ", padding=5, bootstyle="primary")
-    frame_dados.pack(fill=tk.X, pady=5)
-    ttk.Label(frame_dados, text="Professor: * ").pack(side=tk.LEFT, padx=(5,0))
-    campo_nome_professor = ttk.Entry(frame_dados, width=20)
-    campo_nome_professor.pack(side=tk.LEFT, padx=5)
-    ttk.Label(frame_dados, text="Dia da Falta: * ").pack(side=tk.LEFT, padx=(5,0))
-    campo_dia_falta = ttk.Entry(frame_dados, width=10)
-    campo_dia_falta.pack(side=tk.LEFT, padx=5)
-    ttk.Button(frame_dados, text="Gerar", command=lambda:mensagem_para_verificacao(campo_nome_professor, campo_dia_falta, campo_mensagem), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
-
-     # Campo para digitação do modelo de mensagem
-    frame_texto = ttk.Labelframe(frame, text=" Modelo da mensagem: * ", padding=5, bootstyle="primary")
-    frame_texto.pack(fill=tk.BOTH, pady=5)
-    campo_mensagem = tk.Text(frame_texto, height=7, wrap="word")
-    campo_mensagem.pack(fill=tk.BOTH, padx=5)
-
-    # Campo para anexar imagem
-    frame_imagem = ttk.Labelframe(frame, text=" Imagem: ", padding=5, bootstyle="primary")
-    frame_imagem.pack(fill=tk.X, pady=5)
-    campo_imagem = ttk.Entry(frame_imagem)
-    campo_imagem.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-    ttk.Button(frame_imagem, text="Anexar", command=lambda:anexar_imagem(campo_imagem), bootstyle="success").pack(side=tk.RIGHT, padx=5)
-
-    # Criando um frame para organizar os botões
-    frame_botoes = ttk.Frame(frame)
-    frame_botoes.pack(pady=(25,0))
-
-    # Adicionando botões lado a lado usando grid()
-    ttk.Button(frame_botoes, text="Enviar", command=lambda:preparar_envio(campo_planilha, campo_nome_professor, campo_dia_falta, campo_mensagem, campo_imagem),bootstyle="success-outline", width=10).grid(row=0, column=0, padx=40)
-    ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=0, column=1, padx=40)
-
 # Função para configurar a área de "Comunicados"
-def frame_comunicados(janela,frame):
+def frame_mensagens(janela,frame):
     janela.geometry("500x530")
     centralizar_janela(janela)
     # Campo para anexação de planilha
@@ -122,21 +76,16 @@ def frame_comunicados(janela,frame):
     campo_planilha.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
     ttk.Button(frame_contatos, text="Anexar", command=lambda:anexar_planilha(campo_planilha), bootstyle="success").pack(side=tk.RIGHT, padx=5)
 
-    # Campo para digitação do modelo de mensagem
-    frame_texto = ttk.Labelframe(frame, text=" Modelo da mensagem: ", padding=5, bootstyle="primary")
-    frame_texto.pack(fill=tk.BOTH, pady=5)
-    campo_mensagem = tk.Text(frame_texto, height=7, wrap="word")
-    campo_mensagem.pack(fill=tk.BOTH, padx=5)
-
     # Criando o frame para o tipo de comunicado
-    frame_comunicado = ttk.Labelframe(frame, text=" Tipo de Comunicado * ", padding=5)
+    frame_comunicado = ttk.Labelframe(frame, text=" Tipo de Mensagem * ", padding=5)
     frame_comunicado.pack(fill=tk.X, padx=5, pady=5)
 
     # Variável para armazenar o tipo de comunicado selecionado
-    tipo_comunicado_var = tk.StringVar(value="multirão")
+    tipo_mensagem_var = tk.StringVar(value="falta")
 
     # Definindo as opções dos RadioButtons
     opcoes = [
+        ("Falta", "falta"),
         ("Multirão", "multirão"),
         ("Reunião de Pais", "reuniao_de_pais"),
         ("Oficina", "oficina"),
@@ -148,11 +97,26 @@ def frame_comunicados(janela,frame):
     for index, (texto, valor) in enumerate(opcoes):
         row = index // 3  # Calcula em qual linha deve colocar
         column = index % 3  # Calcula a coluna (de 0 a 2)
-        ttk.Radiobutton(frame_comunicado, text=texto, value=valor, variable=tipo_comunicado_var).grid(row=row, column=column, sticky="w", padx=30, pady=5)
+        ttk.Radiobutton(frame_comunicado, text=texto, value=valor, variable=tipo_mensagem_var).grid(row=row, column=column, sticky="w", padx=30, pady=5)
+
+    # Campos para dados adicionais
+    frame_dados = ttk.Labelframe(frame, text=" Variáveis ", padding=5, bootstyle="primary")
+    frame_dados.pack(fill=tk.X, pady=5)
+    ttk.Label(frame_dados, text="Professor: * ").pack(side=tk.LEFT, padx=(5,0))
+    campo_nome_professor = ttk.Entry(frame_dados, width=20)
+    campo_nome_professor.pack(side=tk.LEFT, padx=5)
+    ttk.Label(frame_dados, text="Dia da Falta: * ").pack(side=tk.LEFT, padx=(5,0))
+    campo_dia_falta = ttk.Entry(frame_dados, width=10)
+    campo_dia_falta.pack(side=tk.LEFT, padx=5)
 
     # Botão para aplicar a seleção e inserir a mensagem
-    ttk.Button(frame, text="Gerar mensagem", command=lambda:gerar_comunicado(tipo_comunicado_var, campo_mensagem)).pack(pady=10)
+    ttk.Button(frame, text="Gerar mensagem", command=lambda:gerar_mensagem(tipo_mensagem_var, campo_mensagem, campo_nome_professor, campo_dia_falta)).pack(pady=10)
 
+    # Campo para digitação do modelo de mensagem
+    frame_texto = ttk.Labelframe(frame, text=" Modelo da mensagem: ", padding=5, bootstyle="primary")
+    frame_texto.pack(fill=tk.BOTH, pady=5)
+    campo_mensagem = tk.Text(frame_texto, height=7, wrap="word")
+    campo_mensagem.pack(fill=tk.BOTH, padx=5)
 
     # Campo para anexar imagem
     frame_imagem = ttk.Labelframe(frame, text=" Imagem: ", padding=5, bootstyle="primary")
