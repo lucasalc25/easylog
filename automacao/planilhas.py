@@ -76,12 +76,16 @@ def filtrar_faltosos(caminho_arquivo):
 
     # Selecionar colunas relevantes
     df_faltosos = df_faltosos[["Contrato", "Aluno", "Observação", "Tel Residencial", "Celular"]]
+    print(df_faltosos.columns)
+
+    # Preencher células vazias na coluna "Celular" (C) com valores da coluna "Tel Residencial" (B)
+    df_faltosos['Celular'] = df_faltosos['Celular'].fillna(df_faltosos['Tel Residencial'])
 
     relacionar_educador(df_faltosos)
 
 def relacionar_educador(df_faltosos):
     # Caminho para os arquivos
-    caminho_educadores = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "alunos_e_educadores.xls"
+    caminho_educadores = Path.home() / "OneDrive" / "Documentos" / "EasyLog" / "Planilhas" / "alunos_e_educadores.xls"
 
     # Carregar planilhas
     df_educadores = pd.read_excel(caminho_educadores)
@@ -98,9 +102,13 @@ def relacionar_educador(df_faltosos):
 
     # Selecionar colunas relevantes
     df_educadores = df_educadores[["Contrato", "Aluno", "Educador", "Celular"]]
+    print(df_educadores.columns)
 
     # Mesclar dataframes com base no contrato
     df_mesclado = pd.merge(df_faltosos, df_educadores, on="Aluno", how="left")
+
+    # Resolver conflitos de colunas com o mesmo nome (Contrato_x e Contrato_y)
+    df_mesclado["Contrato"] = df_mesclado["Contrato_x"].combine_first(df_mesclado["Contrato_y"])
 
     # Preencher "Celular" vazio com "Tel Residencial"
     df_mesclado['Celular'] = df_mesclado['Celular_x'].combine_first(df_mesclado['Celular_y'])
@@ -116,6 +124,8 @@ def relacionar_educador(df_faltosos):
 
     # Reorganizar colunas
     df_final = df_mesclado[["Contrato", "Aluno", "Observação", "Educador", "Celular"]]
+
+    print(df_final.columns)
 
     # Salvar o resultado
     df_final.to_excel("faltosos_filtrados.xlsx", index=False)
@@ -143,5 +153,4 @@ def ajustar_largura_colunas(arquivo):
     # Salvar o arquivo depois de ajustar as larguras
     wb.save(arquivo)
 
-
-filtrar_faltosos(Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos.xls")
+filtrar_faltosos(Path.home() / "OneDrive" / "Documentos" / "EasyLog" / "Planilhas" / "faltosos.xls")

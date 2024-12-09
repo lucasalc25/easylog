@@ -268,7 +268,7 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
     
-    caminho_planilha = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos.xls"
+    caminho_planilha = Path.home() / "OneDrive" / "Documentos" / "EasyLog" / "Planilhas" / "faltosos.xls"
     caminho_planilha = os.path.normpath(caminho_planilha)
     campo_nome_planilha = localizar_elemento('./imagens/campo_nome_planilha.png')
     pyautogui.click(campo_nome_planilha)
