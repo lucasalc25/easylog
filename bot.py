@@ -5,9 +5,10 @@ from tkinter import filedialog, messagebox
 import tkinter as tk
 import os
 import pyperclip
-from scripts.planilhas import filtrar_faltosos, ler_contatos, ler_alunos
-from scripts.ocr import esperar_elemento, localizar_elemento, verificar_existencia
 from pathlib import Path
+from config import caminhos
+from scripts.ocr import esperar_elemento, localizar_elemento, verificar_existencia
+from scripts.planilhas import filtrar_faltosos, ler_alunos, ler_contatos
 
 def criar_pastas():
     # Obtém o caminho da pasta Documentos do usuário
@@ -15,10 +16,10 @@ def criar_pastas():
     
     # Define o caminho completo da nova pasta
     caminho_pasta_easylog = os.path.join(caminho_documentos, 'EasyLog')
-    caminho_pasta_planilhas = os.path.join(caminho_pasta_easylog, 'Planilhas')
+    caminho_pasta_data = os.path.join(caminho_pasta_easylog, 'Data')
     
     pasta_easylog = 'EasyLog'
-    pasta_planilhas = 'Planilhas'
+    pasta_data = 'Data'
     
     # Cria a pasta, se ela não existir
     if not os.path.exists(caminho_pasta_easylog):
@@ -28,11 +29,11 @@ def criar_pastas():
         print(f"A pasta '{pasta_easylog}' já existe em {caminho_documentos}")
         
     # Cria a pasta, se ela não existir
-    if not os.path.exists(caminho_pasta_planilhas):
-        os.makedirs(caminho_pasta_planilhas)
-        print(f"Pasta '{pasta_planilhas}' criada em {caminho_pasta_easylog}")
+    if not os.path.exists(caminho_pasta_data):
+        os.makedirs(caminho_pasta_data)
+        print(f"Pasta '{pasta_data}' criada em {caminho_pasta_easylog}")
     else:
-        print(f"A pasta '{pasta_planilhas}' já existe em {caminho_pasta_easylog}")
+        print(f"A pasta '{pasta_data}' já existe em {caminho_pasta_easylog}")
 
 def repetir_tecla(*teclas, total_repeticoes):
     """
@@ -73,15 +74,15 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     
     # Pressionar Windows para abrir a conversa
     pyautogui.press('win')  
-    esperar_elemento(app.caminho_menu_iniciar)
+    esperar_elemento(caminhos["menu_iniciar"])
     
     # Usar o pyautogui para digitar whatsapp
     pyautogui.write('whatsapp')
-    esperar_elemento(app.caminho_whatsapp_encontrado)
+    esperar_elemento(caminhos["whatsapp_encontrado"])
 
     # Pressionar Enter para abrir o app
     pyautogui.press('enter')
-    esperar_elemento(app.caminho_whatsapp_aberto)
+    esperar_elemento(caminhos["whatsapp_aberto"])
 
     # Ler os contatos
     faltosos = ler_contatos(arquivo_contatos)
@@ -90,22 +91,21 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     for faltoso in faltosos:
         try:
             nome_aluno = faltoso['Aluno']  # Nome do aluno
-            print("Nome do aluno obtido")
             telefone = faltoso['Contato']
-            print("Telefone obtido")
             telefone = telefone[:2] + telefone[3:]  # Remove o índice 2 (que é o terceiro número)
             nome_educador = faltoso['Educador']
             mensagem_personalizada = personalizar_mensagem(nome_aluno, nome_educador, mensagem_template)
             pyperclip.copy(mensagem_personalizada)
 
             pyautogui.hotkey('ctrl','n')
-            esperar_elemento(app.caminho_nova_conversa)
+            esperar_elemento(caminhos["nova_conversa"])
             
-            # Usar o pyautogui para digitar o número de telefone do contato
+            # Usar o pyautogui para digitar o número de telefone do contatoe
             pyautogui.write(f'{telefone}')
-            time.sleep(1)   
+            time.sleep(2)   
             
             whatsapp_existe = verificar_existencia('pesquisa_whatsapp')
+            print(whatsapp_existe)
 
             if whatsapp_existe:
                 pyautogui.press('tab')
@@ -117,8 +117,8 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                 
                 #Verifica se há imagem
                 if len(imagem) > 0:
-                    esperar_elemento(app.caminho_anexar)
-                    botao_anexar = localizar_elemento(app.caminho_anexar)
+                    esperar_elemento(caminhos["anexar"])
+                    botao_anexar = localizar_elemento(caminhos["anexar"])
                     pyautogui.click(botao_anexar)
 
                     pyautogui.press('tab')
@@ -132,7 +132,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
 
                     pyautogui.press('enter')
                     
-                    esperar_elemento(app.caminho_aba_anexar)
+                    esperar_elemento(caminhos["aba_anexar"])
 
                     if mensagem_personalizada:
                         # Usar o pyautogui para colar a mensagem
@@ -172,8 +172,9 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
 
 def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrencia):
     repeticoes = 0
+    descricao_ocorrencia = ''
 
-    while not localizar_elemento(app.caminho_hub_aberto):
+    while not localizar_elemento(caminhos["hub_aberto"]):
         if repeticoes > 1:
             # Pressiona 'Alt' e 'Tab' duas vezes mantendo 'Alt' pressionado
             pyautogui.keyDown('alt')  # Mantém a tecla 'Alt' pressionada
@@ -209,8 +210,8 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
             if titulo_ocorrencia == "Falta - <Data>":
                 descricao_ocorrencia = aluno['Observacao']
 
-            esperar_elemento(app.caminho_pesquisa_aluno)
-            pesquisa_aluno = localizar_elemento('./imagens/pesquisa_aluno.png')
+            esperar_elemento(caminhos["pesquisa_aluno"])
+            pesquisa_aluno = localizar_elemento(caminhos["pesquisa_aluno"])
             pyautogui.click(pesquisa_aluno)
     
             pyautogui.hotkey('ctrl','a')
@@ -225,11 +226,11 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
             pyautogui.press('enter')
             time.sleep(3)
             
-            esperar_elemento(app.caminho_aluno_encontrado)
-            aluno_encontrado = localizar_elemento(app.caminho_aluno_encontrado)
+            esperar_elemento(caminhos["aluno_encontrado"])
+            aluno_encontrado = localizar_elemento(caminhos["aluno_encontrado"])
             pyautogui.doubleClick(aluno_encontrado)
             
-            esperar_elemento(app.caminho_contrato_aberto)
+            esperar_elemento(caminhos["contrato_aberto"])
                 
             pyautogui.hotkey('ctrl','tab')
             time.sleep(2)
@@ -260,7 +261,7 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
 def gerar_faltosos_e_educadores(data_inicial, data_final):
     repeticoes = 0
 
-    while not localizar_elemento(app.caminho_hub_aberto):
+    while not localizar_elemento(caminhos["hub_aberto"]):
         if repeticoes > 1:
             # Pressiona 'Alt' e 'Tab' duas vezes mantendo 'Alt' pressionado
             pyautogui.keyDown('alt')  # Mantém a tecla 'Alt' pressionada
@@ -282,36 +283,36 @@ def gerar_faltosos_e_educadores(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
 
-    esperar_elemento(app.caminho_faltas_por_periodo)
+    esperar_elemento(caminhos["faltas_por_periodo"])
     keyboard.write(str(data_inicial))
     time.sleep(1)
     pyautogui.press('tab')
     time.sleep(1)
     keyboard.write(str(data_final))
 
-    pesquisar_faltosos = localizar_elemento(app.caminho_pesquisar)
+    pesquisar_faltosos = localizar_elemento(caminhos["pesquisar"])
     pyautogui.click(pesquisar_faltosos)
 
-    esperar_elemento(app.caminho_lista_faltosos)
-    exportar_faltosos = localizar_elemento(app.caminho_exportar)
+    esperar_elemento(caminhos["lista_faltosos"])
+    exportar_faltosos = localizar_elemento(caminhos["exportar"])
     pyautogui.click(exportar_faltosos)
     pyautogui.press('tab')
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(1)
 
-    caminho_planilhas = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "alunos_e_educadores.xls"
+    caminho_planilhas = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_e_educadores.xls"
     caminho_planilhas = os.path.normpath(caminho_planilhas)
-    campo_nome_planilha = localizar_elemento(app.caminho_campo_nome_planilha)
+    campo_nome_planilha = localizar_elemento(caminhos["campo_nome_planilha"])
     pyautogui.click(campo_nome_planilha)
     time.sleep(1)
     pyautogui.write(caminho_planilhas)
     time.sleep(1)
-    salvar = localizar_elemento(app.caminho_salvar)
+    salvar = localizar_elemento(caminhos["salvar"])
     pyautogui.click(salvar)
     time.sleep(2)
     
-    if localizar_elemento(app.caminho_substituir_arquivo):
+    if localizar_elemento(caminhos["substituir_arquivo"]):
         pyautogui.press('tab')
         time.sleep(1)
         pyautogui.press('enter')
@@ -334,7 +335,7 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
     
-    esperar_elemento(app.caminho_presencas_e_faltas)
+    esperar_elemento(caminhos["presencas_e_faltas"])
     pyautogui.write(data_inicial)
     time.sleep(1)
     pyautogui.press('tab')
@@ -345,10 +346,10 @@ def gerar_faltosos(data_inicial, data_final):
     time.sleep(1)
     pyautogui.press('space')
     time.sleep(1)
-    visualizar = localizar_elemento(app.caminho_visualizar)
+    visualizar = localizar_elemento(caminhos["visualizar"])
     pyautogui.click(visualizar)
     
-    esperar_elemento(app.caminho_visu_presencas_e_faltas)
+    esperar_elemento(caminhos["visu_presencas_e_faltas"])
     pyautogui.press('alt')
     time.sleep(1)
     pyautogui.press('enter')
@@ -360,28 +361,28 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
     
-    esperar_elemento(app.caminho_opcoes_exportacao)
+    esperar_elemento(caminhos["opcoes_exportacao"])
     pyautogui.press('enter')
     time.sleep(1)
    
-    caminho_planilha = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos.xls"
+    caminho_planilha = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos.xls"
     caminho_planilha = os.path.normpath(caminho_planilha)
-    campo_nome_planilha = localizar_elemento(app.caminho_campo_nome_planilha)
+    campo_nome_planilha = localizar_elemento(caminhos["campo_nome_planilha"])
     pyautogui.click(campo_nome_planilha)
     time.sleep(1)
     pyautogui.write(caminho_planilha)
     time.sleep(1)
-    salvar = localizar_elemento(app.caminho_salvar)
+    salvar = localizar_elemento(caminhos["salvar"])
     pyautogui.click(salvar)
     time.sleep(2)
     
-    if localizar_elemento(app.caminho_substituir_arquivo):
+    if localizar_elemento(caminhos["substituir_arquivo"]):
         pyautogui.press('tab')
         time.sleep(1)
         pyautogui.press('enter')
         time.sleep(1)
         
-    esperar_elemento(app.caminho_abrir_planilha)
+    esperar_elemento(caminhos["abrir_planilha"])
     pyautogui.press('tab')
     time.sleep(1)
     pyautogui.press('enter')

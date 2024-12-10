@@ -1,9 +1,7 @@
 from tkinter import messagebox
 import tkinter as tk
-from scripts.ocr import *
 from bot import registrar_ocorrencias
 
-import pyperclip
 
 def gerar_ocorrencia(tipo_ocorrencia_var, campo_titulo, campo_descricao):
     tipo_ocorrencia = tipo_ocorrencia_var.get()  # Pega a opção selecionada

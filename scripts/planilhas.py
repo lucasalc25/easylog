@@ -33,14 +33,14 @@ def ler_contatos(caminho_planilha):
         faltosos = []
         for _, row in df.iterrows():
             faltosos.append({
-                "Aluno": row["Aluno"],              # Nome do aluno
+                "Aluno": row["Aluno"],
+                "Observacao": row["Observação"],              # Nome do aluno
                 "Educador": row["Educador"],        # Nome do Educador
                 "Contato": str(row["Celular"])     # Contato do aluno
             })
         
         for aluno in faltosos:
             aluno['Contato'] = formatar_telefone(aluno['Contato'])
-            print(aluno['Contato'])
 
         return faltosos
     except Exception as e:
@@ -58,7 +58,7 @@ def formatar_telefone(celular):
     return celular  # Retorna o número original caso não tenha o formato esperado
 
 def filtrar_faltosos(arquivo_faltosos):
-    arquivo_educadores = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "alunos_e_educadores.xls"
+    arquivo_educadores = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_e_educadores.xls"
 
     df_faltosos = pd.read_excel(arquivo_faltosos, sheet_name='Sheet', header=3)
     df_educadores = pd.read_excel(arquivo_educadores, sheet_name='Sheet')
@@ -94,7 +94,7 @@ def filtrar_faltosos(arquivo_faltosos):
     df_final.loc[df_final['Educador'].str.contains('Sangela', na=False), 'Observação'] = 'Funcionário'
 
 
-    caminho_saida = Path.home() / "Documents" / "EasyLog" / "Planilhas" / "faltosos_filtrados.xlsx"
+    caminho_saida = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_filtrados.xlsx"
 
     # Salvar o resultado
     df_final.to_excel(caminho_saida, index=False)
@@ -126,6 +126,7 @@ def ajustar_largura_colunas(arquivo):
     wb.save(arquivo)
 
 def preparar_data_faltosos(campo_data_inicial, campo_data_final):
+    from bot import gerar_faltosos
     data_inicial = campo_data_inicial.get()
     data_final = campo_data_final.get()
 

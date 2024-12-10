@@ -1,6 +1,13 @@
 import pyautogui
 import pytesseract
 from PIL import Image
+import cv2
+import numpy as np
+import time
+from config import caminhos
+
+# Configurar Pytesseract
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
    
 def verificar_existencia(elemento):
     if elemento == 'pesquisa_whatsapp':
@@ -10,41 +17,23 @@ def verificar_existencia(elemento):
     elif elemento == 'lista_faltosos':
         coordenadas = (375,423,675,82)
     
-    # Captura a tela e salva como imagem
-    caminho_print = "./imagens/print_verificaçao.png"
-    pyautogui.screenshot(caminho_print, region=coordenadas)
+    try:
+        # Captura a tela e salva como imagem
+        caminho_print = caminhos["print_verificacao"]
+        pyautogui.screenshot(caminho_print, region=coordenadas)
 
+        # Abre a imagem completa
+        imagem = Image.open(caminho_print)
 
-    # Use o Tesseract para extrair texto da imagem
-    # Certifique-se de que o Tesseract esteja instalado e configurado no PATH do sistema
-    # Para Windows, configure o caminho abaixo se necessário:
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+        # Usar o pytesseract para extrair o texto da imagem
+        texto_extraido = pytesseract.image_to_string(imagem)
+        print(texto_extraido)
 
-    # Abre a imagem completa
-    imagem = Image.open(caminho_print)
-
-    # Use o Tesseract para extrair texto da imagem
-    # Certifique-se de que o Tesseract esteja instalado e configurado no PATH do sistema
-    # Para Windows, configure o caminho abaixo se necessário:
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-
-    # Usar o pytesseract para extrair o texto da imagem
-    texto_extraido = pytesseract.image_to_string(imagem)
-    print(texto_extraido.strip())
-
-    # Verificar se há texto na imagem
-    while True:
+        # Verificar se há texto na imagem
         if texto_extraido.strip():  # strip() remove espaços extras
             return True
-    
-import cv2
-import numpy as np
-import pyautogui
-import pytesseract
-import time
-
-# Configurar Pytesseract
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    except Exception as e:
+        print(f"Erro no OCR: {e}")
 
 def localizar_elemento(caminho_imagem, threshold=0.8):
     print = pyautogui.screenshot()
@@ -68,7 +57,7 @@ def localizar_elemento(caminho_imagem, threshold=0.8):
 
 def esperar_elemento(elemento):
     while not localizar_elemento(elemento):
-        if elemento == './imagens/hub_aberto.png':
+        if elemento == caminhos["hub_aberto"]:
             pyautogui.hotkey('alt','tab')
             time.sleep(1)
         

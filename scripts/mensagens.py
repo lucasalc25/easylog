@@ -48,7 +48,7 @@ Obrigado desde já!"""
             messagebox.showinfo("Oops!", "Insira a data da falta para elaborar a mensagem!")
             return
     elif tipo_comunicado == "multirão":
-        mensagem = f"Estamos organizando um multirão de reposições gratuitas até o dia {data} para faltas dentro do mês de yx"
+        mensagem = f"Estamos organizando um multirão de reposições gratuitas até o dia {data} para faltas dentro deste mês"
         if len(data) == 0:
             messagebox.showinfo("Oops!", "Insira a data do multirão para elaborar a mensagem!")
             return
