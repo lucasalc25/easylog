@@ -1,10 +1,7 @@
-import time
-import pyautogui
 from tkinter import messagebox
 import tkinter as tk
-from bot import repetir_tecla
-from automacao.ocr import *
-from automacao.planilhas import ler_alunos
+from scripts.ocr import *
+from bot import registrar_ocorrencias
 
 import pyperclip
 
@@ -58,80 +55,6 @@ def preparar_registros(campo_planilha, campo_titulo, campo_descricao):
         return
     
     messagebox.showinfo("Aviso!", "Certifique-se de que o HUB esteja aberto e atrás do easyLog!")
-    
-    pyautogui.hotkey('alt','tab')
-    time.sleep(1)
-    
-    esperar_elemento("./imagens/hub_aberto.png")
 
     registrar_ocorrencias(arquivo_alunos, titulo, descricao)
 
-def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrencia):
-    # Ler os contatos
-    alunos = ler_alunos(arquivo_alunos)
-    ocorrencias_registradas = 0
-
-    pyautogui.press('alt')
-    time.sleep(1)
-    pyautogui.press('tab')
-    time.sleep(1)
-    pyautogui.press('tab')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-
-    for aluno in alunos:
-        try:
-            nome_aluno = aluno['nome']  # Nome do aluno
-            pyperclip.copy(nome_aluno)
-
-            esperar_elemento('./imagens/pesquisa_aluno.png')
-            pesquisa_aluno = localizar_elemento('./imagens/pesquisa_aluno.png')
-            pyautogui.click(pesquisa_aluno)
-    
-            pyautogui.hotkey('ctrl','a')
-            time.sleep(1)
-
-            # Pressionar Enter para enviar a imagem
-            pyautogui.press('backspace')
-            time.sleep(1)
-
-            pyautogui.hotkey('ctrl','v')
-            pyautogui.press('enter')
-            pyautogui.press('enter')
-            time.sleep(3)
-
-            aluno_existe = verificar_existencia('pesquisa_aluno')
-            
-            if aluno_existe:
-                esperar_elemento('./imagens/aluno_encontrado.png')
-                aluno_encontrado = localizar_elemento('./imagens/aluno_encontrado.png')
-                pyautogui.doubleClick(aluno_encontrado)
-                time.sleep(7)
-                
-            pyautogui.hotkey('ctrl','tab')
-            time.sleep(2)
-            
-            pyperclip.copy(titulo_ocorrencia)
-            repetir_tecla('shift','tab',total_repeticoes=5)
-            pyautogui.hotkey('ctrl','v')
-            time.sleep(2)
-
-            pyperclip.copy(descricao_ocorrencia)
-            repetir_tecla('shift','tab', total_repeticoes=2)
-            pyautogui.hotkey('ctrl','v')
-            time.sleep(2)
-
-            pyautogui.hotkey('alt','s')
-            
-            ocorrencias_registradas += 1
-            
-            time.sleep(4)
-
-        except:
-            if ocorrencias_registradas == 0:
-                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui registrar nenhuma ocorrência :(")
-            else:
-                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui registrar {ocorrencias_registradas} ocorrências :(")
