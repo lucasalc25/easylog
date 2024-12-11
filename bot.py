@@ -91,6 +91,13 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     for faltoso in faltosos:
         try:
             nome_aluno = faltoso['Aluno']  # Nome do aluno
+            observacao = faltoso['Observacao']
+
+            # Verifica se a coluna "Observação" está preenchida
+            if observacao:
+                print(f"Observação encontrada para {nome_aluno}. Pulando para o próximo aluno.")
+                continue  # Pula para o próximo aluno se houver observação
+            
             telefone = faltoso['Contato']
             telefone = telefone[:2] + telefone[3:]  # Remove o índice 2 (que é o terceiro número)
             nome_educador = faltoso['Educador']
@@ -105,7 +112,6 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
             time.sleep(2)   
             
             whatsapp_existe = verificar_existencia('pesquisa_whatsapp')
-            print(whatsapp_existe)
 
             if whatsapp_existe:
                 pyautogui.press('tab')
@@ -170,7 +176,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
 
 
-def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrencia):
+def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_ocorrencia):
     repeticoes = 0
     descricao_ocorrencia = ''
 
@@ -188,29 +194,37 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
 
     # Ler os contatos
     alunos = ler_alunos(arquivo_alunos)
-    print(alunos)
     ocorrencias_registradas = 0
-
-    pyautogui.press('alt')
-    time.sleep(1)
-    pyautogui.press('tab')
-    time.sleep(1)
-    pyautogui.press('tab')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
 
     for aluno in alunos:
         try:
             nome_aluno = aluno['Aluno']  # Nome do aluno
+            observacao = aluno['Observacao']
+
+            # Verifica se a coluna "Observação" está preenchida
+            if not observacao:
+                print(f"Observação não encontrada para {nome_aluno}. Pulando para o próximo aluno.")
+                continue  # Pula para o próximo aluno se houver observação
+            
+            print("\nTitulo da ocorrência:", titulo_ocorrencia)
+            if titulo_ocorrencia.strip() == f"Falta - {data.strip()}":
+                descricao_ocorrencia = observacao
+                print("Descrição da ocorrência:",descricao_ocorrencia)
+
             pyperclip.copy(nome_aluno)
 
-            if titulo_ocorrencia == "Falta - <Data>":
-                descricao_ocorrencia = aluno['Observacao']
+            pyautogui.press('alt')
+            time.sleep(1)
+            pyautogui.press('tab')
+            time.sleep(1)
+            pyautogui.press('tab')
+            time.sleep(1)
+            pyautogui.press('enter')
+            time.sleep(1)
+            pyautogui.press('enter')
+            time.sleep(1)
 
-            esperar_elemento(caminhos["pesquisa_aluno"])
+            esperar_elemento(caminhos["contratos"])
             pesquisa_aluno = localizar_elemento(caminhos["pesquisa_aluno"])
             pyautogui.click(pesquisa_aluno)
     
@@ -249,14 +263,18 @@ def registrar_ocorrencias(arquivo_alunos, titulo_ocorrencia, descricao_ocorrenci
             
             ocorrencias_registradas += 1
             
-            time.sleep(4)
+            esperar_elemento(caminhos["contratos"])
+
+            pyautogui.press('esc')
+            time.sleep(3)
 
         except:
             if ocorrencias_registradas == 0:
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui registrar nenhuma ocorrência :(")
             else:
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui registrar {ocorrencias_registradas} ocorrências :(")
-                
+    
+    messagebox.showinfo("Concluído!", "Histórico registrado para todos os alunos!")           
 
 def gerar_faltosos_e_educadores(data_inicial, data_final):
     repeticoes = 0

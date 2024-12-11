@@ -1,21 +1,25 @@
 import tkinter as tk  # Importando tkinter para acesso a constantes
 from tkinter import messagebox
 from ttkbootstrap import Window, ttk  # Importando ttkbootstrap para personalização do tema
-from datetime import datetime
+from datetime import datetime, timedelta
 from config import caminhos
 from bot import anexar_imagem, anexar_planilha, criar_pastas
 from scripts.historicos import gerar_ocorrencia, preparar_registros
 from scripts.mensagens import gerar_mensagem, preparar_envio
 from scripts.planilhas import preparar_data_faltosos
 
-data_atual = datetime.now().strftime("%d/%m/%Y")
+# Obter a data atual
+data_atual = datetime.now()
+
+# Subtrair um dia da data atual
+data_anterior = (data_atual - timedelta(days=1)).strftime('%d/%m/%Y')
 
 # Função para exibir a tela inicial
 def exibir_janela_inicial():
     root = Window(themename="cosmo")
     root.title("EasyLog")
     root.iconbitmap(caminhos["icone"])
-    root.resizable(False, False)
+    root.resizable(False, False)            
 
     frame_principal = ttk.Frame(root, padding=(70,20))
     frame_principal.pack(fill=tk.BOTH, expand=True)
@@ -102,19 +106,64 @@ def frame_mensagens(janela,frame):
     for index, (texto, valor) in enumerate(opcoes):
         row = index // 3  # Calcula em qual linha deve colocar
         column = index % 3  # Calcula a coluna (de 0 a 2)
-        ttk.Radiobutton(frame_tipo_mensagem, text=texto, value=valor, variable=tipo_mensagem_var).grid(row=row, column=column, sticky="w", padx=30, pady=5)
+        ttk.Radiobutton(frame_tipo_mensagem, text=texto, value=valor, variable=tipo_mensagem_var, command=lambda valor=valor: atualizar_campos(valor)).grid(row=row, column=column, sticky="w", padx=30, pady=5)
 
-    # Campos para dados adicionais
+    # Campos para variáveis
     frame_variaveis = ttk.Labelframe(frame, text=" Variáveis ", padding=5, bootstyle="primary")
     frame_variaveis.pack(fill=tk.X, pady=5)
+
     ttk.Label(frame_variaveis, text="Data: ").pack(side=tk.LEFT, padx=(5,0))
-    campo_data = ttk.Entry(frame_variaveis, width=12)
-    campo_data.pack(side=tk.LEFT, padx=5)
-    campo_data.insert(0, data_atual)
-    ttk.Label(frame_variaveis, text="Oficina: ").pack(side=tk.LEFT, padx=(5,0))
-    campo_oficina = ttk.Entry(frame_variaveis, width=28)
-    campo_oficina.pack(side=tk.LEFT, padx=5)
-    ttk.Button(frame_variaveis, text="Gerar", command=lambda:gerar_mensagem(tipo_mensagem_var, campo_mensagem, campo_data, campo_oficina)).pack(side=tk.RIGHT, padx=(5,0))
+    campo_data = ttk.Entry(frame_variaveis, width=10)
+    campo_data.pack(side=tk.LEFT, padx=(10,5))
+    campo_data.insert(0, data_anterior)
+
+    campo_data_inicial = ttk.Entry(frame_variaveis, width=10)
+    campo_data_final = ttk.Entry(frame_variaveis, width=10)
+    
+    campo_tema = ttk.Entry(frame_variaveis, width=29)
+
+    campo_hora = ttk.Entry(frame_variaveis, width=7)
+
+    ttk.Button(frame_variaveis, text="Gerar", command=lambda:gerar_mensagem(tipo_mensagem_var, campo_mensagem, campo_data, campo_hora, campo_tema, campo_data_inicial, campo_data_final)).pack(side=tk.RIGHT, padx=5)
+
+    # Função para atualizar os campos
+    def atualizar_campos(valor):
+        for widget in frame_variaveis.winfo_children():
+            widget.pack_forget()
+
+        campo_data.delete(0, tk.END)  # Limpa a área de texto antes de inserir
+        campo_hora.delete(0, tk.END)  # Limpa a área de texto antes de inserir
+        campo_tema.delete(0, tk.END)  # Limpa a área de texto antes de inserir
+
+        if valor == "falta":
+            ttk.Label(frame_variaveis, text="Data: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_data.pack(side=tk.LEFT, padx=5)
+            campo_data.insert(0, data_anterior)
+        elif valor == "multirão":
+            ttk.Label(frame_variaveis, text="Data Inicial: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_data_inicial.pack(side=tk.LEFT, padx=5)
+            ttk.Label(frame_variaveis, text="Data Final: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_data_final.pack(side=tk.LEFT, padx=5)
+        elif valor == "reuniao_de_pais":
+            ttk.Label(frame_variaveis, text="Data: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_data.pack(side=tk.LEFT, padx=5)
+            campo_data.insert(0, data_anterior)
+        elif valor == "oficina":
+            ttk.Label(frame_variaveis, text="Data: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_data.pack(side=tk.LEFT, padx=5)
+            ttk.Label(frame_variaveis, text="Tema: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_tema.pack(side=tk.LEFT, padx=5)
+        elif valor == "formatura":
+            ttk.Label(frame_variaveis, text="Data: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_data.pack(side=tk.LEFT, padx=5)
+            campo_data.insert(0, data_anterior)
+            ttk.Label(frame_variaveis, text="Hora: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_hora.pack(side=tk.LEFT, padx=5)
+        elif valor == "feriado":
+            ttk.Label(frame_variaveis, text="Data: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_data.pack(side=tk.LEFT, padx=5)
+
+        ttk.Button(frame_variaveis, text="Gerar", command=lambda:gerar_mensagem(tipo_mensagem_var, campo_mensagem, campo_data, campo_hora, campo_tema, campo_data_inicial, campo_data_final)).pack(side=tk.RIGHT, padx=5)
 
     # Campo para digitação do modelo de mensagem
     frame_texto = ttk.Labelframe(frame, text=" Modelo da mensagem: ", padding=5, bootstyle="primary")
@@ -172,10 +221,34 @@ def frame_historicos(janela, frame):
     for index, (texto, valor) in enumerate(opcoes):
         row = index // 4  # Calcula em qual linha deve colocar
         column = index % 4  # Calcula a coluna (de 0 a 2)
-        ttk.Radiobutton(frame_comunicado, text=texto, value=valor, variable=tipo_ocorrencia_var).grid(row=row, column=column, sticky="w", padx=15, pady=5)
+        ttk.Radiobutton(frame_comunicado, text=texto, value=valor, variable=tipo_ocorrencia_var, command=lambda valor=valor: atualizar_campos(valor)).grid(row=row, column=column, sticky="w", padx=15, pady=5)
 
-    # Botão para aplicar a seleção e inserir a mensagem
-    ttk.Button(frame, text="Gerar Ocorrência", command=lambda:gerar_ocorrencia(tipo_ocorrencia_var, campo_titulo, campo_descricao)).pack(pady=10)
+    # Campos para variáveis
+    frame_variaveis = ttk.Labelframe(frame, text=" Variáveis ", padding=5, bootstyle="primary")
+    frame_variaveis.pack(fill=tk.X, pady=5)
+
+    ttk.Label(frame_variaveis, text="Data da falta: ").pack(side=tk.LEFT, padx=(5,0))
+    campo_data = ttk.Entry(frame_variaveis, width=10)
+    campo_data.pack(side=tk.LEFT, padx=(10,5))
+    campo_data.insert(0, data_anterior)
+
+    ttk.Button(frame_variaveis, text="Gerar", command=lambda:gerar_ocorrencia(tipo_ocorrencia_var, campo_data, campo_titulo, campo_descricao)).pack(side=tk.RIGHT, padx=5)
+
+    # Função para atualizar os campos
+    def atualizar_campos(valor):
+        for widget in frame_variaveis.winfo_children():
+            widget.pack_forget()
+
+        campo_data.delete(0, tk.END)  # Limpa a área de texto antes de inserir
+
+        if valor == "falta":
+            ttk.Label(frame_variaveis, text="Data da falta: ").pack(side=tk.LEFT, padx=(5,0))
+            campo_data.pack(side=tk.LEFT, padx=5)
+            campo_data.insert(0, data_anterior)
+        else:
+            ttk.Label(frame_variaveis, text="Não há variáveis para esse caso ").pack(side=tk.LEFT, padx=(5,0))
+    
+        ttk.Button(frame_variaveis, text="Gerar", command=lambda:gerar_ocorrencia(tipo_ocorrencia_var, campo_data, campo_titulo, campo_descricao)).pack(side=tk.RIGHT, padx=5)
 
     # Campo para digitação do título da ocorrência
     frame_texto_tipo = ttk.Labelframe(frame, text=" Título: * ", padding=5, bootstyle="primary")
@@ -195,7 +268,7 @@ def frame_historicos(janela, frame):
 
     # Adicionando botões lado a lado usando grid()
     ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=0, column=0, padx=40)
-    ttk.Button(frame_botoes, text="Registrar", command=lambda:preparar_registros(campo_planilha, campo_titulo, campo_descricao),bootstyle="success-outline", width=10).grid(row=0, column=1, padx=40)
+    ttk.Button(frame_botoes, text="Registrar", command=lambda:preparar_registros(campo_planilha, campo_data, campo_titulo, campo_descricao),bootstyle="success-outline", width=10).grid(row=0, column=1, padx=40)
 
 
 # Função para configurar a área de "Planilhas"
@@ -209,11 +282,11 @@ def frame_planilhas(janela, frame):
     ttk.Label(frame_planilhas, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(5,0))
     campo_data_inicial = ttk.Entry(frame_planilhas, width=12)
     campo_data_inicial.pack(side=tk.LEFT, padx=5)
-    campo_data_inicial.insert(0, data_atual)
+    campo_data_inicial.insert(0, data_anterior)
     ttk.Label(frame_planilhas, text="Data Final: * ").pack(side=tk.LEFT, padx=(5,0))
     campo_data_final = ttk.Entry(frame_planilhas, width=12)
     campo_data_final.pack(side=tk.LEFT, padx=5)
-    campo_data_final.insert(0, data_atual)
+    campo_data_final.insert(0, data_anterior)
 
     ttk.Button(frame_planilhas, text="Gerar", command=lambda:preparar_data_faltosos(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
 

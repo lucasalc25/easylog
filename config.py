@@ -21,6 +21,7 @@ caminhos = {
     "campo_pesquisa" : resource_path('imagens/campo_pesquisa.png'),
     "contato_inexistente" : resource_path('imagens/contato_inexistente.png'),
     "contato" : resource_path('imagens/contato.png'),
+    "contratos" : resource_path('imagens/contratos.png'),
     "contrato_aberto" : resource_path('imagens/contrato_aberto.png'),
     "descricao" : resource_path('imagens/descricao.png'),
     "exportar" : resource_path('imagens/exportar.png'),
@@ -43,10 +44,10 @@ caminhos = {
     "visualizar" : resource_path('imagens/visualizar.png'),
     "whatsapp_aberto" : resource_path('imagens/whatsapp_aberto.png'),
     "whatsapp_encontrado":resource_path('imagens/whatsapp_encontrado.png'),
-    "bot": resource_path("bot.py"),
     "historicos": resource_path("scripts/historicos.py"),
     "mensagens": resource_path("scripts/mensagens.py"),
     "planilhas": resource_path("scripts/planilhas.py"),
     "ocr": resource_path("scripts/ocr.py"),
+    "bot": resource_path("bot.py")
     # Adicione outros caminhos necessários
-} # type: ignore
+}
