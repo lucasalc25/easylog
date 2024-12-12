@@ -4,7 +4,7 @@ import openpyxl
 import re
 
 # Função para ler os contatos de um arquivo TXT
-def ler_alunos(caminho_planilha):
+def ler_registros(caminho_planilha):
     try:
         # Lê a planilha usando pandas
         df = pd.read_excel(caminho_planilha)
@@ -24,7 +24,27 @@ def ler_alunos(caminho_planilha):
         return []
     
 # Função para ler os contatos de um arquivo TXT
-def ler_contatos(caminho_planilha):
+def ler_conformes(caminho_planilha):
+    try:
+        # Lê a planilha usando pandas
+        df = pd.read_excel(caminho_planilha)
+        
+        # Certifique-se de que os nomes das colunas estão corretos
+        alunos = []
+        for _, row in df.iterrows():
+            alunos.append({
+                "Aluno": row["Aluno"],         # Nome do aluno
+                "Contato": row["Celular"]
+            })
+
+        return alunos
+        
+    except Exception as e:
+        print(f"Erro ao ler a planilha: {e}")
+        return []
+    
+# Função para ler os contatos de um arquivo TXT
+def ler_colunas(caminho_planilha):
     try:
         # Lê a planilha usando pandas
         df = pd.read_excel(caminho_planilha)
@@ -116,25 +136,44 @@ def filtrar_alunos_atencao(planilha_alunos_atencao):
     
     # Filtrar as linhas onde o valor da coluna é diferente do nome_a_remover
     df_alunos_atencao = df_alunos_atencao[df_alunos_atencao['Educador'] != 'Sangela']
+
+    # Exemplo: Converter todos os nomes para maiúsculas
+    df_alunos_atencao["Telefone Responsável"] = df_alunos_atencao["Telefone Responsável"].apply(formatar_telefone)
     
     caminho_saida = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_atencao_filtrados.xlsx"
 
     # Salvar o resultado
     df_alunos_atencao.to_excel(caminho_saida, index=False)
+
+    ajustar_largura_colunas(caminho_saida)
+
+    print("Processamento concluído. O arquivo de alunos em atenção gerado.")
+
     
 def ajustar_largura_colunas(arquivo):
     # Carregar o arquivo Excel
     wb = openpyxl.load_workbook(arquivo)
     ws = wb.active
 
-    # Definir larguras específicas para as colunas
-    colunas_largura = {
-        "A": 10.0,
-        "B": 40.0,
-        "C": 50.0,
-        "D": 12.0,
-        "E": 18.0
-    }
+    if arquivo == Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_filtrados.xlsx":
+        # Definir larguras específicas para as colunas
+        colunas_largura = {
+            "A": 10.0,
+            "B": 40.0,
+            "C": 50.0,
+            "D": 12.0,
+            "E": 18.0
+        }
+    elif arquivo == Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_atencao_filtrados.xlsx":
+        # Definir larguras específicas para as colunas
+        colunas_largura = {
+            "A": 35.0,
+            "B": 10.0,
+            "C": 22.0,
+            "D": 22.0,
+            "E": 7.0,
+            "F": 12.0
+        }
 
     # Ajustar a largura das colunas conforme o dicionário
     for coluna, largura in colunas_largura.items():
@@ -160,3 +199,6 @@ def preparar_alunos_atencao(campo_data_inicial, campo_data_final):
     data_inicial = data_inicial.replace("/", "")
     
     gerar_alunos_atencao(data_inicial, data_final) 
+
+
+ajustar_largura_colunas(Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_atencao_filtrados.xlsx")

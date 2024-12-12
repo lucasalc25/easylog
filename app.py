@@ -98,10 +98,10 @@ def frame_mensagens(janela,frame):
     opcoes = [
         ("Falta", "falta"),
         ("Multirão", "multirão"),
+        ("Atenção", "atenção"),              
         ("Reunião de Pais", "reuniao_de_pais"),
         ("Oficina", "oficina"),
-        ("Formatura", "formatura"),
-        ("Feriado", "feriado")
+        ("Personalizada", "personalizada")
     ]
 
     # Colocando os RadioButtons em uma grade
@@ -155,15 +155,8 @@ def frame_mensagens(janela,frame):
             campo_data.pack(side=tk.LEFT, padx=5)
             ttk.Label(frame_variaveis, text="Tema: ").pack(side=tk.LEFT, padx=(5,0))
             campo_tema.pack(side=tk.LEFT, padx=5)
-        elif valor == "formatura":
-            ttk.Label(frame_variaveis, text="Data: ").pack(side=tk.LEFT, padx=(5,0))
-            campo_data.pack(side=tk.LEFT, padx=5)
-            campo_data.insert(0, data_anterior)
-            ttk.Label(frame_variaveis, text="Hora: ").pack(side=tk.LEFT, padx=(5,0))
-            campo_hora.pack(side=tk.LEFT, padx=5)
-        elif valor == "feriado":
-            ttk.Label(frame_variaveis, text="Data: ").pack(side=tk.LEFT, padx=(5,0))
-            campo_data.pack(side=tk.LEFT, padx=5)
+        elif valor == "personalizada" or valor == "atenção":
+            ttk.Label(frame_variaveis, text="Não há variáveis para essa opção ").pack(side=tk.LEFT, padx=(5,0))
 
         ttk.Button(frame_variaveis, text="Gerar", command=lambda:gerar_mensagem(tipo_mensagem_var, campo_mensagem, campo_data, campo_hora, campo_tema, campo_data_inicial, campo_data_final)).pack(side=tk.RIGHT, padx=5)
 
@@ -211,12 +204,11 @@ def frame_historicos(janela, frame):
     opcoes = [
         ("Falta", "falta"),
         ("Multirão", "multirao"),
-        ("Comportamento", "comportamento"),
+        ("Atenção", "atenção"),
         ("Prova", "prova"),
         ("Atividades", "atividades"),
         ("1° dia de aula", "1_dia_de_aula"),
-        ("Plantão", "plantao"),
-
+        ("Personalizada", "personalizada"),
     ]
 
     # Colocando os RadioButtons em uma grade
@@ -248,7 +240,7 @@ def frame_historicos(janela, frame):
             campo_data.pack(side=tk.LEFT, padx=5)
             campo_data.insert(0, data_anterior)
         else:
-            ttk.Label(frame_variaveis, text="Não há variáveis para esse caso ").pack(side=tk.LEFT, padx=(5,0))
+            ttk.Label(frame_variaveis, text="Não há variáveis para essa opção ").pack(side=tk.LEFT, padx=(5,0))
     
         ttk.Button(frame_variaveis, text="Gerar", command=lambda:gerar_ocorrencia(tipo_ocorrencia_var, campo_data, campo_titulo, campo_descricao)).pack(side=tk.RIGHT, padx=5)
 

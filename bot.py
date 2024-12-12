@@ -8,7 +8,7 @@ import pyperclip
 from pathlib import Path
 from config import caminhos
 from scripts.ocr import esperar_elemento, localizar_elemento, verificar_existencia
-from scripts.planilhas import filtrar_alunos_atencao, filtrar_faltosos, ler_alunos, ler_contatos
+from scripts.planilhas import filtrar_alunos_atencao, filtrar_faltosos, ler_registros, ler_colunas
 
 def criar_pastas():
     # Obtém o caminho da pasta Documentos do usuário
@@ -51,18 +51,22 @@ def repetir_tecla(*teclas, total_repeticoes):
         
 def procurar_hub():
     repeticoes = 0
-
-    while not localizar_elemento(caminhos["hub_aberto"]):
-        if repeticoes > 1:
-            # Pressiona 'Alt' e 'Tab' duas vezes mantendo 'Alt' pressionado
-            pyautogui.keyDown('alt')  # Mantém a tecla 'Alt' pressionada
-            repetir_tecla('tab', total_repeticoes=repeticoes)
-            pyautogui.keyUp('alt')  # Mantém a tecla 'Alt' pressionada
-        else:
-            pyautogui.hotkey('alt','tab')
-
-        repeticoes += 1
+    
+    if localizar_elemento(caminhos["hub_aberto"]):
+        pyautogui.hotkey('alt','tab')
         time.sleep(2) 
+    else:             
+        while not localizar_elemento(caminhos["hub_aberto"]):
+            if repeticoes > 1:
+                # Pressiona 'Alt' e 'Tab' duas vezes mantendo 'Alt' pressionado
+                pyautogui.keyDown('alt')  # Mantém a tecla 'Alt' pressionada
+                repetir_tecla('tab', total_repeticoes=repeticoes)
+                pyautogui.keyUp('alt')  # Mantém a tecla 'Alt' pressionada
+            else:
+                pyautogui.hotkey('alt','tab')
+
+            repeticoes += 1
+            time.sleep(2) 
 
 def abrir_aba(aba):
     pyautogui.press('alt')
@@ -147,22 +151,26 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     esperar_elemento(caminhos["whatsapp_aberto"])
 
     # Ler os contatos
-    faltosos = ler_contatos(arquivo_contatos)
+    alunos = ler_colunas(arquivo_contatos)
     mensagens_enviadas = 0
     
-    for faltoso in faltosos:
+    for aluno in alunos:
         try:
-            nome_aluno = faltoso['Aluno']  # Nome do aluno
-            observacao = faltoso['Observacao']
+            if aluno['Aluno']:
+                nome_aluno = aluno['Aluno']  # Nome do aluno
+            if aluno['Observacao']:
+                observacao = aluno['Observacao']
+                # Verifica se a coluna "Observação" está preenchida
+                if observacao:
+                    print(f"Observação encontrada para {nome_aluno}. Pulando para o próximo aluno.")
+                    continue  # Pula para o próximo aluno se houver observação
 
-            # Verifica se a coluna "Observação" está preenchida
-            if observacao:
-                print(f"Observação encontrada para {nome_aluno}. Pulando para o próximo aluno.")
-                continue  # Pula para o próximo aluno se houver observação
-            
-            telefone = faltoso['Contato']
-            telefone = telefone[:2] + telefone[3:]  # Remove o índice 2 (que é o terceiro número)
-            nome_educador = faltoso['Educador']
+            if aluno['Contato']:
+                telefone = aluno['Contato']
+                telefone = telefone[:2] + telefone[3:]  # Remove o índice 2 (que é o terceiro número)
+            if aluno['Educador']:
+                nome_educador = aluno['Educador']
+
             mensagem_personalizada = personalizar_mensagem(nome_aluno, nome_educador, mensagem_template)
             pyperclip.copy(mensagem_personalizada)
 
@@ -255,7 +263,7 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
         time.sleep(2) 
 
     # Ler os contatos
-    alunos = ler_alunos(arquivo_alunos)
+    alunos = ler_registros(arquivo_alunos)
     ocorrencias_registradas = 0
 
     for aluno in alunos:

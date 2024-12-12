@@ -8,7 +8,7 @@ def gerar_mensagem(tipo_comunicado_var, campo_mensagem, campo_data, campo_hora, 
     tipo_comunicado = tipo_comunicado_var.get()  # Pega a opção selecionada
     data = campo_data.get()
 
-    if len(data) == 0 and tipo_comunicado != "multirão":
+    if len(data) == 0 and tipo_comunicado != "multirão" and tipo_comunicado != "personalizada" and tipo_comunicado != "atenção":
         messagebox.showinfo("Oops!", "Insira a data para elaborar a mensagem!")
         return
 
@@ -20,18 +20,36 @@ Verifiquei que o(a) aluno(a) <nome_aluno> não compareceu à aula de {data}. Pod
 
 Fico no seu aguardo. 
 Obrigado desde já!"""
+        
     elif tipo_comunicado == "multirão":
         data_inicial = campo_data_inicial.get()
         data_final = campo_data_final.get()
-        mensagem = f"Atenção! Estamos organizando um multirão de reposições gratuitas dos dias {data_inicial} a {data_final} para faltas dentro deste mês. Não perca essa chance de deixar seu curso em dia!"
+        mensagem = f"""Olá, tudo bem?
+
+Gostaríamos de convidar o(a) aluno(a) <nome_aluno> para participar do nosso Mutirão de Reposição, que acontecerá gratuitamente dos dias {data_inicial} até {data_final}. Essa é uma excelente oportunidade para reforçar conteúdos e manter o ritmo de aprendizado.
+
+Por favor, nos informe sua disponibilidade de data e horário para organizarmos a melhor programação. Estamos à disposição para dúvidas e detalhes.
+
+Aguardamos seu retorno!
+
+Atenciosamente, CoordenaçãoⓂ"""
         if len(data_inicial) == 0:
             messagebox.showinfo("Oops!", "Insira a data de início do multirão para elaborar a mensagem!")
             return
         elif len(data_final) == 0:
             messagebox.showinfo("Oops!", "Insira a data de fim do multirão para elaborar a mensagem!")
             return
+        
+    elif tipo_comunicado == "atenção":
+            mensagem = f"""Prezados responsáveis,
+
+Gostaríamos de informar que o(a) aluno(a) <nome_aluno> não compareceu às aulas do curso e está com faltas. Para garantir a continuidade do aprendizado, solicitamos que ele(a) realize as reposições correspondentes. Pedimos que entrem em contato conosco para agendar a reposição e esclarecer qualquer dúvida.
+
+Atenciosamente, Coordenação!Ⓜ"""
+            
     elif tipo_comunicado == "reuniao_de_pais":
         mensagem = f"No dia {data} acontecerá a reunião de pais e professores do curso de x."
+
     elif tipo_comunicado == "oficina":
         tema = campo_tema.get()
         mensagem = f"Anunciamos a oficina de {tema}, com início a partir do dia {data}."
@@ -41,14 +59,9 @@ Obrigado desde já!"""
         elif len(tema) == 0:
             messagebox.showinfo("Oops!", "Insira o tema da oficina para elaborar a mensagem!")
             return
-    elif tipo_comunicado == "formatura":
-        hora = campo_hora.get()
-        mensagem = f"Convidamos o(a) aluno(a) <nome_aluno> para a nossa formatura, que acontecerá no dia {data} a partir das {hora}."
-        if len(hora) == 0:
-            messagebox.showinfo("Oops!", "Insira a hora da formatura para elaborar a mensagem!")
-            return
-    elif tipo_comunicado == "feriado":
-        mensagem = f"Lembrete sobre o feriado do dia {data}."
+        
+    elif tipo_comunicado == "personalizada":
+        mensagem = f"Digite a mensagem aqui..."
 
     # Exibe a mensagem no campo de texto
     campo_mensagem.delete("1.0", tk.END)  # Limpa a área de texto antes de inserir
