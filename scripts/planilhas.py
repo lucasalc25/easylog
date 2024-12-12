@@ -57,11 +57,11 @@ def formatar_telefone(celular):
             return f"{celular[:2]}{celular[2]}{celular[3:7]}{celular[7:]}"
     return celular  # Retorna o número original caso não tenha o formato esperado
 
-def filtrar_faltosos(arquivo_faltosos):
-    arquivo_educadores = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_e_educadores.xls"
+def filtrar_faltosos(planilha_faltosos):
+    planilha_educadores = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_e_educadores.xls"
 
-    df_faltosos = pd.read_excel(arquivo_faltosos, sheet_name='Sheet', header=3)
-    df_educadores = pd.read_excel(arquivo_educadores, sheet_name='Sheet')
+    df_faltosos = pd.read_excel(planilha_faltosos, sheet_name='Sheet', header=3)
+    df_educadores = pd.read_excel(planilha_educadores, sheet_name='Sheet')
 
     df_educadores.rename(columns={"Nome Aluno": "Aluno"}, inplace=True)
 
@@ -103,7 +103,25 @@ def filtrar_faltosos(arquivo_faltosos):
 
     print("Processamento concluído. O arquivo de faltosos foi gerado.")
 
+def filtrar_alunos_atencao(planilha_alunos_atencao):
+    df_alunos_atencao = pd.read_excel(planilha_alunos_atencao, sheet_name='Sheet')
+    
+    # Transferir telefones residenciais para a coluna celular quando não houver
+    df_alunos_atencao['Telefone Responsável'] = df_alunos_atencao['Telefone Responsável'].fillna(df_alunos_atencao['Telefone Aluno'])
+    
+    df_alunos_atencao = df_alunos_atencao[['Nome Aluno', 'Educador', 'Data Cadastro Contrato', 'Telefone Responsável', 'Faltas', 'Reposições']]
+    
+    # Manter apenas o primeiro nome do educador
+    df_alunos_atencao['Educador'] = df_alunos_atencao['Educador'].str.split().str[0]
+    
+    # Filtrar as linhas onde o valor da coluna é diferente do nome_a_remover
+    df_alunos_atencao = df_alunos_atencao[df_alunos_atencao['Educador'] != 'Sangela']
+    
+    caminho_saida = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_atencao_filtrados.xlsx"
 
+    # Salvar o resultado
+    df_alunos_atencao.to_excel(caminho_saida, index=False)
+    
 def ajustar_largura_colunas(arquivo):
     # Carregar o arquivo Excel
     wb = openpyxl.load_workbook(arquivo)
@@ -133,3 +151,12 @@ def preparar_data_faltosos(campo_data_inicial, campo_data_final):
     data_inicial = data_inicial.replace("/", "")
     
     gerar_faltosos(data_inicial, data_final) 
+    
+def preparar_alunos_atencao(campo_data_inicial, campo_data_final):
+    from bot import gerar_alunos_atencao
+    data_inicial = campo_data_inicial.get()
+    data_final = campo_data_final.get()
+
+    data_inicial = data_inicial.replace("/", "")
+    
+    gerar_alunos_atencao(data_inicial, data_final) 

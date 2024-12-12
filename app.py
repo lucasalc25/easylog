@@ -6,13 +6,15 @@ from config import caminhos
 from bot import anexar_imagem, anexar_planilha, criar_pastas
 from scripts.historicos import gerar_ocorrencia, preparar_registros
 from scripts.mensagens import gerar_mensagem, preparar_envio
-from scripts.planilhas import preparar_data_faltosos
+from scripts.planilhas import preparar_alunos_atencao, preparar_data_faltosos
 
 # Obter a data atual
 data_atual = datetime.now()
 
 # Subtrair um dia da data atual
 data_anterior = (data_atual - timedelta(days=1)).strftime('%d/%m/%Y')
+dia_inicio_mes = data_atual.strftime('01/%m/%Y')
+data_atual_format = data_atual.strftime('%d/%m/%Y')
 
 # Função para exibir a tela inicial
 def exibir_janela_inicial():
@@ -276,19 +278,29 @@ def frame_planilhas(janela, frame):
     janela.geometry("500x500")
     centralizar_janela(janela)
     
-    # Campo para anexação de planilha
-    frame_planilhas = ttk.Labelframe(frame, text=" Faltas ", padding=5, bootstyle="primary")
-    frame_planilhas.pack(fill=tk.X, pady=5)
-    ttk.Label(frame_planilhas, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(5,0))
-    campo_data_inicial = ttk.Entry(frame_planilhas, width=12)
+    frame_faltas = ttk.Labelframe(frame, text=" Faltas ", padding=5, bootstyle="primary")
+    frame_faltas.pack(fill=tk.X, pady=5)
+    ttk.Label(frame_faltas, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(5,0))
+    campo_data_inicial = ttk.Entry(frame_faltas, width=12)
     campo_data_inicial.pack(side=tk.LEFT, padx=5)
     campo_data_inicial.insert(0, data_anterior)
-    ttk.Label(frame_planilhas, text="Data Final: * ").pack(side=tk.LEFT, padx=(5,0))
-    campo_data_final = ttk.Entry(frame_planilhas, width=12)
+    ttk.Label(frame_faltas, text="Data Final: * ").pack(side=tk.LEFT, padx=(5,0))
+    campo_data_final = ttk.Entry(frame_faltas, width=12)
     campo_data_final.pack(side=tk.LEFT, padx=5)
     campo_data_final.insert(0, data_anterior)
-
-    ttk.Button(frame_planilhas, text="Gerar", command=lambda:preparar_data_faltosos(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
+    ttk.Button(frame_faltas, text="Gerar", command=lambda:preparar_data_faltosos(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
+    
+    frame_alunos_atencao = ttk.Labelframe(frame, text=" Alunos em atenção ", padding=5, bootstyle="primary")
+    frame_alunos_atencao.pack(fill=tk.X, pady=5)
+    ttk.Label(frame_alunos_atencao, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(5,0))
+    campo_data_inicial = ttk.Entry(frame_alunos_atencao, width=12)
+    campo_data_inicial.pack(side=tk.LEFT, padx=5)
+    campo_data_inicial.insert(0, dia_inicio_mes)
+    ttk.Label(frame_alunos_atencao, text="Data Final: * ").pack(side=tk.LEFT, padx=(5,0))
+    campo_data_final = ttk.Entry(frame_alunos_atencao, width=12)
+    campo_data_final.pack(side=tk.LEFT, padx=5)
+    campo_data_final.insert(0, data_atual_format)
+    ttk.Button(frame_alunos_atencao, text="Gerar", command=lambda:preparar_alunos_atencao(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
 
     ttk.Button(frame, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).pack(pady=10)
 
