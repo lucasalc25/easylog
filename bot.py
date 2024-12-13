@@ -10,6 +10,25 @@ from config import caminhos
 from scripts.ocr import esperar_elemento, localizar_elemento, verificar_existencia
 from scripts.planilhas import filtrar_alunos_atencao, filtrar_faltosos, ler_registros, ler_colunas
 
+# Configurações de cada planilha
+CONFIG_PLANILHAS = {
+    "falta": {
+        "caminho": "faltosos_filtrados.xlsx",
+        "colunas_telefone": ["celular"],
+        "mensagem": "Olá, faltoso",
+    },
+    "atenção": {
+        "caminho": "alunos_atencao_filtrados.xlsx",
+        "colunas_telefone": ["telefone responsável"],
+        "mensagem": "Atenção!",
+    },
+    "personalizada": {
+        "caminho": "conformes.xlsx",
+        "colunas_telefone": ["celular"],
+        "mensagem": "Está nos conformes",
+    },
+}
+
 def criar_pastas():
     # Obtém o caminho da pasta Documentos do usuário
     caminho_documentos = Path.home() / "Documents"

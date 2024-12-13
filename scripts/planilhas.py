@@ -199,6 +199,3 @@ def preparar_alunos_atencao(campo_data_inicial, campo_data_final):
     data_inicial = data_inicial.replace("/", "")
     
     gerar_alunos_atencao(data_inicial, data_final) 
-
-
-ajustar_largura_colunas(Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_atencao_filtrados.xlsx")

@@ -31,10 +31,9 @@ def exibir_janela_inicial():
     ttk.Label(frame_principal, text="Tornando seu trabalho mais eficiente", font=("Helvetica", 11)).pack(pady=(10, 20))
 
     # Botões
-
+    ttk.Button(frame_principal, text="PLANILHAS", command=lambda:abrir_janela(root, "Planilhas"), bootstyle="warning-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="MENSAGENS", command=lambda:abrir_janela(root, "Mensagens"), bootstyle="success-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="HISTÓRICOS",command=lambda:abrir_janela(root, "Históricos"), bootstyle="info-outline", width=20).pack(pady=10)
-    ttk.Button(frame_principal, text="PLANILHAS", command=lambda:abrir_janela(root, "Planilhas"), bootstyle="warning-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="SUPORTE", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="danger-outline", width=20).pack(pady=10)
 
     # Rodapé com versão
