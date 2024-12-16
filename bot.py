@@ -6,28 +6,10 @@ import tkinter as tk
 import os
 import pyperclip
 from pathlib import Path
+import pandas as pd
 from config import caminhos
 from scripts.ocr import esperar_elemento, localizar_elemento, verificar_existencia
-from scripts.planilhas import filtrar_alunos_atencao, filtrar_faltosos, ler_registros, ler_colunas
-
-# Configurações de cada planilha
-CONFIG_PLANILHAS = {
-    "falta": {
-        "caminho": "faltosos_filtrados.xlsx",
-        "colunas_telefone": ["celular"],
-        "mensagem": "Olá, faltoso",
-    },
-    "atenção": {
-        "caminho": "alunos_atencao_filtrados.xlsx",
-        "colunas_telefone": ["telefone responsável"],
-        "mensagem": "Atenção!",
-    },
-    "personalizada": {
-        "caminho": "conformes.xlsx",
-        "colunas_telefone": ["celular"],
-        "mensagem": "Está nos conformes",
-    },
-}
+from scripts.planilhas import filtrar_faltosos_do_mes, filtrar_faltosos_do_dia, ler_registros, ler_faltosos_dia
 
 def criar_pastas():
     # Obtém o caminho da pasta Documentos do usuário
@@ -92,32 +74,24 @@ def abrir_aba(aba):
     time.sleep(1)
         
     if aba == 'faltas_por_periodo':
-        pyautogui.press('tab')
-        time.sleep(1)
-        pyautogui.press('enter')
-        time.sleep(1)
-        repetir_tecla('tab', total_repeticoes=3)
-        pyautogui.press('enter')
-        time.sleep(1)
+        aba_pedagogico = localizar_elemento(caminhos["aba_pedagogico"])
+        pyautogui.click(aba_pedagogico)
+        esperar_elemento(caminhos["abrir_faltas_por_periodo"])
+        abrir_faltas_por_periodo = localizar_elemento(caminhos["abrir_faltas_por_periodo"])
+        pyautogui.click(abrir_faltas_por_periodo)
+        esperar_elemento(caminhos["faltas_por_periodo"])
     elif aba == 'presencas_e_faltas':
-        repetir_tecla('tab', total_repeticoes=7)
-        pyautogui.press('enter')
-        time.sleep(1)
-        pyautogui.press('tab')
-        time.sleep(1)
-        pyautogui.press('enter')
-        time.sleep(1)
-        pyautogui.press('enter')
-        time.sleep(1)
+        aba_relatorios = localizar_elemento(caminhos["aba_relatorios"])
+        pyautogui.click(aba_relatorios)
+        esperar_elemento(caminhos["relatorios_pedagogico"])
+        relatorios_pedagogico = localizar_elemento(caminhos["relatorios_pedagogico"])
+        pyautogui.click(relatorios_pedagogico)
+        esperar_elemento(caminhos["abrir_presencas_e_faltas"])
+        abrir_presencas_e_faltas = localizar_elemento(caminhos["abrir_presencas_e_faltas"])
+        pyautogui.click(abrir_presencas_e_faltas)
+        esperar_elemento(caminhos["presencas_e_faltas"])
     
 def exportar_planilha(caminho_destino):
-    exportar_faltosos = localizar_elemento(caminhos["exportar"])
-    pyautogui.click(exportar_faltosos)
-    pyautogui.press('tab')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-
     caminho_destino = os.path.normpath(caminho_destino)
     campo_nome_planilha = localizar_elemento(caminhos["campo_nome_planilha"])
     pyautogui.click(campo_nome_planilha)
@@ -155,7 +129,7 @@ def anexar_imagem(imagem):
 def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     from scripts.mensagens import personalizar_mensagem
 
-    messagebox.showinfo("Aviso!", "Certifique-se de que o Whatsapp esteja conectado ao aparelho!")
+    messagebox.showinfo("Aviso!", "Certifique-se de que o Whatsapp esteja conectado ao aplicativo!")
     
     # Pressionar Windows para abrir a conversa
     pyautogui.press('win')  
@@ -170,7 +144,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     esperar_elemento(caminhos["whatsapp_aberto"])
 
     # Ler os contatos
-    alunos = ler_colunas(arquivo_contatos)
+    alunos = ler_faltosos_dia(arquivo_contatos)
     mensagens_enviadas = 0
     
     for aluno in alunos:
@@ -178,9 +152,9 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
             if aluno['Aluno']:
                 nome_aluno = aluno['Aluno']  # Nome do aluno
             if aluno['Observacao']:
-                observacao = aluno['Observacao']
-                # Verifica se a coluna "Observação" está preenchida
-                if observacao:
+                 # Verifica se a coluna "Observação" está preenchida
+                observacao = aluno.get('Observacao')  # Usa get para evitar KeyError
+                if pd.notna(observacao):  # Verifica se a observação não é NaN
                     print(f"Observação encontrada para {nome_aluno}. Pulando para o próximo aluno.")
                     continue  # Pula para o próximo aluno se houver observação
 
@@ -255,7 +229,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                 # Pressionar Enter para enviar a imagem
                 pyautogui.press('backspace')
             
-            time.sleep(2)  # Aguarde um tempo antes de enviar para o próximo contato
+            time.sleep(10)  # Aguarde um tempo antes de enviar para o próximo contato
         except:
             if mensagens_enviadas == 0:
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui enviar nenhuma mensagem :(")
@@ -365,33 +339,120 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
     
     messagebox.showinfo("Concluído!", "Histórico registrado para todos os alunos!")           
 
-def gerar_faltosos_e_educadores(data_inicial, data_final):
-    abrir_aba('faltas_por_periodo')
+def gerar_planilha_com_educadores(data_falta, filtro_educador):
+    abrir_aba("faltas_por_periodo")
 
-    esperar_elemento(caminhos["faltas_por_periodo"])
-    keyboard.write(str(data_inicial))
+    keyboard.write(str(data_falta))
     time.sleep(1)
     pyautogui.press('tab')
     time.sleep(1)
-    keyboard.write(str(data_final))
+    keyboard.write(str(data_falta))
 
     pesquisar_faltosos = localizar_elemento(caminhos["pesquisar"])
     pyautogui.click(pesquisar_faltosos)
 
     esperar_elemento(caminhos["lista_faltosos"])
+    abrir_menu_coluna = localizar_elemento(caminhos["abrir_menu_coluna"])
+    pyautogui.rightClick(abrir_menu_coluna)
+    esperar_elemento(caminhos["editor_de_filtro"])
+    editor_de_filtro = localizar_elemento(caminhos["editor_de_filtro"])
+    pyautogui.rightClick(editor_de_filtro)
+
+    esperar_elemento(caminhos["construtor_filtro"])
+    if filtro_educador != "Geral":
+        nome_filtro = localizar_elemento(caminhos["nome_filtro"])
+        pyautogui.click(nome_filtro)
+        repetir_tecla("tab", total_repeticoes=5)
+        pyautogui.press('enter')
+        time.sleep(1)
+        valor_filtro = localizar_elemento(caminhos["valor_filtro"])
+        pyautogui.click(valor_filtro)
+        time.sleep(1)
+        keyboard.write(str(filtro_educador))
+        time.sleep(1)
+        adicionar_filtro = localizar_elemento(caminhos["adicionar_filtro"])
+        pyautogui.click(adicionar_filtro)
+        time.sleep(1)
+        pyautogui.moveTo(valor_filtro)
+        time.sleep(1)
+    valor_filtro = localizar_elemento(caminhos["valor_filtro"])
+    pyautogui.click(valor_filtro)
+    time.sleep(1)
+    keyboard.write('0')
+    time.sleep(1)
+    pyautogui.press('enter')
+    botao_ok = localizar_elemento(caminhos["botao_ok"])
+    pyautogui.click(botao_ok)
+    time.sleep(3)
+
+    esperar_elemento(caminhos["lista_faltosos"])
+    exportar_faltosos = localizar_elemento(caminhos["exportar"])
+    pyautogui.click(exportar_faltosos)
+    pyautogui.press('tab')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+
     caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_e_educadores.xls"
     exportar_planilha(caminho_destino)
+
         
-def gerar_faltosos(data_inicial, data_final):
+def gerar_faltosos_do_dia(campo_data_inicial, campo_data_final, campo_filtro_educador):
     messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
 
     procurar_hub()
-    
-    gerar_faltosos_e_educadores(data_inicial, data_final)
+
+    data_falta = campo_data_inicial.get()
+    data_falta = data_falta.replace("/", "")
+    filtro_educador = campo_filtro_educador.get()
+
+    gerar_planilha_com_educadores(data_falta, filtro_educador)
         
     abrir_aba('presencas_e_faltas')
     
-    esperar_elemento(caminhos["presencas_e_faltas"])
+    pyautogui.write(data_falta)
+    time.sleep(1)
+    pyautogui.press('tab')
+    time.sleep(1)
+    pyautogui.write(data_falta)
+    time.sleep(1)
+    pyautogui.press('tab')
+    time.sleep(1)
+    pyautogui.press('space')
+    time.sleep(1)
+    visualizar = localizar_elemento(caminhos["visualizar"])
+    pyautogui.click(visualizar)
+    
+    esperar_elemento(caminhos["visu_presencas_e_faltas"])
+    aba_arquivo = localizar_elemento(caminhos["aba_arquivo"])
+    pyautogui.click(aba_arquivo)
+    exportar_documento = localizar_elemento(caminhos["exportar_documento"])
+    pyautogui.moveTo(exportar_documento)
+    esperar_elemento(caminhos["documento_excel"])
+    documento_excel = localizar_elemento(caminhos["documento_excel"])
+    pyautogui.click(documento_excel)
+    time.sleep(1)
+    
+    esperar_elemento(caminhos["opcoes_exportacao"])
+    pyautogui.press('enter')
+    time.sleep(1)
+   
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_dia.xls"
+    exportar_planilha(caminho_destino)
+        
+    esperar_elemento(caminhos["abrir_planilha"])
+    pyautogui.press('tab')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+
+    filtrar_faltosos_do_dia(caminho_destino)
+
+    messagebox.showinfo("Atenção!", "Planilha de faltosos do dia gerada!")
+
+def gerar_planilha_com_celulares(data_inicial, data_final):
+    abrir_aba("presencas_e_faltas")
+
     pyautogui.write(data_inicial)
     time.sleep(1)
     pyautogui.press('tab')
@@ -406,22 +467,20 @@ def gerar_faltosos(data_inicial, data_final):
     pyautogui.click(visualizar)
     
     esperar_elemento(caminhos["visu_presencas_e_faltas"])
-    pyautogui.press('alt')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-    repetir_tecla('tab', total_repeticoes=3)
-    pyautogui.press('right')
-    time.sleep(1)
-    repetir_tecla('tab', total_repeticoes=5)
-    pyautogui.press('enter')
+    aba_arquivo = localizar_elemento(caminhos["aba_arquivo"])
+    pyautogui.click(aba_arquivo)
+    exportar_documento = localizar_elemento(caminhos["exportar_documento"])
+    pyautogui.moveTo(exportar_documento)
+    esperar_elemento(caminhos["documento_excel"])
+    documento_excel = localizar_elemento(caminhos["documento_excel"])
+    pyautogui.click(documento_excel)
     time.sleep(1)
     
     esperar_elemento(caminhos["opcoes_exportacao"])
     pyautogui.press('enter')
     time.sleep(1)
    
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos.xls"
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "celulares_faltosos_do_mes.xls"
     exportar_planilha(caminho_destino)
         
     esperar_elemento(caminhos["abrir_planilha"])
@@ -429,18 +488,28 @@ def gerar_faltosos(data_inicial, data_final):
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(1)
-
-    messagebox.showinfo("Atenção!", "Planilha de faltosos gerada!")
     
-    filtrar_faltosos(caminho_destino)
-    
-def gerar_alunos_atencao(data_inicial, data_final):
+def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
     messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
-
     procurar_hub()
+
+    data_inicial = campo_data_inicial.get()
+    data_final = campo_data_final.get()
+
+    data_inicial = data_inicial.replace("/", "")
+    data_final = data_final.replace("/", "")
     
-    abrir_aba('faltas_por_periodo')
+    gerar_planilha_com_celulares(data_inicial, data_final)
     
+    procurar_hub()
+
+    aba_pedagogico = localizar_elemento(caminhos["aba_pedagogico"])
+    pyautogui.click(aba_pedagogico)
+
+    esperar_elemento(caminhos["abrir_faltas_por_periodo"])
+    abrir_faltas_por_periodo = localizar_elemento(caminhos["abrir_faltas_por_periodo"])
+    pyautogui.click(abrir_faltas_por_periodo)
+
     esperar_elemento(caminhos["faltas_por_periodo"])
     keyboard.write(str(data_inicial))
     time.sleep(1)
@@ -452,12 +521,75 @@ def gerar_alunos_atencao(data_inicial, data_final):
     pyautogui.click(pesquisar_faltosos)
 
     esperar_elemento(caminhos["lista_faltosos"])
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_atencao.xls"
+    abrir_menu_coluna = localizar_elemento(caminhos["abrir_menu_coluna"])
+    pyautogui.rightClick(abrir_menu_coluna)
+    esperar_elemento(caminhos["editor_de_filtro"])
+    editor_de_filtro = localizar_elemento(caminhos["editor_de_filtro"])
+    pyautogui.rightClick(editor_de_filtro)
+
+    esperar_elemento(caminhos["construtor_filtro"])
+    nome_filtro = localizar_elemento(caminhos["nome_filtro"])
+    pyautogui.click(nome_filtro)
+    repetir_tecla("tab", total_repeticoes=18)
+    pyautogui.press('enter')
+    time.sleep(1)
+    valor_filtro = localizar_elemento(caminhos["valor_filtro"])
+    pyautogui.click(valor_filtro)
+    time.sleep(1)
+    keyboard.write("Normal")
+    time.sleep(1)
+
+    adicionar_filtro = localizar_elemento(caminhos["adicionar_filtro"])
+    pyautogui.click(adicionar_filtro)
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+    nome_filtro = localizar_elemento(caminhos["nome_filtro"])
+    pyautogui.click(nome_filtro)
+    repetir_tecla("tab", total_repeticoes=15)
+    pyautogui.press('enter')
+    time.sleep(1)
+    valor_filtro = localizar_elemento(caminhos["valor_filtro"])
+    pyautogui.click(valor_filtro)
+    time.sleep(1)
+    keyboard.write("Ativo")
+    time.sleep(1)
+
+    adicionar_filtro = localizar_elemento(caminhos["adicionar_filtro"])
+    pyautogui.click(adicionar_filtro)
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+    nome_filtro = localizar_elemento(caminhos["nome_filtro"])
+    pyautogui.click(nome_filtro)
+    repetir_tecla("tab", total_repeticoes=7)
+    pyautogui.press('enter')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+    repetir_tecla("tab", total_repeticoes=3)
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+    keyboard.write("0")
+    time.sleep(1)
+    botao_ok = localizar_elemento(caminhos["botao_ok"])
+    pyautogui.click(botao_ok)
+    time.sleep(3)
+
+    exportar_faltosos = localizar_elemento(caminhos["exportar"])
+    pyautogui.click(exportar_faltosos)
+    pyautogui.press('tab')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_mes.xls"
     exportar_planilha(caminho_destino)
-     
-    messagebox.showinfo("Atenção!", "Planilha de alunos em atenção gerada!")
     
-    filtrar_alunos_atencao(caminho_destino)
+    filtrar_faltosos_do_mes(caminho_destino)
+
+    messagebox.showinfo("Atenção!", "Planilha de faltosos do mês gerada!")
     
     
     

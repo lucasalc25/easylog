@@ -3,10 +3,10 @@ from tkinter import messagebox
 from ttkbootstrap import Window, ttk  # Importando ttkbootstrap para personalização do tema
 from datetime import datetime, timedelta
 from config import caminhos
-from bot import anexar_imagem, anexar_planilha, criar_pastas
+from bot import anexar_imagem, anexar_planilha, criar_pastas, gerar_faltosos_do_mes, gerar_faltosos_do_dia
 from scripts.historicos import gerar_ocorrencia, preparar_registros
 from scripts.mensagens import gerar_mensagem, preparar_envio
-from scripts.planilhas import preparar_alunos_atencao, preparar_data_faltosos
+from scripts.planilhas import gerar_planilha
 
 # Obter a data atual
 data_atual = datetime.now()
@@ -28,16 +28,17 @@ def exibir_janela_inicial():
 
     # Título e subtítulo
     ttk.Label(frame_principal, text="Bem-vindo(a) ao EasyLog", font=("Helvetica", 16, "bold")).pack(pady=10)
-    ttk.Label(frame_principal, text="Tornando seu trabalho mais eficiente", font=("Helvetica", 11)).pack(pady=(10, 20))
+    ttk.Label(frame_principal, text="Facilitando sua gestão acadêmica", font=("Helvetica", 11)).pack(pady=(10, 20))
 
     # Botões
-    ttk.Button(frame_principal, text="PLANILHAS", command=lambda:abrir_janela(root, "Planilhas"), bootstyle="warning-outline", width=20).pack(pady=10)
-    ttk.Button(frame_principal, text="MENSAGENS", command=lambda:abrir_janela(root, "Mensagens"), bootstyle="success-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="PLANILHAS", command=lambda:abrir_janela(root, "Planilhas"), bootstyle="success-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="MENSAGENS", command=lambda:abrir_janela(root, "Mensagens"), bootstyle="primary-outline", width=20).pack(pady=10)
     ttk.Button(frame_principal, text="HISTÓRICOS",command=lambda:abrir_janela(root, "Históricos"), bootstyle="info-outline", width=20).pack(pady=10)
-    ttk.Button(frame_principal, text="SUPORTE", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="danger-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="AJUDA", command=lambda:messagebox.showinfo("Aviso", "Funcionalidade em desenvolvimento"), bootstyle="warning-outline", width=20).pack(pady=10)
+    ttk.Button(frame_principal, text="FECHAR", command=lambda:root.quit(), bootstyle="danger-outline", width=20).pack(pady=10)
 
     # Rodapé com versão
-    ttk.Label(frame_principal, text="Versão 1.0", font=("Helvetica", 9)).pack(pady=(20, 0))
+    ttk.Label(frame_principal, text="Versão 1.1", font=("Helvetica", 9)).pack(pady=(20, 0))
 
     centralizar_janela(root)
     root.mainloop()
@@ -66,14 +67,49 @@ def abrir_janela(janela_inicial, titulo):
     frame.pack(fill=tk.BOTH, expand=True)
 
     # Configurar conteúdo da área central com base no título
-    if titulo == "Mensagens":
+    if titulo == "Planilhas":
+        frame_planilhas(janela,frame)
+    elif titulo == "Mensagens":
         frame_mensagens(janela, frame)
     elif titulo == "Históricos":
         frame_historicos(janela,frame)
-    elif titulo == "Planilhas":
-        frame_planilhas(janela,frame)
     else:
         ttk.Label(frame, text="Conteúdo não configurado.", font=("Helvetica", 12)).pack(pady=10)
+
+
+# Função para configurar a área de "Planilhas"
+def frame_planilhas(janela, frame):
+    janela.geometry("500x500")
+    centralizar_janela(janela)
+    
+    frame_faltas = ttk.Labelframe(frame, text=" Faltas no dia", padding=5, bootstyle="primary")
+    frame_faltas.pack(fill=tk.X, pady=(0,5))
+
+    # Adicionando os elementos existentes usando grid
+    ttk.Label(frame_faltas, text="Data da falta: *").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
+    data_falta = ttk.Entry(frame_faltas, width=12)
+    data_falta.pack(side=tk.LEFT, padx=5, pady=(10, 15))
+    data_falta.insert(0, data_anterior)
+    ttk.Label(frame_faltas, text="Educador: *").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
+    filtro_educador = ttk.Combobox(frame_faltas, values=["Geral", "Lucas", "Linderlly", "Yasmin"], state="readonly", width=10, height=3, justify="center")
+    filtro_educador.pack(side=tk.LEFT, padx=5, pady=(10, 15))       
+    filtro_educador.current(0)  # Define "Nenhum" como o valor padrão
+    ttk.Button(frame_faltas, text="Gerar", command=lambda:gerar_planilha("faltas_do_dia", data_falta, data_falta,  filtro_educador), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
+    
+    frame_alunos_atencao = ttk.Labelframe(frame, text=" Faltas no mês ", padding=5, bootstyle="primary")
+    frame_alunos_atencao.pack(fill=tk.X, pady=(0,5))
+
+    ttk.Label(frame_alunos_atencao, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
+    data_inicial = ttk.Entry(frame_alunos_atencao, width=12)
+    data_inicial.pack(side=tk.LEFT, padx=5, pady=(10, 15))
+    data_inicial.insert(0, dia_inicio_mes)
+    ttk.Label(frame_alunos_atencao, text="Data Final: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
+    data_final = ttk.Entry(frame_alunos_atencao, width=12)
+    data_final.pack(side=tk.LEFT, padx=5, pady=(10, 15))
+    data_final.insert(0, data_atual_format)
+    ttk.Button(frame_alunos_atencao, text="Gerar", command=lambda:gerar_planilha("faltas_do_mes", data_inicial, data_final, "Geral"), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
+
+    ttk.Button(frame, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).pack(pady=10)
 
 # Função para configurar a área de "Mensagens"
 def frame_mensagens(janela,frame):
@@ -263,37 +299,6 @@ def frame_historicos(janela, frame):
     ttk.Button(frame_botoes, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=0, column=0, padx=40)
     ttk.Button(frame_botoes, text="Registrar", command=lambda:preparar_registros(campo_planilha, campo_data, campo_titulo, campo_descricao),bootstyle="success-outline", width=10).grid(row=0, column=1, padx=40)
 
-
-# Função para configurar a área de "Planilhas"
-def frame_planilhas(janela, frame):
-    janela.geometry("500x500")
-    centralizar_janela(janela)
-    
-    frame_faltas = ttk.Labelframe(frame, text=" Faltas ", padding=5, bootstyle="primary")
-    frame_faltas.pack(fill=tk.X, pady=5)
-    ttk.Label(frame_faltas, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(5,0))
-    campo_data_inicial = ttk.Entry(frame_faltas, width=12)
-    campo_data_inicial.pack(side=tk.LEFT, padx=5)
-    campo_data_inicial.insert(0, data_anterior)
-    ttk.Label(frame_faltas, text="Data Final: * ").pack(side=tk.LEFT, padx=(5,0))
-    campo_data_final = ttk.Entry(frame_faltas, width=12)
-    campo_data_final.pack(side=tk.LEFT, padx=5)
-    campo_data_final.insert(0, data_anterior)
-    ttk.Button(frame_faltas, text="Gerar", command=lambda:preparar_data_faltosos(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
-    
-    frame_alunos_atencao = ttk.Labelframe(frame, text=" Alunos em atenção ", padding=5, bootstyle="primary")
-    frame_alunos_atencao.pack(fill=tk.X, pady=5)
-    ttk.Label(frame_alunos_atencao, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(5,0))
-    campo_data_inicial = ttk.Entry(frame_alunos_atencao, width=12)
-    campo_data_inicial.pack(side=tk.LEFT, padx=5)
-    campo_data_inicial.insert(0, dia_inicio_mes)
-    ttk.Label(frame_alunos_atencao, text="Data Final: * ").pack(side=tk.LEFT, padx=(5,0))
-    campo_data_final = ttk.Entry(frame_alunos_atencao, width=12)
-    campo_data_final.pack(side=tk.LEFT, padx=5)
-    campo_data_final.insert(0, data_atual_format)
-    ttk.Button(frame_alunos_atencao, text="Gerar", command=lambda:preparar_alunos_atencao(campo_data_inicial, campo_data_final), bootstyle="primary").pack(side=tk.RIGHT, padx=5)
-
-    ttk.Button(frame, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).pack(pady=10)
 
 # Execução do programa      
 if __name__ == "__main__":
