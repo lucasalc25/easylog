@@ -10,7 +10,7 @@ from config import caminhos
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
    
 def verificar_existencia(elemento):
-    if elemento == 'pesquisa_whatsapp':
+    if elemento == 'pesquisa_contato':
         coordenadas = (307, 233, 200, 65)
     elif elemento == 'pesquisa_aluno':
         coordenadas = (443,210,737,18)

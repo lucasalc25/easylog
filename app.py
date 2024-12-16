@@ -3,7 +3,7 @@ from tkinter import messagebox
 from ttkbootstrap import Window, ttk  # Importando ttkbootstrap para personalização do tema
 from datetime import datetime, timedelta
 from config import caminhos
-from bot import anexar_imagem, anexar_planilha, criar_pastas, gerar_faltosos_do_mes, gerar_faltosos_do_dia
+from bot import anexar_imagem, anexar_planilha, criar_pastas
 from scripts.historicos import gerar_ocorrencia, preparar_registros
 from scripts.mensagens import gerar_mensagem, preparar_envio
 from scripts.planilhas import gerar_planilha

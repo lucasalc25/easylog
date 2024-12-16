@@ -150,31 +150,32 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
     for aluno in alunos:
         try:
             if aluno['Aluno']:
-                nome_aluno = aluno['Aluno']  # Nome do aluno
-            if aluno['Observacao']:
-                 # Verifica se a coluna "Observação" está preenchida
-                observacao = aluno.get('Observacao')  # Usa get para evitar KeyError
-                if pd.notna(observacao):  # Verifica se a observação não é NaN
-                    print(f"Observação encontrada para {nome_aluno}. Pulando para o próximo aluno.")
-                    continue  # Pula para o próximo aluno se houver observação
+                nome_aluno = str(aluno['Aluno'])  # Nome do aluno
+                if aluno['Observacao']:
+                    # Verifica se a coluna "Observação" está preenchida
+                    observacao = aluno.get('Observacao')  # Usa get para evitar KeyError
+                    if pd.notna(observacao):  # Verifica se a observação não é NaN
+                        print(f"Observação encontrada para {nome_aluno}. Pulando para o próximo aluno.")
+                        continue  # Pula para o próximo aluno se houver observação
+                    
+                    if aluno['Educador']:
+                        nome_educador = str(aluno['Educador'])
+                        if len(nome_aluno) > 0 and len(nome_educador) > 0:
+                            print("Personalizando mensagem...")
+                            mensagem_personalizada = personalizar_mensagem(nome_aluno, nome_educador, mensagem_template)
 
-            if aluno['Contato']:
-                telefone = aluno['Contato']
-                telefone = telefone[:2] + telefone[3:]  # Remove o índice 2 (que é o terceiro número)
-            if aluno['Educador']:
-                nome_educador = aluno['Educador']
-
-            mensagem_personalizada = personalizar_mensagem(nome_aluno, nome_educador, mensagem_template)
-            pyperclip.copy(mensagem_personalizada)
+                        if aluno['Contato']:
+                            telefone = aluno['Contato']
+                            telefone = telefone[:2] + telefone[3:]  # Remove o índice 2 (que é o terceiro número)
 
             pyautogui.hotkey('ctrl','n')
             esperar_elemento(caminhos["nova_conversa"])
             
-            # Usar o pyautogui para digitar o número de telefone do contatoe
+            # Usar o pyautogui para digitar o número de telefone do contato
             pyautogui.write(f'{telefone}')
             time.sleep(2)   
             
-            whatsapp_existe = verificar_existencia('pesquisa_whatsapp')
+            whatsapp_existe = verificar_existencia('pesquisa_contato')
 
             if whatsapp_existe:
                 pyautogui.press('tab')
@@ -195,6 +196,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                     pyautogui.press('enter')  
                     time.sleep(2)
 
+                    pyperclip.copy(imagem)
                     # Colar o caminho da imagem
                     pyautogui.hotkey('ctrl', 'v')  # Colar o caminho da imagem no campo
                     time.sleep(2)
@@ -204,6 +206,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                     esperar_elemento(caminhos["aba_anexar"])
 
                     if mensagem_personalizada:
+                        pyperclip.copy(mensagem_personalizada)
                         # Usar o pyautogui para colar a mensagem
                         pyautogui.hotkey('ctrl','v')
                         time.sleep(1)
@@ -214,6 +217,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                     mensagens_enviadas += 1
 
                 else:
+                    pyperclip.copy(mensagem_personalizada)
                     # Usar o pyautogui para colar a mensagem
                     pyautogui.hotkey('ctrl','v')
                     time.sleep(2)
@@ -230,11 +234,15 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                 pyautogui.press('backspace')
             
             time.sleep(10)  # Aguarde um tempo antes de enviar para o próximo contato
-        except:
+        except Exception as e:
             if mensagens_enviadas == 0:
+                print(f"Erro ao enviar mensagens: {e}")
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui enviar nenhuma mensagem :(")
+                return []
             else:
+                print(f"Erro ao enviar mensagens: {e}")
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui enviar {mensagens_enviadas} mensagens :(")
+                return []
                             
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
 
@@ -450,6 +458,7 @@ def gerar_faltosos_do_dia(campo_data_inicial, campo_data_final, campo_filtro_edu
 
     messagebox.showinfo("Atenção!", "Planilha de faltosos do dia gerada!")
 
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_dia_filtrados.xlsx"
     os.startfile(caminho_destino)
 
 def gerar_planilha_com_celulares(data_inicial, data_final):
@@ -593,6 +602,7 @@ def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
 
     messagebox.showinfo("Atenção!", "Planilha de faltosos do mês gerada!")
 
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_mes_filtrados.xlsx"
     os.startfile(caminho_destino)
     
     

@@ -20,6 +20,8 @@ caminhos = {
     "abrir_planilha": resource_path('imagens/abrir_planilha.png'),
     "aluno_encontrado": resource_path('imagens/aluno_encontrado.png'),
     "anexar" : resource_path('imagens/anexar.png'),
+    "tela_login" : resource_path('imagens/tela_login.png'),
+    "hub_encontrado" : resource_path('imagens/hub_encontrado.png'),
     "hub_aberto" : resource_path('imagens/hub_aberto.png'),
     "caixa_mensagem" : resource_path('imagens/caixa_mensagem.png'),
     "campo_nome_planilha" : resource_path('imagens/campo_nome_planilha.png'),
