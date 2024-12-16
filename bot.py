@@ -450,6 +450,8 @@ def gerar_faltosos_do_dia(campo_data_inicial, campo_data_final, campo_filtro_edu
 
     messagebox.showinfo("Atenção!", "Planilha de faltosos do dia gerada!")
 
+    os.startfile(caminho_destino)
+
 def gerar_planilha_com_celulares(data_inicial, data_final):
     abrir_aba("presencas_e_faltas")
 
@@ -590,6 +592,8 @@ def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
     filtrar_faltosos_do_mes(caminho_destino)
 
     messagebox.showinfo("Atenção!", "Planilha de faltosos do mês gerada!")
+
+    os.startfile(caminho_destino)
     
     
     
