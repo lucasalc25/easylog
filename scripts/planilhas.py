@@ -172,7 +172,7 @@ def filtrar_faltosos_do_mes(planilha_faltosos_do_mes):
     # Remover linhas duplicadas
     df_mesclado = df_mesclado.drop_duplicates(subset=['Celular'])
 
-     # Transferir telefones residenciais para a coluna celular quando não houver
+    # Transferir telefones residenciais para a coluna celular quando não houver
     df_mesclado['Celular'] = df_mesclado['Celular'].fillna(df_mesclado['Tel Residencial'])
 
     # Remover a coluna tel_residencial
@@ -190,6 +190,31 @@ def filtrar_faltosos_do_mes(planilha_faltosos_do_mes):
     df_final.to_excel(caminho_saida, index=False)
 
     ajustar_largura_colunas(caminho_saida)
+
+def filtrar_alunos_ativos(planilha_alunos_ativos):
+    df_alunos_ativos = pd.read_excel(planilha_alunos_ativos, sheet_name='Sheet')
+
+    df_alunos_ativos.rename(columns={"Telefone Celular Responsável Financeiro": "Celular"}, inplace=True)
+    df_alunos_ativos.rename(columns={"Tel. Residencial Responsável Financeiro": "Tel Residencial"}, inplace=True)
+
+    # Selecionar apenas as colunas necessárias
+    df_final = df_alunos_ativos[['Contrato', 'Aluno', 'Tel Residencial', 'Celular']]
+
+    # Transferir telefones residenciais para a coluna celular quando não houver
+    df_final['Celular'] = df_final['Celular'].fillna(df_final['Tel Residencial'])
+
+    # Remover a coluna tel_residencial
+    df_final = df_final.drop(columns=['Tel Residencial'])
+
+    # Ordena o DataFrame pela coluna "Aluno" em ordem alfabética (A a Z)
+    df_final = df_final.sort_values(by='Aluno')
+
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_ativos_filtrados.xlsx"
+    # Salva o DataFrame processado em um novo arquivo Excel
+    df_final.to_excel(caminho_destino, index=False)
+
+    ajustar_largura_colunas(caminho_destino)
+    print("Planilha de alunos ativos filtrada!")
 
 def ajustar_largura_colunas(arquivo):
     # Carregar o arquivo Excel
@@ -216,6 +241,13 @@ def ajustar_largura_colunas(arquivo):
             "F": 7.0,
             "E": 11.0
         }
+    elif arquivo == Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_ativos_filtrados.xlsx":
+        # Definir larguras específicas para as colunas
+        colunas_largura = {
+            "A": 10.5,
+            "B": 40.5,
+            "C": 15.0,
+        }
         
 
     # Ajustar a largura das colunas conforme o dicionário
@@ -232,3 +264,4 @@ def gerar_planilha(tipo, campo_data_inicial, campo_data_final, campo_filtro_educ
         gerar_faltosos_do_dia(campo_data_inicial, campo_data_final, campo_filtro_educador)
     elif tipo == "faltas_do_mes":
         gerar_faltosos_do_mes(campo_data_inicial, campo_data_final)
+
