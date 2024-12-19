@@ -69,10 +69,7 @@ def procurar_hub():
             repeticoes += 1
             time.sleep(2) 
 
-def abrir_aba(aba):
-    pyautogui.press('alt')
-    time.sleep(1)
-        
+def abrir_aba(aba):   
     if aba == 'faltas_por_periodo':
         aba_pedagogico = localizar_elemento(caminhos["aba_pedagogico"])
         pyautogui.click(aba_pedagogico)
@@ -90,7 +87,14 @@ def abrir_aba(aba):
         abrir_presencas_e_faltas = localizar_elemento(caminhos["abrir_presencas_e_faltas"])
         pyautogui.click(abrir_presencas_e_faltas)
         esperar_elemento(caminhos["presencas_e_faltas"])
-    
+    elif aba == 'controle_pedagogico':
+        aba_pedagogico = localizar_elemento(caminhos["aba_pedagogico"])
+        pyautogui.click(aba_pedagogico)
+        esperar_elemento(caminhos["abrir_controle_pedagogico"])
+        abrir_controle_pedagogico = localizar_elemento(caminhos["abrir_controle_pedagogico"])
+        pyautogui.click(abrir_controle_pedagogico)
+        esperar_elemento(caminhos["controle_pedagogico"])
+
 def exportar_planilha(caminho_destino):
     caminho_destino = os.path.normpath(caminho_destino)
     campo_nome_planilha = localizar_elemento(caminhos["campo_nome_planilha"])
@@ -605,5 +609,71 @@ def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
     caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_mes_filtrados.xlsx"
     os.startfile(caminho_destino)
     
-    
-    
+def gerar_frequencia(campo_dia_da_semana, campo_sala):
+    messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
+    procurar_hub()
+
+    dia_da_semana = campo_dia_da_semana.get()
+    sala = campo_sala.get()
+
+    abrir_aba("controle_pedagogico")
+
+    ocultar_contrato = localizar_elemento(caminhos["ocultar_contrato"])
+    pyautogui.click(ocultar_contrato)
+
+    for i in range(0,2):
+        pyautogui.press('tab')
+        time.sleep(0.5)
+        pyautogui.press('space')
+        time.sleep(0.5)
+
+    pyautogui.press('tab')
+    time.sleep(0.5)
+
+    for i in range(0,2):
+        pyautogui.press('tab')
+        time.sleep(0.5)
+        pyautogui.press('space')
+        time.sleep(0.5)
+
+    pyautogui.press('tab')
+    time.sleep(0.5)
+
+    for i in range(0,3):
+        pyautogui.press('tab')
+        time.sleep(0.5)
+        pyautogui.press('space')
+        time.sleep(0.5)
+
+    repetir_tecla("tab", total_repeticoes=5)
+    pyautogui.press('space')
+    time.sleep(0.5)
+    pyautogui.press('tab')
+    time.sleep(0.5)
+
+    for i in range(0,13):
+        pyautogui.press('tab')
+        time.sleep(0.5)
+        pyautogui.press('space')
+        time.sleep(0.5)
+
+    mostrar_icone_filtro_sala = localizar_elemento(caminhos["mostrar_icone_filtro_sala"])
+    pyautogui.moveTo(mostrar_icone_filtro_sala)
+    esperar_elemento(caminhos["icone_filtro"])
+    icone_filtro = localizar_elemento(caminhos["icone_filtro"])
+    pyautogui.click(icone_filtro)
+    time.sleep(5)
+
+    filtro_todos = localizar_elemento(caminhos["filtro_todos"])
+    pyautogui.click(filtro_todos)
+
+    if sala == "Dinâmica 1":
+        repetir_tecla("down", total_repeticoes=3)
+    else:
+        repetir_tecla("down", total_repeticoes=4)
+
+    pyautogui.press('space')
+    time.sleep(0.5)
+
+    botao_fechar = localizar_elemento(caminhos["botao_fechar"])
+    pyautogui.click(botao_fechar)

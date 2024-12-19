@@ -15,6 +15,7 @@ data_atual = datetime.now()
 data_anterior = (data_atual - timedelta(days=1)).strftime('%d/%m/%Y')
 dia_inicio_mes = data_atual.strftime('01/%m/%Y')
 data_atual_format = data_atual.strftime('%d/%m/%Y')
+mes_atual = data_atual.month - 1
 
 # Função para exibir a tela inicial
 def exibir_janela_inicial():
@@ -84,7 +85,6 @@ def frame_planilhas(janela, frame):
     
     frame_faltas = ttk.Labelframe(frame, text=" Faltas no dia", padding=5, bootstyle="primary")
     frame_faltas.pack(fill=tk.X, pady=(0,5))
-
     # Adicionando os elementos existentes usando grid
     ttk.Label(frame_faltas, text="Data da falta: *").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
     data_falta = ttk.Entry(frame_faltas, width=12)
@@ -98,7 +98,6 @@ def frame_planilhas(janela, frame):
     
     frame_alunos_atencao = ttk.Labelframe(frame, text=" Faltas no mês ", padding=5, bootstyle="primary")
     frame_alunos_atencao.pack(fill=tk.X, pady=(0,5))
-
     ttk.Label(frame_alunos_atencao, text="Data Inicial: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
     data_inicial = ttk.Entry(frame_alunos_atencao, width=12)
     data_inicial.pack(side=tk.LEFT, padx=5, pady=(10, 15))
@@ -108,6 +107,19 @@ def frame_planilhas(janela, frame):
     data_final.pack(side=tk.LEFT, padx=5, pady=(10, 15))
     data_final.insert(0, data_atual_format)
     ttk.Button(frame_alunos_atencao, text="Gerar", command=lambda:gerar_planilha("faltas_do_mes", data_inicial, data_final, "Geral"), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
+
+    frame_frequencia = ttk.Labelframe(frame, text=" Listas de Frequência ", padding=5, bootstyle="primary")
+    frame_frequencia.pack(fill=tk.X, pady=(0,5))
+    ttk.Label(frame_frequencia, text="Dia: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
+    dia_da_semana = ttk.Combobox(frame_frequencia, values=["Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"], state="readonly", width=14, height=3, justify="center")
+    dia_da_semana.pack(side=tk.LEFT, padx=5, pady=(10, 15))
+    dia_da_semana.current(0)  # Define Segunda-Feira como o valor padrão
+    ttk.Label(frame_frequencia, text="Sala: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
+    sala = ttk.Combobox(frame_frequencia, values=["Dinâmica 1", "Dinâmica 2"], state="readonly", width=10, height=3, justify="center")
+    sala.pack(side=tk.LEFT, padx=5, pady=(10, 15))  
+    sala.current(0)  # Define o mês atual como o valor padrão
+    ttk.Button(frame_frequencia, text="Gerar", command=lambda:gerar_planilha("frequencia", data_inicial, data_final, filtro_educador, dia_da_semana, sala), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
+
 
     ttk.Button(frame, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).pack(pady=10)
 
