@@ -77,6 +77,16 @@ def abrir_janela(janela_inicial, titulo):
     else:
         ttk.Label(frame, text="Conteúdo não configurado.", font=("Helvetica", 12)).pack(pady=10)
 
+# Função para atualizar as opções de horas das aulas
+def mudar_hora_aulas(sala, hora_aulas):
+    valor_selecionado = sala.get()
+    if valor_selecionado == "Dinamica 1":
+        hora_aulas["values"] = ["08:00:00", "08:00:00,09:00:00", "10:00:00", "13:00:00", "14:00:00", "15:00:00", "16:00:00", "17:00:00", "18:00:00", "19:00:00"],
+        hora_aulas.current(0)
+    elif valor_selecionado == "Dinamica 2":
+        hora_aulas["values"] = ["08:00:00", "10:00:00", "12:00:00", "13:00:00", "14:00:00", "16:00:00", "17:00:00", "18:00:00", "19:00:00"],
+        hora_aulas.current(0)
+
 
 # Função para configurar a área de "Planilhas"
 def frame_planilhas(janela, frame):
@@ -115,9 +125,13 @@ def frame_planilhas(janela, frame):
     dia_da_semana.pack(side=tk.LEFT, padx=5, pady=(10, 15))
     dia_da_semana.current(0)  # Define Segunda-Feira como o valor padrão
     ttk.Label(frame_frequencia, text="Sala: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
-    sala = ttk.Combobox(frame_frequencia, values=["Dinâmica 1", "Dinâmica 2"], state="readonly", width=10, height=3, justify="center")
+    sala = ttk.Combobox(frame_frequencia, values=["Dinamica 1", "Dinamica 2"], state="readonly", width=10, height=3, justify="center")
     sala.pack(side=tk.LEFT, padx=5, pady=(10, 15))  
     sala.current(0)  # Define o mês atual como o valor padrão
+    ttk.Label(frame_frequencia, text="Sala: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
+    hora_aulas = ttk.Combobox(frame_frequencia, state="readonly", width=7, height=3, justify="center")
+    hora_aulas.pack(side=tk.LEFT, padx=5, pady=(10, 15))  
+    sala.bind("<<ComboboxSelected>>", mudar_hora_aulas(sala, hora_aulas))
     ttk.Button(frame_frequencia, text="Gerar", command=lambda:gerar_planilha("frequencia", data_inicial, data_final, filtro_educador, dia_da_semana, sala), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
 
 
