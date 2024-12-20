@@ -78,7 +78,8 @@ def formatar_telefone(celular):
     return celular  # Retorna o número original caso não tenha o formato esperado
 
 def filtrar_faltosos_do_dia(planilha_faltosos_do_dia):
-    planilha_educadores = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_e_educadores.xls"
+    from bot import excluir_arquivo
+    planilha_educadores = Path.home() / "Documents" / "EasyLog" / "alunos_e_educadores.xls"
 
     df_faltosos = pd.read_excel(planilha_faltosos_do_dia, sheet_name='Sheet', header=3)
     df_educadores = pd.read_excel(planilha_educadores, sheet_name='Sheet')
@@ -115,16 +116,21 @@ def filtrar_faltosos_do_dia(planilha_faltosos_do_dia):
     # Adicionar "Funcionário" na coluna "Observação" onde a coluna "Educador" contém "Sangela"
     df_final.loc[df_final['Educador'].str.contains('Sangela', na=False), 'Observação'] = 'Funcionário'
 
-    caminho_saida = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_dia_filtrados.xlsx"
+    caminho_saida = Path.home() / "Documents" / "EasyLog" / "faltosos_do_dia_filtrados.xlsx"
 
     # Salvar o resultado
     df_final.to_excel(caminho_saida, index=False)
 
     ajustar_largura_colunas(caminho_saida)
+
+    excluir_arquivo(planilha_faltosos_do_dia)
+    excluir_arquivo(planilha_educadores)
     
 
 def filtrar_faltosos_do_mes(planilha_faltosos_do_mes):
-    planilha_celulares = Path.home() / "Documents" / "EasyLog" / "Data" / "celulares_faltosos_do_mes.xls"
+    from bot import excluir_arquivo
+
+    planilha_celulares = Path.home() / "Documents" / "EasyLog" / "celulares_faltosos_do_mes.xls"
 
     df_celulares_faltosos_do_mes = pd.read_excel(planilha_celulares, sheet_name='Sheet', header=3)
     df_faltosos_do_mes = pd.read_excel(planilha_faltosos_do_mes, sheet_name='Sheet')
@@ -184,14 +190,18 @@ def filtrar_faltosos_do_mes(planilha_faltosos_do_mes):
     # Selecionar as colunas finais
     df_final = df_mesclado[['Contrato','Aluno', 'Educador', 'Data Cadastro Contrato', 'Celular', 'Faltas', 'Reposições']]
 
-    caminho_saida = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_mes_filtrados.xlsx"
+    caminho_saida = Path.home() / "Documents" / "EasyLog" / "faltosos_do_mes_filtrados.xlsx"
 
     # Salva o DataFrame processado em um novo arquivo Excel
     df_final.to_excel(caminho_saida, index=False)
 
     ajustar_largura_colunas(caminho_saida)
 
+    excluir_arquivo(planilha_faltosos_do_mes)
+    excluir_arquivo(planilha_celulares)
+
 def filtrar_alunos_ativos(planilha_alunos_ativos):
+    from bot import excluir_arquivo
     df_alunos_ativos = pd.read_excel(planilha_alunos_ativos, sheet_name='Sheet')
 
     df_alunos_ativos.rename(columns={"Telefone Celular Responsável Financeiro": "Celular"}, inplace=True)
@@ -209,7 +219,8 @@ def filtrar_alunos_ativos(planilha_alunos_ativos):
     # Ordena o DataFrame pela coluna "Aluno" em ordem alfabética (A a Z)
     df_final = df_final.sort_values(by='Aluno')
 
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_ativos_filtrados.xlsx"
+    excluir_arquivo(planilha_alunos_ativos)
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "alunos_ativos_filtrados.xlsx"
     # Salva o DataFrame processado em um novo arquivo Excel
     df_final.to_excel(caminho_destino, index=False)
 
@@ -221,7 +232,7 @@ def ajustar_largura_colunas(arquivo):
     wb = openpyxl.load_workbook(arquivo)
     ws = wb.active
 
-    if arquivo == Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_dia_filtrados.xlsx":
+    if arquivo == Path.home() / "Documents" / "EasyLog" / "faltosos_do_dia_filtrados.xlsx":
         # Definir larguras específicas para as colunas
         colunas_largura = {
             "A": 10.0,
@@ -230,7 +241,7 @@ def ajustar_largura_colunas(arquivo):
             "D": 12.0,
             "E": 18.0
         }
-    elif arquivo == Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_mes_filtrados.xlsx":
+    elif arquivo == Path.home() / "Documents" / "EasyLog" / "faltosos_do_mes_filtrados.xlsx":
         # Definir larguras específicas para as colunas
         colunas_largura = {
             "A": 10.5,
@@ -241,7 +252,7 @@ def ajustar_largura_colunas(arquivo):
             "F": 7.0,
             "E": 11.0
         }
-    elif arquivo == Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_ativos_filtrados.xlsx":
+    elif arquivo == Path.home() / "Documents" / "EasyLog" / "alunos_ativos_filtrados.xlsx":
         # Definir larguras específicas para as colunas
         colunas_largura = {
             "A": 10.5,
@@ -257,7 +268,7 @@ def ajustar_largura_colunas(arquivo):
     # Salvar o arquivo depois de ajustar as larguras
     wb.save(arquivo)
 
-def gerar_planilha(tipo, campo_data_inicial, campo_data_final, campo_filtro_educador, campo_dia_da_semana, campo_sala, campo_hora):
+def gerar_planilha(tipo, campo_data_inicial, campo_data_final, campo_filtro_educador, campo_dia_da_semana, campo_sala):
     from bot import gerar_faltosos_do_dia, gerar_faltosos_do_mes, gerar_frequencia
 
     if tipo == "faltas_do_dia":
@@ -265,5 +276,5 @@ def gerar_planilha(tipo, campo_data_inicial, campo_data_final, campo_filtro_educ
     elif tipo == "faltas_do_mes":
         gerar_faltosos_do_mes(campo_data_inicial, campo_data_final)
     elif tipo == "frequencia":
-        gerar_frequencia(campo_dia_da_semana, campo_sala, campo_hora)
+        gerar_frequencia(campo_dia_da_semana, campo_sala)
 

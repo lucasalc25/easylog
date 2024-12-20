@@ -36,6 +36,14 @@ def criar_pastas():
     else:
         print(f"A pasta '{pasta_data}' já existe em {caminho_pasta_easylog}")
 
+def excluir_arquivo(caminho_arquivo):
+    # Verifica se o arquivo existe antes de tentar removê-lo
+    if os.path.exists(caminho_arquivo):
+        os.remove(caminho_arquivo)
+        print(f"Arquivo removido com sucesso!")
+    else:
+        print(f"Arquivo não encontrado.")
+
 def repetir_tecla(*teclas, total_repeticoes):
     """
     Pressiona uma ou mais teclas repetidamente.
@@ -364,8 +372,8 @@ def gerar_planilha_com_educadores(data_falta, filtro_educador):
     pyautogui.click(pesquisar_faltosos)
 
     esperar_elemento(caminhos["lista_faltosos"])
-    abrir_menu_coluna = localizar_elemento(caminhos["abrir_menu_coluna"])
-    pyautogui.rightClick(abrir_menu_coluna)
+    nome_filtro_presencas = localizar_elemento(caminhos["nome_filtro_presencas"])
+    pyautogui.rightClick(nome_filtro_presencas)
     esperar_elemento(caminhos["editor_de_filtro"])
     editor_de_filtro = localizar_elemento(caminhos["editor_de_filtro"])
     pyautogui.rightClick(editor_de_filtro)
@@ -405,7 +413,7 @@ def gerar_planilha_com_educadores(data_falta, filtro_educador):
     pyautogui.press('enter')
     time.sleep(1)
 
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "alunos_e_educadores.xls"
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "alunos_e_educadores.xls"
     exportar_planilha(caminho_destino)
 
         
@@ -449,7 +457,7 @@ def gerar_faltosos_do_dia(campo_data_inicial, campo_data_final, campo_filtro_edu
     pyautogui.press('enter')
     time.sleep(1)
    
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_dia.xls"
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "faltosos_do_dia.xls"
     exportar_planilha(caminho_destino)
         
     esperar_elemento(caminhos["abrir_planilha"])
@@ -462,7 +470,7 @@ def gerar_faltosos_do_dia(campo_data_inicial, campo_data_final, campo_filtro_edu
 
     messagebox.showinfo("Atenção!", "Planilha de faltosos do dia gerada!")
 
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_dia_filtrados.xlsx"
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "faltosos_do_dia_filtrados.xlsx"
     os.startfile(caminho_destino)
 
 def gerar_planilha_com_celulares(data_inicial, data_final):
@@ -495,7 +503,7 @@ def gerar_planilha_com_celulares(data_inicial, data_final):
     pyautogui.press('enter')
     time.sleep(1)
    
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "celulares_faltosos_do_mes.xls"
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "celulares_faltosos_do_mes.xls"
     exportar_planilha(caminho_destino)
         
     esperar_elemento(caminhos["abrir_planilha"])
@@ -536,15 +544,15 @@ def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
     pyautogui.click(pesquisar_faltosos)
 
     esperar_elemento(caminhos["lista_faltosos"])
-    abrir_menu_coluna = localizar_elemento(caminhos["abrir_menu_coluna"])
-    pyautogui.rightClick(abrir_menu_coluna)
+    abrir_menu_presencas = localizar_elemento(caminhos["abrir_menu_presencas"])
+    pyautogui.rightClick(abrir_menu_presencas)
     esperar_elemento(caminhos["editor_de_filtro"])
     editor_de_filtro = localizar_elemento(caminhos["editor_de_filtro"])
     pyautogui.click(editor_de_filtro)
 
     esperar_elemento(caminhos["construtor_filtro"])
-    filtro_presencas = localizar_elemento(caminhos["filtro_presencas"])
-    pyautogui.click(filtro_presencas)
+    nome_filtro_presencas = localizar_elemento(caminhos["nome_filtro_presencas"])
+    pyautogui.click(nome_filtro_presencas)
     repetir_tecla("tab", total_repeticoes=18)
     pyautogui.press('enter')
     time.sleep(1)
@@ -559,8 +567,8 @@ def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(1)
-    filtro_presencas = localizar_elemento(caminhos["filtro_presencas"])
-    pyautogui.click(filtro_presencas)
+    nome_filtro_presencas = localizar_elemento(caminhos["nome_filtro_presencas"])
+    pyautogui.click(nome_filtro_presencas)
     repetir_tecla("tab", total_repeticoes=15)
     pyautogui.press('enter')
     time.sleep(1)
@@ -575,8 +583,8 @@ def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(1)
-    filtro_presencas = localizar_elemento(caminhos["filtro_presencas"])
-    pyautogui.click(filtro_presencas)
+    nome_filtro_presencas = localizar_elemento(caminhos["nome_filtro_presencas"])
+    pyautogui.click(nome_filtro_presencas)
     repetir_tecla("tab", total_repeticoes=7)
     pyautogui.press('enter')
     time.sleep(1)
@@ -599,23 +607,22 @@ def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
     pyautogui.press('enter')
     time.sleep(1)
 
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_mes.xls"
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "faltosos_do_mes.xls"
     exportar_planilha(caminho_destino)
     
     filtrar_faltosos_do_mes(caminho_destino)
 
     messagebox.showinfo("Atenção!", "Planilha de faltosos do mês gerada!")
 
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / "faltosos_do_mes_filtrados.xlsx"
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "faltosos_do_mes_filtrados.xlsx"
     os.startfile(caminho_destino)
     
-def gerar_frequencia(campo_dia_da_semana, campo_sala, campo_hora):
+def gerar_frequencia(campo_dia_da_semana, campo_sala):
     messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
     procurar_hub()
 
     dia_da_semana = campo_dia_da_semana.get()
     sala = campo_sala.get()
-    hora = campo_hora.get()
 
     abrir_aba("controle_pedagogico")
 
@@ -668,58 +675,51 @@ def gerar_frequencia(campo_dia_da_semana, campo_sala, campo_hora):
     # ADICIONAR FILTRO DA SALA
     nome_filtro_aluno = localizar_elemento(caminhos["nome_filtro_aluno"])
     pyautogui.click(nome_filtro_aluno)
-    repetir_tecla("tab", total_repeticoes=15)
-    pyautogui.press('enter')
+    esperar_elemento(caminhos["filtrar_por_sala"])
+    filtrar_por_sala = localizar_elemento(caminhos["filtrar_por_sala"])
+    pyautogui.click(filtrar_por_sala)
     time.sleep(1)
     valor_filtro = localizar_elemento(caminhos["valor_filtro"])
     pyautogui.click(valor_filtro)
     time.sleep(1)
     keyboard.write(sala)
     time.sleep(1)
-    # ADICIONAR FILTRO DO DIA DE AULA
+
+    # ADICIONAR FILTRO DO DIA
     adicionar_filtro = localizar_elemento(caminhos["adicionar_filtro"])
     pyautogui.click(adicionar_filtro)
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(1)
-    nome_filtro_aluno = localizar_elemento(caminhos["nome_filtro_aluno"])
-    pyautogui.click(nome_filtro_aluno)
-    repetir_tecla("tab", total_repeticoes=12)
-    pyautogui.press('enter')
+    filtrar_por_dias = localizar_elemento(caminhos["filtrar_por_dias"])
+    pyautogui.click(filtrar_por_dias)
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(1)
-    repetir_tecla("tab", total_repeticoes=9)
-    time.sleep(1)
-    pyautogui.press('enter')
+    contem = localizar_elemento(caminhos["contem"])
+    pyautogui.click(contem)
     time.sleep(1)
     keyboard.write(dia_da_semana)
-    time.sleep(1)
-    # ADICIONAR FILTRO DA HORA DA AULA
-    adicionar_filtro = localizar_elemento(caminhos["adicionar_filtro"])
-    pyautogui.click(adicionar_filtro)
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-    nome_filtro_aluno = localizar_elemento(caminhos["nome_filtro_aluno"])
-    pyautogui.click(nome_filtro_aluno)
-    repetir_tecla("tab", total_repeticoes=15)
-    pyautogui.press('enter')
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-    repetir_tecla("tab", total_repeticoes=9)
-    time.sleep(1)
-    pyautogui.press('enter')
-    time.sleep(1)
-    keyboard.write(hora)
     time.sleep(1)
     botao_ok = localizar_elemento(caminhos["botao_ok"])
     pyautogui.click(botao_ok)
     time.sleep(3)
 
-    ordenar_alunos = localizar_elemento(caminhos["abrir_menu_aluno"])
-    pyautogui.click(ordenar_alunos)
+    # ORDENAR HORÁRIOS
+    abrir_menu_horas = localizar_elemento(caminhos["abrir_menu_horas"])
+    pyautogui.rightClick(abrir_menu_horas)
+    esperar_elemento(caminhos["ordem_ascendente"])
+    ordenar_horas= localizar_elemento(caminhos["ordem_ascendente"])
+    pyautogui.click(ordenar_horas)
+    time.sleep(1)
+
+    # ORDENAR NOMES
+    abrir_menu_aluno = localizar_elemento(caminhos["abrir_menu_aluno"])
+    pyautogui.rightClick(abrir_menu_aluno)
+    esperar_elemento(caminhos["ordem_ascendente"])
+    ordenar_nomes= localizar_elemento(caminhos["ordem_ascendente"])
+    pyautogui.click(ordenar_nomes)
+    time.sleep(1)
 
     exportar_frequencia = localizar_elemento(caminhos["exportar"])
     pyautogui.click(exportar_frequencia)
@@ -730,7 +730,7 @@ def gerar_frequencia(campo_dia_da_semana, campo_sala, campo_hora):
 
     sala = sala.lower()
     dia_da_semana = dia_da_semana.lower()
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "Data" / f"alunos_{sala}_{dia_da_semana}.xls"
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / f"alunos_{sala}_{dia_da_semana}.xlsx"
     exportar_planilha(caminho_destino)
 
     messagebox.showinfo("Atenção!", "Planilha para frequência de alunos gerada!")
