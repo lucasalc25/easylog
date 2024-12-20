@@ -257,7 +257,7 @@ def ajustar_largura_colunas(arquivo):
     # Salvar o arquivo depois de ajustar as larguras
     wb.save(arquivo)
 
-def gerar_planilha(tipo, campo_data_inicial, campo_data_final, campo_filtro_educador, dia_da_semana, sala):
+def gerar_planilha(tipo, campo_data_inicial, campo_data_final, campo_filtro_educador, campo_dia_da_semana, campo_sala, campo_hora):
     from bot import gerar_faltosos_do_dia, gerar_faltosos_do_mes, gerar_frequencia
 
     if tipo == "faltas_do_dia":
@@ -265,5 +265,5 @@ def gerar_planilha(tipo, campo_data_inicial, campo_data_final, campo_filtro_educ
     elif tipo == "faltas_do_mes":
         gerar_faltosos_do_mes(campo_data_inicial, campo_data_final)
     elif tipo == "frequencia":
-        gerar_frequencia(dia_da_semana, sala)
+        gerar_frequencia(campo_dia_da_semana, campo_sala, campo_hora)
 

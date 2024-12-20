@@ -78,14 +78,34 @@ def abrir_janela(janela_inicial, titulo):
         ttk.Label(frame, text="Conteúdo não configurado.", font=("Helvetica", 12)).pack(pady=10)
 
 # Função para atualizar as opções de horas das aulas
-def mudar_hora_aulas(sala, hora_aulas):
-    valor_selecionado = sala.get()
-    if valor_selecionado == "Dinamica 1":
-        hora_aulas["values"] = ["08:00:00", "08:00:00,09:00:00", "10:00:00", "13:00:00", "14:00:00", "15:00:00", "16:00:00", "17:00:00", "18:00:00", "19:00:00"],
-        hora_aulas.current(0)
-    elif valor_selecionado == "Dinamica 2":
-        hora_aulas["values"] = ["08:00:00", "10:00:00", "12:00:00", "13:00:00", "14:00:00", "16:00:00", "17:00:00", "18:00:00", "19:00:00"],
-        hora_aulas.current(0)
+def mudar_hora_aulas(frame_frequencia, dia_da_semana, sala, hora_aula):
+    sala_selecionada = sala.get()
+    dia_selecionado = dia_da_semana.get()
+
+    for i, widget in enumerate(frame_frequencia.winfo_children()):
+        if i >= 4:    
+            widget.pack_forget()
+
+            dia_da_semana.delete(0, tk.END)  # Limpa a área de texto antes de inserir
+            sala.delete(0, tk.END)  # Limpa a área de texto antes de inserir
+            hora_aula.delete(0, tk.END)  # Limpa a área de texto antes de inserir
+
+            if dia_selecionado != "Sábado":
+                if sala_selecionada == "Dinamica 1":
+                    ttk.Label(frame_frequencia, text="Hora: * ").pack(side="left", padx=5, pady=(10, 15))
+                    hora_aula.pack(side="left", padx=(0, 5), pady=(10, 15))  
+                    hora_aula["values"] = ["08:00:00", "09:00:00", "10:00:00", "13:00:00", "14:00:00", "15:00:00", "16:00:00", "17:00:00", "18:00:00", "19:00:00"]
+                    hora_aula.current(0)
+                elif sala_selecionada == "Dinamica 2":
+                    ttk.Label(frame_frequencia, text="Hora: * ").pack(side="left", padx=5, pady=(10, 15))
+                    hora_aula.pack(side="left", padx=(0, 5), pady=(10, 15))
+                    hora_aula["values"] = ["08:00:00", "10:00:00", "13:00:00", "15:00:00", "17:00:00", "18:00:00"]
+                    hora_aula.current(0)
+            elif dia_selecionado == "Sábado":
+                ttk.Label(frame_frequencia, text="Hora: * ").pack(side="left", padx=5, pady=(10, 15))
+                hora_aula.pack(side="left", padx=(0, 5), pady=(10, 15))
+                hora_aula["values"] = ["08:00:00", "10:00:00", "12:00:00", "14:00:00", "16:00:00"]
+                hora_aula.current(0)
 
 
 # Função para configurar a área de "Planilhas"
@@ -104,7 +124,7 @@ def frame_planilhas(janela, frame):
     filtro_educador = ttk.Combobox(frame_faltas, values=["Geral", "Lucas", "Linderlly", "Yasmin"], state="readonly", width=10, height=3, justify="center")
     filtro_educador.pack(side=tk.LEFT, padx=5, pady=(10, 15))       
     filtro_educador.current(0)  # Define "Nenhum" como o valor padrão
-    ttk.Button(frame_faltas, text="Gerar", command=lambda:gerar_planilha("faltas_do_dia", data_falta, data_falta,  filtro_educador), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
+    ttk.Button(frame_faltas, text="Gerar", command=lambda:gerar_planilha("faltas_do_dia", data_falta, data_falta, filtro_educador, "campo_dia_da_semana", "campo_sala", "campo_hora"), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
     
     frame_alunos_atencao = ttk.Labelframe(frame, text=" Faltas no mês ", padding=5, bootstyle="primary")
     frame_alunos_atencao.pack(fill=tk.X, pady=(0,5))
@@ -116,25 +136,26 @@ def frame_planilhas(janela, frame):
     data_final = ttk.Entry(frame_alunos_atencao, width=12)
     data_final.pack(side=tk.LEFT, padx=5, pady=(10, 15))
     data_final.insert(0, data_atual_format)
-    ttk.Button(frame_alunos_atencao, text="Gerar", command=lambda:gerar_planilha("faltas_do_mes", data_inicial, data_final, "Geral"), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
+    ttk.Button(frame_alunos_atencao, text="Gerar", command=lambda:gerar_planilha("faltas_do_mes", data_inicial, data_final, "Geral", "campo_dia_da_semana", "campo_sala", "campo_hora"), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
 
     frame_frequencia = ttk.Labelframe(frame, text=" Listas de Frequência ", padding=5, bootstyle="primary")
-    frame_frequencia.pack(fill=tk.X, pady=(0,5))
-    ttk.Label(frame_frequencia, text="Dia: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
-    dia_da_semana = ttk.Combobox(frame_frequencia, values=["Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"], state="readonly", width=14, height=3, justify="center")
-    dia_da_semana.pack(side=tk.LEFT, padx=5, pady=(10, 15))
-    dia_da_semana.current(0)  # Define Segunda-Feira como o valor padrão
-    ttk.Label(frame_frequencia, text="Sala: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
-    sala = ttk.Combobox(frame_frequencia, values=["Dinamica 1", "Dinamica 2"], state="readonly", width=10, height=3, justify="center")
-    sala.pack(side=tk.LEFT, padx=5, pady=(10, 15))  
-    sala.current(0)  # Define o mês atual como o valor padrão
-    ttk.Label(frame_frequencia, text="Sala: * ").pack(side=tk.LEFT, padx=(10,0), pady=(10, 15))
-    hora_aulas = ttk.Combobox(frame_frequencia, state="readonly", width=7, height=3, justify="center")
-    hora_aulas.pack(side=tk.LEFT, padx=5, pady=(10, 15))  
-    sala.bind("<<ComboboxSelected>>", mudar_hora_aulas(sala, hora_aulas))
-    ttk.Button(frame_frequencia, text="Gerar", command=lambda:gerar_planilha("frequencia", data_inicial, data_final, filtro_educador, dia_da_semana, sala), bootstyle="primary").pack(side=tk.RIGHT, padx=10, pady=(10, 15))
-
-
+    frame_frequencia.pack(pady=(0, 5), fill="x")
+    # Linha de widgets lado a lado
+    ttk.Label(frame_frequencia, text="Dia: * ").pack(side="left", padx=5, pady=(10, 15))
+    dia_da_semana = ttk.Combobox(frame_frequencia, values=["Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"], state="readonly", width=14, justify="center")
+    dia_da_semana.pack(side="left", padx=(0, 5), pady=(10, 15))
+    dia_da_semana.current(0)
+    # Bind para atualizar horas
+    dia_da_semana.bind("<<ComboboxSelected>>", lambda event: mudar_hora_aulas(frame_frequencia, dia_da_semana, sala, hora_aula))
+    ttk.Label(frame_frequencia, text="Sala: * ").pack(side="left", padx=5, pady=(10, 15))
+    sala = ttk.Combobox(frame_frequencia, values=["Dinamica 1", "Dinamica 2"], state="readonly", width=10, justify="center")
+    sala.pack(side="left", padx=(0, 5), pady=(10, 15))
+    # Bind para atualizar horas
+    sala.bind("<<ComboboxSelected>>", lambda event: mudar_hora_aulas(frame_frequencia, dia_da_semana, sala, hora_aula))
+    hora_aula = ttk.Combobox(frame_frequencia, state="readonly", width=9, justify="center")
+    # Botão na linha debaixo
+    ttk.Button(frame, text="Gerar", command=lambda: gerar_planilha("frequencia", data_inicial, data_final, filtro_educador, dia_da_semana, sala, hora_aula), bootstyle="primary").pack(pady=(10, 15))
+    
     ttk.Button(frame, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).pack(pady=10)
 
 # Função para configurar a área de "Mensagens"
