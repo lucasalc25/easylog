@@ -29,7 +29,7 @@ def exibir_janela_inicial():
 
     # Título e subtítulo
     ttk.Label(frame_principal, text="Bem-vindo(a) ao EasyLog", font=("Helvetica", 16, "bold")).pack(pady=10)
-    ttk.Label(frame_principal, text="Facilitando sua gestão acadêmica", font=("Helvetica", 11)).pack(pady=(10, 20))
+    ttk.Label(frame_principal, text="Facilitando nossos processos pedagógicos", font=("Helvetica", 11)).pack(pady=(10, 20))
 
     # Botões
     ttk.Button(frame_principal, text="PLANILHAS", command=lambda:abrir_janela(root, "Planilhas"), bootstyle="success-outline", width=20).pack(pady=10)
@@ -108,7 +108,7 @@ def frame_planilhas(janela, frame):
     centralizar_janela(janela)
     
     frame_faltas = ttk.Labelframe(frame, text=" Faltas no dia", padding=5, bootstyle="primary")
-    frame_faltas.grid(row=0, column=0, pady=(0,5), sticky="nsew")
+    frame_faltas.grid(row=0, column=0, padx=5, pady=(0,10), sticky="nsew")
     # Configurar grid para ajustar os elementos lado a lado
     frame_faltas.grid_columnconfigure(0, weight=1)
     frame_faltas.grid_columnconfigure(1, weight=1)
@@ -119,16 +119,16 @@ def frame_planilhas(janela, frame):
     # Adicionando os elementos existentes usando grid
     ttk.Label(frame_faltas, text="Data da falta: *").grid(row=0, column=0, padx=(10,0), pady=(10, 15))
     data_falta = ttk.Entry(frame_faltas, width=12)
-    data_falta.grid(row=0, column=1, padx=(0,5), pady=(10, 15), sticky="w")
+    data_falta.grid(row=0, column=1, padx=5, pady=(10, 15), sticky="w")
     data_falta.insert(0, data_anterior)
     ttk.Label(frame_faltas, text="Educador: *").grid(row=0, column=2, padx=(10,0), pady=(10, 15))
     filtro_educador = ttk.Combobox(frame_faltas, values=["Geral", "Lucas", "Linderlly", "Yasmin"], state="readonly", width=10, height=3, justify="center")
-    filtro_educador.grid(row=0, column=3, padx=(0,5), pady=(10, 15), sticky="w")       
+    filtro_educador.grid(row=0, column=3, padx=5, pady=(10, 15), sticky="w")       
     filtro_educador.current(0)  # Define "Nenhum" como o valor padrão
-    ttk.Button(frame_faltas, text="Gerar", command=lambda:gerar_planilha("faltas_do_dia", data_falta, data_falta, filtro_educador, "campo_dia_da_semana", "campo_sala"), bootstyle="primary").grid(row=0, column=4,padx=(20,10), pady=(10, 15), sticky="n")
+    ttk.Button(frame_faltas, text="Gerar", command=lambda:gerar_planilha("faltas_do_dia", data_falta, data_falta, filtro_educador, "dia_da_semana", "sala"), bootstyle="primary").grid(row=0, column=4,padx=(20,10), pady=(10, 15), sticky="n")
     
     frame_alunos_atencao = ttk.Labelframe(frame, text=" Faltas no mês ", padding=5, bootstyle="primary")
-    frame_alunos_atencao.grid(row=1, column=0, pady=(0,5), sticky="nsew")
+    frame_alunos_atencao.grid(row=1, column=0, padx=5, pady=(0,10), sticky="nsew")
     # Configurar grid para ajustar os elementos lado a lado
     frame_alunos_atencao.grid_columnconfigure(0, weight=1)
     frame_alunos_atencao.grid_columnconfigure(1, weight=1)
@@ -138,16 +138,16 @@ def frame_planilhas(janela, frame):
     frame_alunos_atencao.grid_columnconfigure(5, weight=1)
     ttk.Label(frame_alunos_atencao, text="Data Inicial: * ").grid(row=1, column=1, padx=(10,0), pady=(10, 15))
     data_inicial = ttk.Entry(frame_alunos_atencao, width=12)
-    data_inicial.grid(row=1, column=2, padx=(0,5), pady=(10, 15), sticky="w")
+    data_inicial.grid(row=1, column=2, padx=5, pady=(10, 15), sticky="w")
     data_inicial.insert(0, dia_inicio_mes)
     ttk.Label(frame_alunos_atencao, text="Data Final: * ").grid(row=1, column=3, padx=(10,0), pady=(10, 15))
     data_final = ttk.Entry(frame_alunos_atencao, width=12)
-    data_final.grid(row=1, column=4, padx=(0,5), pady=(10, 15), sticky="w")
+    data_final.grid(row=1, column=4, padx=5, pady=(10, 15), sticky="w")
     data_final.insert(0, data_atual_format)
-    ttk.Button(frame_alunos_atencao, text="Gerar", command=lambda:gerar_planilha("faltas_do_mes", data_inicial, data_final, "Geral", "campo_dia_da_semana", "campo_sala"), bootstyle="primary").grid(row=1, column=5, padx=(20,10), pady=(10, 15), sticky="n")
+    ttk.Button(frame_alunos_atencao, text="Gerar", command=lambda:gerar_planilha("faltas_do_mes", data_inicial, data_final, "Geral", "dia_da_semana", "sala"), bootstyle="primary").grid(row=1, column=5, padx=(20,10), pady=(10, 15), sticky="n")
 
-    frame_frequencia = ttk.Labelframe(frame, text=" Listas de Frequência ", padding=5, bootstyle="primary")
-    frame_frequencia.grid(row=2, column=0, pady=(0, 5), sticky="nsew")
+    frame_frequencia = ttk.Labelframe(frame, text=" Frequência do mês", padding=5, bootstyle="primary")
+    frame_frequencia.grid(row=2, column=0, padx=5, pady=(0,10), sticky="nsew")
     # Configurar grid para ajustar os elementos lado a lado
     frame_frequencia.grid_columnconfigure(0, weight=1)
     frame_frequencia.grid_columnconfigure(1, weight=1)
@@ -156,15 +156,15 @@ def frame_planilhas(janela, frame):
     frame_frequencia.grid_columnconfigure(4, weight=1)
     frame_frequencia.grid_columnconfigure(5, weight=1)
     # Linha de widgets lado a lado
-    ttk.Label(frame_frequencia, text="Dia: *").grid(row=2, column=1, pady=(10, 15))
+    ttk.Label(frame_frequencia, text="Dia da semana: *").grid(row=2, column=0, padx=(10,0), pady=(10, 15))
     dia_da_semana = ttk.Combobox(frame_frequencia, values=["Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"], state="readonly", width=14, justify="center")
-    dia_da_semana.grid(row=2, column=2, padx=(0, 5), pady=(10, 15), sticky="w")
+    dia_da_semana.grid(row=2, column=1, padx=5, pady=(10, 15), sticky="w")
     dia_da_semana.current(0)
-    ttk.Label(frame_frequencia, text="Sala: *").grid(row=2, column=3, pady=(10, 15))
+    ttk.Label(frame_frequencia, text="Sala: *").grid(row=2, column=2, padx=(10,0), pady=(10, 15))
     sala = ttk.Combobox(frame_frequencia, values=["Dinamica 1", "Dinamica 2"], state="readonly", width=10, justify="center")
-    sala.grid(row=2, column=4, padx=(0, 5), pady=(10, 15), sticky="w")
+    sala.grid(row=2, column=3, padx=5, pady=(10, 15), sticky="w")
     # Botão na linha debaixo
-    ttk.Button(frame_frequencia, text="Gerar", command=lambda: gerar_planilha("frequencia", data_inicial, data_final, filtro_educador, dia_da_semana, sala), bootstyle="primary").grid(row=2, column=5,pady=(10, 15), sticky="")
+    ttk.Button(frame_frequencia, text="Gerar", command=lambda: gerar_planilha("frequencia", data_inicial, data_final, filtro_educador, dia_da_semana, sala), bootstyle="primary").grid(row=2, column=4, padx=(20,10), pady=(10, 15), sticky="")
     
     ttk.Button(frame, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=3, column=0,pady=10)
 
@@ -174,14 +174,14 @@ def frame_mensagens(janela,frame):
     centralizar_janela(janela)
     # Campo para anexação de planilha
     frame_contatos = ttk.Labelframe(frame, text=" Planilha de contatos: * ", padding=5, bootstyle="primary")
-    frame_contatos.pack(fill=tk.X, pady=5)
+    frame_contatos.pack(fill=tk.X, padx=5, pady=(0,10))
     campo_planilha = ttk.Entry(frame_contatos)
     campo_planilha.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
     ttk.Button(frame_contatos, text="Anexar", command=lambda:anexar_planilha(campo_planilha), bootstyle="success").pack(side=tk.RIGHT, padx=5)
 
     # Criando o frame para o tipo de comunicado
-    frame_tipo_mensagem = ttk.Labelframe(frame, text=" Tipo de Mensagem * ", padding=5)
-    frame_tipo_mensagem.pack(fill=tk.X, padx=5, pady=5)
+    frame_tipo_mensagem = ttk.Labelframe(frame, text=" Tipo de Mensagem * ", padding=5, bootstyle="primary")
+    frame_tipo_mensagem.pack(fill=tk.X, padx=5, pady=(0,10))
 
     # Variável para armazenar o tipo de comunicado selecionado
     tipo_mensagem_var = tk.StringVar(value="falta")
@@ -204,7 +204,7 @@ def frame_mensagens(janela,frame):
 
     # Campos para variáveis
     frame_variaveis = ttk.Labelframe(frame, text=" Variáveis ", padding=5, bootstyle="primary")
-    frame_variaveis.pack(fill=tk.X, pady=5)
+    frame_variaveis.pack(fill=tk.X, padx=5, pady=(0,10))
 
     ttk.Label(frame_variaveis, text="Data: ").pack(side=tk.LEFT, padx=(5,0))
     campo_data = ttk.Entry(frame_variaveis, width=10)
@@ -280,7 +280,7 @@ def frame_historicos(janela, frame):
 
     # Campo para anexação de planilha
     frame_contatos = ttk.Labelframe(frame, text=" Planilha de alunos: * ", padding=5, bootstyle="primary")
-    frame_contatos.pack(fill=tk.X, pady=5)
+    frame_contatos.pack(fill=tk.X, padx=5, pady=5)
     campo_planilha = ttk.Entry(frame_contatos)
     campo_planilha.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
     ttk.Button(frame_contatos, text="Anexar", command=lambda:anexar_planilha(campo_planilha), bootstyle="success").pack(side=tk.RIGHT, padx=5)
@@ -295,7 +295,7 @@ def frame_historicos(janela, frame):
     # Definindo as opções dos RadioButtons
     opcoes = [
         ("Falta", "falta"),
-        ("Multirão", "multirao"),
+        ("Multirão", "multirão"),
         ("Atenção", "atenção"),
         ("Prova", "prova"),
         ("Atividades", "atividades"),
@@ -311,7 +311,7 @@ def frame_historicos(janela, frame):
 
     # Campos para variáveis
     frame_variaveis = ttk.Labelframe(frame, text=" Variáveis ", padding=5, bootstyle="primary")
-    frame_variaveis.pack(fill=tk.X, pady=5)
+    frame_variaveis.pack(fill=tk.X, padx=5, pady=5)
 
     ttk.Label(frame_variaveis, text="Data da falta: ").pack(side=tk.LEFT, padx=(5,0))
     campo_data = ttk.Entry(frame_variaveis, width=10)
@@ -338,13 +338,13 @@ def frame_historicos(janela, frame):
 
     # Campo para digitação do título da ocorrência
     frame_texto_tipo = ttk.Labelframe(frame, text=" Título: * ", padding=5, bootstyle="primary")
-    frame_texto_tipo.pack(fill=tk.BOTH, pady=5)
+    frame_texto_tipo.pack(fill=tk.BOTH, padx=5, pady=5)
     campo_titulo = tk.Text(frame_texto_tipo, height=1, wrap="word")
     campo_titulo.pack(fill=tk.BOTH, padx=5)
 
     # Campo para digitação da descrição da ocorrência
     frame_texto_descricao = ttk.Labelframe(frame, text=" Descrição: * ", padding=5, bootstyle="primary")
-    frame_texto_descricao.pack(fill=tk.BOTH, pady=5)
+    frame_texto_descricao.pack(fill=tk.BOTH, padx=5, pady=5)
     campo_descricao = tk.Text(frame_texto_descricao, height=7, wrap="word")
     campo_descricao.pack(fill=tk.BOTH, padx=5)
 

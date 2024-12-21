@@ -75,6 +75,7 @@ caminhos = {
     "substituir_arquivo" : resource_path('imagens/substituir_arquivo.png'),
     "visu_presencas_e_faltas" : resource_path('imagens/visu_presencas_e_faltas.png'),
     "visualizar" : resource_path('imagens/visualizar.png'),
+    "msg_processo_finalizado":resource_path('imagens/msg_processo_finalizado.png'),
     "whatsapp_aberto" : resource_path('imagens/whatsapp_aberto.png'),
     "whatsapp_encontrado":resource_path('imagens/whatsapp_encontrado.png'),
     "historicos": resource_path("scripts/historicos.py"),

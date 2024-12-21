@@ -10,11 +10,11 @@ def gerar_ocorrencia(tipo_ocorrencia_var, campo_data, campo_titulo, campo_descri
     if tipo_ocorrencia == "falta":
         titulo = f"Falta - {data}"
         descricao = "<Observação da planilha>"
-    elif tipo_ocorrencia == "multirao":
+    elif tipo_ocorrencia == "multirão":
         titulo = "Multirão de reposição"
         descricao = "Enviado Convite para o(a) aluno(a) para participar do multirão de reposição, explicando o objetivo da iniciativa, a gratuidade e as datas disponíveis. Solicitamos que informassem a data e horário de preferência para organizarmos a programação."
-    elif tipo_ocorrencia == "comportamento":
-        titulo = "Acompanhamento pedagógico"
+    elif tipo_ocorrencia == "atenção":
+        titulo = "Acompanhamento - Atenção"
         descricao = "<Observação da planilha>"
     elif tipo_ocorrencia == "prova":
         titulo = "Prova - <Módulo>"
@@ -25,9 +25,9 @@ def gerar_ocorrencia(tipo_ocorrencia_var, campo_data, campo_titulo, campo_descri
     elif tipo_ocorrencia == "1_dia_de_aula":
         titulo = "Acompanhamento - 1° dia de aula"
         descricao = "Aluno iniciou seu curso na unidade Manaus Zona Oeste, onde conheceu os professores e a plataforma, realizou a aula inaugural e linha da vida. Foi observado que o aluno possui uma certa dificuldade com..."
-    elif tipo_ocorrencia == "plantao":
-        titulo = "Plantão de dúvidas"
-        descricao = "Foi identificado uma certa dificuldade do aluno(a) na fixação do conteúdo, sendo então oferecido o plantão de dúvidas. Em contato com responsável para informar a situação e horários disponíveis, aguardando retorno."
+    elif tipo_ocorrencia == "personalizada":
+        titulo = ">>Altere o título aqui<<"
+        descricao = "<Observação da planilha>"
 
     # Exibe o título no campo de texto
     campo_titulo.delete("1.0", tk.END)  # Limpa a área de texto antes de inserir

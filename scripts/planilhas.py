@@ -1,3 +1,4 @@
+from datetime import datetime
 import pandas as pd
 from pathlib import Path
 import openpyxl
@@ -77,7 +78,7 @@ def formatar_telefone(celular):
             return f"{celular[:2]}{celular[2]}{celular[3:7]}{celular[7:]}"
     return celular  # Retorna o número original caso não tenha o formato esperado
 
-def filtrar_faltosos_do_dia(planilha_faltosos_do_dia):
+def filtrar_faltosos_do_dia(planilha_faltosos_do_dia, data_falta):
     from bot import excluir_arquivo
     planilha_educadores = Path.home() / "Documents" / "EasyLog" / "alunos_e_educadores.xls"
 
@@ -116,12 +117,12 @@ def filtrar_faltosos_do_dia(planilha_faltosos_do_dia):
     # Adicionar "Funcionário" na coluna "Observação" onde a coluna "Educador" contém "Sangela"
     df_final.loc[df_final['Educador'].str.contains('Sangela', na=False), 'Observação'] = 'Funcionário'
 
-    caminho_saida = Path.home() / "Documents" / "EasyLog" / "faltosos_do_dia_filtrados.xlsx"
+    caminho_saida = Path.home() / "Documents" / "EasyLog" / f"faltosos_{data_falta}.xlsx"
 
     # Salvar o resultado
     df_final.to_excel(caminho_saida, index=False)
 
-    ajustar_largura_colunas(caminho_saida)
+    ajustar_largura_colunas(caminho_saida, data_falta, "mes_atual")
 
     excluir_arquivo(planilha_faltosos_do_dia)
     excluir_arquivo(planilha_educadores)
@@ -190,12 +191,15 @@ def filtrar_faltosos_do_mes(planilha_faltosos_do_mes):
     # Selecionar as colunas finais
     df_final = df_mesclado[['Contrato','Aluno', 'Educador', 'Data Cadastro Contrato', 'Celular', 'Faltas', 'Reposições']]
 
-    caminho_saida = Path.home() / "Documents" / "EasyLog" / "faltosos_do_mes_filtrados.xlsx"
+    data_atual = datetime.now()
+    mes_atual = data_atual.strftime("%B")
+    mes_atual = mes_atual.lower()
+    caminho_saida = Path.home() / "Documents" / "EasyLog" / f"faltosos_{mes_atual}.xlsx"
 
     # Salva o DataFrame processado em um novo arquivo Excel
     df_final.to_excel(caminho_saida, index=False)
 
-    ajustar_largura_colunas(caminho_saida)
+    ajustar_largura_colunas(caminho_saida, "data_falta", mes_atual)
 
     excluir_arquivo(planilha_faltosos_do_mes)
     excluir_arquivo(planilha_celulares)
@@ -224,15 +228,15 @@ def filtrar_alunos_ativos(planilha_alunos_ativos):
     # Salva o DataFrame processado em um novo arquivo Excel
     df_final.to_excel(caminho_destino, index=False)
 
-    ajustar_largura_colunas(caminho_destino)
+    ajustar_largura_colunas(caminho_destino, "data_falta", "mes_atual")
     print("Planilha de alunos ativos filtrada!")
 
-def ajustar_largura_colunas(arquivo):
+def ajustar_largura_colunas(arquivo, data_falta, mes_atual):
     # Carregar o arquivo Excel
     wb = openpyxl.load_workbook(arquivo)
     ws = wb.active
 
-    if arquivo == Path.home() / "Documents" / "EasyLog" / "faltosos_do_dia_filtrados.xlsx":
+    if arquivo == Path.home() / "Documents" / "EasyLog" / f"faltosos_{data_falta}.xlsx":
         # Definir larguras específicas para as colunas
         colunas_largura = {
             "A": 10.0,
@@ -241,7 +245,7 @@ def ajustar_largura_colunas(arquivo):
             "D": 12.0,
             "E": 18.0
         }
-    elif arquivo == Path.home() / "Documents" / "EasyLog" / "faltosos_do_mes_filtrados.xlsx":
+    elif arquivo == Path.home() / "Documents" / "EasyLog" / f"faltosos_{mes_atual}.xlsx":
         # Definir larguras específicas para as colunas
         colunas_largura = {
             "A": 10.5,
@@ -250,7 +254,7 @@ def ajustar_largura_colunas(arquivo):
             "D": 21.0,
             "E": 14.0,
             "F": 7.0,
-            "E": 11.0
+            "G": 11.0
         }
     elif arquivo == Path.home() / "Documents" / "EasyLog" / "alunos_ativos_filtrados.xlsx":
         # Definir larguras específicas para as colunas

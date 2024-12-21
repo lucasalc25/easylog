@@ -17,10 +17,8 @@ def criar_pastas():
     
     # Define o caminho completo da nova pasta
     caminho_pasta_easylog = os.path.join(caminho_documentos, 'EasyLog')
-    caminho_pasta_data = os.path.join(caminho_pasta_easylog, 'Data')
     
     pasta_easylog = 'EasyLog'
-    pasta_data = 'Data'
     
     # Cria a pasta, se ela não existir
     if not os.path.exists(caminho_pasta_easylog):
@@ -29,13 +27,7 @@ def criar_pastas():
     else:
         print(f"A pasta '{pasta_easylog}' já existe em {caminho_documentos}")
         
-    # Cria a pasta, se ela não existir
-    if not os.path.exists(caminho_pasta_data):
-        os.makedirs(caminho_pasta_data)
-        print(f"Pasta '{pasta_data}' criada em {caminho_pasta_easylog}")
-    else:
-        print(f"A pasta '{pasta_data}' já existe em {caminho_pasta_easylog}")
-
+        
 def excluir_arquivo(caminho_arquivo):
     # Verifica se o arquivo existe antes de tentar removê-lo
     if os.path.exists(caminho_arquivo):
@@ -466,12 +458,13 @@ def gerar_faltosos_do_dia(campo_data_inicial, campo_data_final, campo_filtro_edu
     pyautogui.press('enter')
     time.sleep(1)
 
-    filtrar_faltosos_do_dia(caminho_destino)
+    filtrar_faltosos_do_dia(caminho_destino, data_falta)
+
+    data_falta = data_falta.lower()
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / f"faltosos_{data_falta}.xlsx"
+    os.startfile(caminho_destino)
 
     messagebox.showinfo("Atenção!", "Planilha de faltosos do dia gerada!")
-
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "faltosos_do_dia_filtrados.xlsx"
-    os.startfile(caminho_destino)
 
 def gerar_planilha_com_celulares(data_inicial, data_final):
     abrir_aba("presencas_e_faltas")
@@ -513,6 +506,8 @@ def gerar_planilha_com_celulares(data_inicial, data_final):
     time.sleep(1)
     
 def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
+    from datetime import datetime
+
     messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
     procurar_hub()
 
@@ -607,15 +602,16 @@ def gerar_faltosos_do_mes(campo_data_inicial, campo_data_final):
     pyautogui.press('enter')
     time.sleep(1)
 
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "faltosos_do_mes.xls"
+    data_atual = datetime.now()
+    mes_atual = data_atual.strftime("%B")
+    mes_atual = mes_atual.lower()
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / f"faltosos_{mes_atual}.xls"
     exportar_planilha(caminho_destino)
-    
     filtrar_faltosos_do_mes(caminho_destino)
 
-    messagebox.showinfo("Atenção!", "Planilha de faltosos do mês gerada!")
-
-    caminho_destino = Path.home() / "Documents" / "EasyLog" / "faltosos_do_mes_filtrados.xlsx"
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / f"faltosos_{mes_atual}.xlsx"
     os.startfile(caminho_destino)
+    messagebox.showinfo("Atenção!", f"Planilha dos faltosos de {mes_atual} gerada!")
     
 def gerar_frequencia(campo_dia_da_semana, campo_sala):
     messagebox.showinfo("Atenção!", "Certifique-se de ter feito o login no HUB!")
@@ -732,5 +728,7 @@ def gerar_frequencia(campo_dia_da_semana, campo_sala):
     dia_da_semana = dia_da_semana.lower()
     caminho_destino = Path.home() / "Documents" / "EasyLog" / f"alunos_{sala}_{dia_da_semana}.xlsx"
     exportar_planilha(caminho_destino)
+
+    os.startfile(caminho_destino)
 
     messagebox.showinfo("Atenção!", "Planilha para frequência de alunos gerada!")
