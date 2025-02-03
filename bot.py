@@ -129,127 +129,6 @@ def anexar_imagem(imagem):
         imagem.delete(0, tk.END)  # Limpa o conteúdo atual
         imagem.insert(0, caminho)  # Exibe o caminho do arquivo
 
-# Função para enviar uma imagem para os contatos
-def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
-    from scripts.mensagens import personalizar_mensagem
-
-    messagebox.showinfo("Aviso!", "Certifique-se de que o Whatsapp esteja conectado ao aplicativo!")
-    
-    # Pressionar Windows para abrir a conversa
-    pyautogui.press('win')  
-    esperar_elemento(caminhos["menu_iniciar"])
-    
-    # Usar o pyautogui para digitar whatsapp
-    pyautogui.write('whatsapp')
-    esperar_elemento(caminhos["whatsapp_encontrado"])
-
-    # Pressionar Enter para abrir o app
-    pyautogui.press('enter')
-    esperar_elemento(caminhos["whatsapp_aberto"])
-
-    # Ler os contatos
-    alunos = ler_faltosos_dia(arquivo_contatos)
-    mensagens_enviadas = 0
-    
-    for aluno in alunos:
-        try:
-            if aluno['Aluno']:
-                nome_aluno = str(aluno['Aluno'])  # Nome do aluno
-                if aluno['Observacao']:
-                    # Verifica se a coluna "Observação" está preenchida
-                    observacao = aluno.get('Observacao')  # Usa get para evitar KeyError
-                    if pd.notna(observacao):  # Verifica se a observação não é NaN
-                        print(f"Observação encontrada para {nome_aluno}. Pulando para o próximo aluno.")
-                        continue  # Pula para o próximo aluno se houver observação
-                    
-                    if aluno['Educador']:
-                        nome_educador = str(aluno['Educador'])
-                        if len(nome_aluno) > 0 and len(nome_educador) > 0:
-                            print("Personalizando mensagem...")
-                            mensagem_personalizada = personalizar_mensagem(nome_aluno, nome_educador, mensagem_template)
-
-                        if aluno['Contato']:
-                            telefone = aluno['Contato']
-                            telefone = telefone[:2] + telefone[3:]  # Remove o índice 2 (que é o terceiro número)
-
-            pyautogui.hotkey('ctrl','n')
-            esperar_elemento(caminhos["nova_conversa"])
-            
-            # Usar o pyautogui para digitar o número de telefone do contato
-            pyautogui.write(f'{telefone}')
-            time.sleep(2)   
-            
-            whatsapp_existe = verificar_existencia('pesquisa_contato')
-
-            if whatsapp_existe:
-                pyautogui.press('tab')
-                pyautogui.press('tab')  
-                time.sleep(1)
-
-                pyautogui.press('enter')  
-                time.sleep(1)
-                
-                #Verifica se há imagem
-                if len(imagem) > 0:
-                    esperar_elemento(caminhos["anexar"])
-                    botao_anexar = localizar_elemento(caminhos["anexar"])
-                    pyautogui.click(botao_anexar)
-
-                    pyautogui.press('tab')
-                    time.sleep(1)
-                    pyautogui.press('enter')  
-                    time.sleep(2)
-
-                    pyperclip.copy(imagem)
-                    # Colar o caminho da imagem
-                    pyautogui.hotkey('ctrl', 'v')  # Colar o caminho da imagem no campo
-                    time.sleep(2)
-
-                    pyautogui.press('enter')
-                    
-                    esperar_elemento(caminhos["aba_anexar"])
-
-                    if mensagem_personalizada:
-                        pyperclip.copy(mensagem_personalizada)
-                        # Usar o pyautogui para colar a mensagem
-                        pyautogui.hotkey('ctrl','v')
-                        time.sleep(1)
-                    
-                    time.sleep(1)
-                    # Pressionar Enter para enviar a imagem
-                    pyautogui.press('enter')
-                    mensagens_enviadas += 1
-
-                else:
-                    pyperclip.copy(mensagem_personalizada)
-                    # Usar o pyautogui para colar a mensagem
-                    pyautogui.hotkey('ctrl','v')
-                    time.sleep(2)
-
-                    # Clicar no botão de alternar
-                    pyautogui.press('enter')
-                    mensagens_enviadas += 1
-                
-            else:
-                pyautogui.hotkey('ctrl','a')
-                time.sleep(1)
-
-                # Pressionar Enter para enviar a imagem
-                pyautogui.press('backspace')
-            
-            time.sleep(10)  # Aguarde um tempo antes de enviar para o próximo contato
-        except Exception as e:
-            if mensagens_enviadas == 0:
-                print(f"Erro ao enviar mensagens: {e}")
-                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui enviar nenhuma mensagem :(")
-                return []
-            else:
-                print(f"Erro ao enviar mensagens: {e}")
-                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui enviar {mensagens_enviadas} mensagens :(")
-                return []
-                            
-    messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
-
 
 def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_ocorrencia):
     repeticoes = 0
@@ -732,3 +611,126 @@ def gerar_frequencia(campo_dia_da_semana, campo_sala):
     os.startfile(caminho_destino)
 
     messagebox.showinfo("Atenção!", "Planilha para frequência de alunos gerada!")
+
+# Função para enviar uma imagem para os contatos
+def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
+    from scripts.mensagens import personalizar_mensagem
+
+    messagebox.showinfo("Aviso!", "Certifique-se de que o Whatsapp esteja conectado ao aplicativo!")
+    
+    # Pressionar Windows para abrir a conversa
+    pyautogui.press('win')  
+    esperar_elemento(caminhos["menu_iniciar"])
+    
+    # Usar o pyautogui para digitar whatsapp
+    pyautogui.write('whatsapp')
+    esperar_elemento(caminhos["whatsapp_encontrado"])
+
+    # Pressionar Enter para abrir o app
+    pyautogui.press('enter')
+    esperar_elemento(caminhos["whatsapp_aberto"])
+
+    # Ler os contatos
+    alunos = ler_faltosos_dia(arquivo_contatos)
+    mensagens_enviadas = 0
+    
+    for aluno in alunos:
+        try:
+            if aluno['Aluno']:
+                nome_aluno = str(aluno['Aluno'])  # Nome do aluno
+                if aluno['Observacao']:
+                    # Verifica se a coluna "Observação" está preenchida
+                    observacao = aluno.get('Observacao')  # Usa get para evitar KeyError
+                    if pd.notna(observacao):  # Verifica se a observação não é NaN
+                        print(f"Observação encontrada para {nome_aluno}. Pulando para o próximo aluno.")
+                        continue  # Pula para o próximo aluno se houver observação
+                    
+                    if aluno['Educador']:
+                        nome_educador = str(aluno['Educador'])
+                        if len(nome_aluno) > 0 and len(nome_educador) > 0:
+                            print("Personalizando mensagem...")
+                            mensagem_personalizada = personalizar_mensagem(nome_aluno, nome_educador, mensagem_template)
+
+                        if aluno['Contato']:
+                            telefone = aluno['Contato']
+                            telefone = telefone[:2] + telefone[3:]  # Remove o índice 2 (que é o terceiro número)
+
+            pyautogui.hotkey('ctrl','n')
+            esperar_elemento(caminhos["nova_conversa"])
+            
+            # Usar o pyautogui para digitar o número de telefone do contato
+            pyautogui.write(f'{telefone}')
+            time.sleep(2)   
+            
+            whatsapp_existe = verificar_existencia('pesquisa_contato')
+
+            if whatsapp_existe:
+                print("Whatsapp encontrado")
+                pyautogui.press('tab')
+                pyautogui.press('tab')  
+                time.sleep(1)
+
+                pyautogui.press('enter')  
+                time.sleep(1)
+                
+                #Verifica se há imagem
+                if len(imagem) > 0:
+                    esperar_elemento(caminhos["anexar"])
+                    botao_anexar = localizar_elemento(caminhos["anexar"])
+                    pyautogui.click(botao_anexar)
+
+                    pyautogui.press('tab')
+                    time.sleep(1)
+                    pyautogui.press('enter')  
+                    time.sleep(2)
+
+                    pyperclip.copy(imagem)
+                    # Colar o caminho da imagem
+                    pyautogui.hotkey('ctrl', 'v')  # Colar o caminho da imagem no campo
+                    time.sleep(2)
+
+                    pyautogui.press('enter')
+                    
+                    esperar_elemento(caminhos["aba_anexar"])
+
+                    if mensagem_personalizada:
+                        pyperclip.copy(mensagem_personalizada)
+                        # Usar o pyautogui para colar a mensagem
+                        pyautogui.hotkey('ctrl','v')
+                        time.sleep(1)
+                    
+                    time.sleep(1)
+                    # Pressionar Enter para enviar a imagem
+                    pyautogui.press('enter')
+                    mensagens_enviadas += 1
+
+                else:
+                    pyperclip.copy(mensagem_personalizada)
+                    # Usar o pyautogui para colar a mensagem
+                    pyautogui.hotkey('ctrl','v')
+                    time.sleep(2)
+
+                    # Clicar no botão de alternar
+                    pyautogui.press('enter')
+                    mensagens_enviadas += 1
+                
+            else:
+                print("Whatsapp não encontrado")
+                pyautogui.hotkey('ctrl','a')
+                time.sleep(1)
+
+                # Pressionar Enter para enviar a imagem
+                pyautogui.press('backspace')
+            
+            time.sleep(10)  # Aguarde um tempo antes de enviar para o próximo contato
+        except Exception as e:
+            if mensagens_enviadas == 0:
+                print(f"Erro ao enviar mensagens: {e}")
+                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui enviar nenhuma mensagem :(")
+                return []
+            else:
+                print(f"Erro ao enviar mensagens: {e}")
+                messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui enviar {mensagens_enviadas} mensagens :(")
+                return []
+                            
+    messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")

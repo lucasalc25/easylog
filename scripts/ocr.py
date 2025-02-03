@@ -27,7 +27,7 @@ def verificar_existencia(elemento):
 
         # Usar o pytesseract para extrair o texto da imagem
         texto_extraido = pytesseract.image_to_string(imagem)
-        print(texto_extraido)
+        print("Texto extraído da imagem:",texto_extraido)
 
         # Verificar se há texto na imagem
         if texto_extraido.strip():  # strip() remove espaços extras
