@@ -213,14 +213,19 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
             pyautogui.hotkey('ctrl','v')
             time.sleep(2)
 
-            pyautogui.hotkey('alt','s')
+            botao_salvar = localizar_elemento(caminhos["botao_salvar"])
+            pyautogui.click(botao_salvar)
             
+            esperar_elemento(caminhos["registro_salvo"])
             ocorrencias_registradas += 1
-            
+
+            pyautogui.press('esc')
+            time.sleep(2)
+
             esperar_elemento(caminhos["contratos"])
 
             pyautogui.press('esc')
-            time.sleep(3)
+            time.sleep(2)
 
         except:
             if ocorrencias_registradas == 0:
@@ -734,3 +739,16 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                 return []
                             
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
+
+def voltar_para_easylog():
+    while not localizar_elemento(caminhos["easylog_aberto"]):
+        if repeticoes > 1:
+            # Pressiona 'Alt' e 'Tab' duas vezes mantendo 'Alt' pressionado
+            pyautogui.keyDown('alt')  # Mantém a tecla 'Alt' pressionada
+            repetir_tecla('tab', total_repeticoes=repeticoes)
+            pyautogui.keyUp('alt')  # Mantém a tecla 'Alt' pressionada
+        else:
+            pyautogui.hotkey('alt','tab')
+
+        repeticoes += 1
+        time.sleep(2) 
