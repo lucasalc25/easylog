@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "node": "^23.7.0",
+    "pyinstaller": "^0.0.1"
+  }
+}

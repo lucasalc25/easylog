@@ -326,7 +326,7 @@ def frame_historicos(janela, frame):
             widget.pack_forget()
 
         campo_data.delete(0, tk.END)  # Limpa a área de texto antes de inserir
-
+                
         if valor == "falta":
             ttk.Label(frame_variaveis, text="Data da falta: ").pack(side=tk.LEFT, padx=(5,0))
             campo_data.pack(side=tk.LEFT, padx=5)
