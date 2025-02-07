@@ -18,23 +18,22 @@ def criar_pastas():
     # Define o caminho completo da nova pasta
     caminho_pasta_easylog = os.path.join(caminho_documentos, 'EasyLog')
     
-    pasta_easylog = 'EasyLog'
-    
     # Cria a pasta, se ela não existir
     if not os.path.exists(caminho_pasta_easylog):
         os.makedirs(caminho_pasta_easylog)
-        print(f"Pasta '{pasta_easylog}' criada em {caminho_documentos}")
+        print(f"\nPasta Easylog criada em {caminho_documentos}")
     else:
-        print(f"A pasta '{pasta_easylog}' já existe em {caminho_documentos}")
+        print(f"\nPasta Easylog localizada em {caminho_documentos}")
         
         
 def excluir_arquivo(caminho_arquivo):
     # Verifica se o arquivo existe antes de tentar removê-lo
     if os.path.exists(caminho_arquivo):
+        print(f"Removendo arquivo '{caminho_arquivo}'...")
         os.remove(caminho_arquivo)
-        print(f"Arquivo removido com sucesso!")
+        print(f"\nArquivo '{caminho_arquivo}' removido com sucesso!")
     else:
-        print(f"Arquivo não encontrado.")
+        print(f"\nArquivo '{caminho_arquivo}' não encontrado.")
 
 def repetir_tecla(*teclas, total_repeticoes):
     """
@@ -111,6 +110,7 @@ def abrir_aba(aba):
         esperar_elemento(caminhos["controle_pedagogico"])
 
 def exportar_planilha(caminho_destino):
+    print(f"Exportando planilha '{caminho_destino}...")
     caminho_destino = os.path.normpath(caminho_destino)
     campo_nome_planilha = localizar_elemento(caminhos["campo_nome_planilha"])
     pyautogui.click(campo_nome_planilha)
@@ -126,13 +126,17 @@ def exportar_planilha(caminho_destino):
         time.sleep(1)
         pyautogui.press('enter')
         time.sleep(1)
+
+    print(f"Planilha exportada!")
     
 # Função para anexar arquivo
 def anexar_planilha(campo_planilha):
+    print(f"Anexando planilha...")
     caminho_planilha = filedialog.askopenfilename(title="Selecione uma planilha", filetypes=[("Arquivos do Excel", "*.xlsx")])
     if caminho_planilha:
         campo_planilha.delete(0, tk.END)
         campo_planilha.insert(0, caminho_planilha)
+        print(f"Endereço da planilha anexado no campo")
 
 # Função para anexar imagem
 def anexar_imagem(imagem):
@@ -172,13 +176,13 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
 
             # Verifica se a coluna "Observação" está preenchida
             if not observacao:
-                print(f"Observação não encontrada para {nome_aluno}. Pulando para o próximo aluno.")
+                print(f"\nObservação não encontrada para {nome_aluno}. Pulando para o próximo aluno.")
                 continue  # Pula para o próximo aluno se houver observação
             
             print("\nTitulo da ocorrência:", titulo_ocorrencia)
             if titulo_ocorrencia.strip() == f"Falta - {data.strip()}":
                 descricao_ocorrencia = observacao
-                print("Descrição da ocorrência:",descricao_ocorrencia)
+                print("\nDescrição da ocorrência:",descricao_ocorrencia)
 
             pyperclip.copy(nome_aluno)
 
@@ -635,7 +639,7 @@ def gerar_frequencia(campo_dia_da_semana, campo_sala):
     messagebox.showinfo("Atenção!", "Planilha para frequência de alunos gerada!")
 
 # Função para enviar uma imagem para os contatos
-def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
+def enviar_mensagens(arquivo_contatos, caminho_imagem, mensagem_template):
     from scripts.mensagens import personalizar_mensagem
 
     messagebox.showinfo("Aviso!", "Certifique-se de que o Whatsapp esteja conectado ao aplicativo!")
@@ -696,18 +700,20 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
                 time.sleep(1)
                 
                 #Verifica se há imagem
-                if len(imagem) > 0:
+                if len(caminho_imagem) > 0:
                     esperar_elemento(caminhos["anexar"])
                     botao_anexar = localizar_elemento(caminhos["anexar"])
                     pyautogui.click(botao_anexar)
 
-                    pyautogui.press('tab')
+                    esperar_elemento(caminhos["fotos_e_videos"])
+                    fotos_e_videos = localizar_elemento(caminhos["fotos_e_videos"])
+                    pyautogui.click(fotos_e_videos)
+                    
+                    esperar_elemento(caminhos["janela_anexar"])
+                    # Copia o caminho da imagem
+                    pyperclip.copy(caminho_imagem)
                     time.sleep(1)
-                    pyautogui.press('enter')  
-                    time.sleep(2)
-
-                    pyperclip.copy(imagem)
-                    # Colar o caminho da imagem
+                    # Cola o caminho da imagem
                     pyautogui.hotkey('ctrl', 'v')  # Colar o caminho da imagem no campo
                     time.sleep(2)
 
@@ -717,6 +723,7 @@ def enviar_mensagens(arquivo_contatos, imagem, mensagem_template):
 
                     if mensagem_personalizada:
                         pyperclip.copy(mensagem_personalizada)
+                        time.sleep(2)
                         # Usar o pyautogui para colar a mensagem
                         pyautogui.hotkey('ctrl','v')
                         time.sleep(1)

@@ -24,6 +24,8 @@ caminhos = {
     "botao_fechar" : resource_path('imagens/botao_fechar.png'),
     "print_verificacao": resource_path('imagens/print_verificaçao.png'),
     "aba_anexar": resource_path('imagens/aba_anexar.png'),
+    "janela_anexar": resource_path('imagens/janela_anexar.png'),
+    "fotos_e_videos": resource_path('imagens/fotos_e_videos.png'),
     "abrir_planilha": resource_path('imagens/abrir_planilha.png'),
     "aluno_encontrado": resource_path('imagens/aluno_encontrado.png'),
     "anexar" : resource_path('imagens/anexar.png'),
