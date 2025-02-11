@@ -67,21 +67,7 @@ def procurar_hub():
 
             repeticoes += 1
             time.sleep(2)
-
-def procurar_easylog():
-    repeticoes = 1
-
-    while not localizar_elemento(caminhos["easylog_aberto"]):
-        if repeticoes > 1:
-            # Pressiona 'Alt' e 'Tab' duas vezes mantendo 'Alt' pressionado
-            pyautogui.keyDown('alt')  # Mantém a tecla 'Alt' pressionada
-            repetir_tecla('tab', total_repeticoes=repeticoes)
-            pyautogui.keyUp('alt')  # Mantém a tecla 'Alt' pressionada
-        else:
-            pyautogui.hotkey('alt','tab')
-
-        repeticoes += 1
-        time.sleep(2)  
+ 
 
 def abrir_aba(aba):   
     if aba == 'faltas_por_periodo':
@@ -251,8 +237,6 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, não consegui registrar nenhuma ocorrência :(")
             else:
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui registrar {ocorrencias_registradas} ocorrências :(")
-    
-    procurar_easylog()
 
     messagebox.showinfo("Concluído!", "Histórico registrado para todos os alunos!")           
 
@@ -761,7 +745,5 @@ def enviar_mensagens(arquivo_contatos, caminho_imagem, mensagem_template):
                 print(f"Erro ao enviar mensagens: {e}")
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui enviar {mensagens_enviadas} mensagens :(")
                 return []
-                                      
-    procurar_easylog()
-
+                            
     messagebox.showinfo("Concluído!", "Mensagem enviada para todos os contatos")
