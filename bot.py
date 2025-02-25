@@ -690,8 +690,9 @@ def enviar_mensagens(arquivo_contatos, caminho_imagem, mensagem_template):
                     pyautogui.click(botao_anexar)
 
                     esperar_elemento(caminhos["fotos_e_videos"])
-                    fotos_e_videos = localizar_elemento(caminhos["fotos_e_videos"])
-                    pyautogui.click(fotos_e_videos)
+                    pyautogui.press('tab')
+                    time.sleep(1)
+                    pyautogui.press('enter')
                     
                     esperar_elemento(caminhos["janela_anexar"])
                     # Copia o caminho da imagem
@@ -735,7 +736,7 @@ def enviar_mensagens(arquivo_contatos, caminho_imagem, mensagem_template):
                 # Pressionar Enter para enviar a imagem
                 pyautogui.press('backspace')
             
-            time.sleep(10)  # Aguarde um tempo antes de enviar para o próximo contato
+            time.sleep(15)  # Aguarde um tempo antes de enviar para o próximo contato
         except Exception as e:
             if mensagens_enviadas == 0:
                 print(f"Erro ao enviar mensagens: {e}")
