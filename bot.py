@@ -137,7 +137,6 @@ def anexar_imagem(imagem):
 
 def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_ocorrencia):
     repeticoes = 0
-    descricao_ocorrencia = ''
 
     while not localizar_elemento(caminhos["hub_aberto"]):
         if repeticoes > 1:
@@ -166,9 +165,9 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
                 continue  # Pula para o próximo aluno se houver observação
             
             print("\nTitulo da ocorrência:", titulo_ocorrencia)
-            if titulo_ocorrencia.strip() == f"Falta - {data.strip()}":
+            if "<Observação da Planilha>" in descricao_ocorrencia:
                 descricao_ocorrencia = observacao
-                print("\nDescrição da ocorrência:",descricao_ocorrencia)
+                print("\nDescrição da ocorrência:", descricao_ocorrencia)
 
             pyperclip.copy(nome_aluno)
 
