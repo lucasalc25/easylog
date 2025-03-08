@@ -1,6 +1,8 @@
 import pyautogui
 import pytesseract
 from PIL import Image
+import re
+from PIL import ImageGrab
 import cv2
 import numpy as np
 import time
@@ -62,3 +64,33 @@ def esperar_elemento(elemento):
             time.sleep(1)
         
         time.sleep(1)
+
+def encontrar_telefone():
+    """
+    Captura uma região da tela, detecta e retorna um número de telefone.
+    
+    Parâmetros:
+    - x1, y1, x2, y2: Coordenadas da região da tela a ser analisada.
+    
+    Retorna:
+    - O número de telefone encontrado (string) ou None se não encontrar.
+    """
+    
+    # Captura da tela na região especificada
+    screenshot = ImageGrab.grab(bbox=(348, 597, 583, 652))
+    image = cv2.cvtColor(cv2.array(screenshot), cv2.COLOR_RGB2BGR)
+
+    # Configuração do Tesseract
+    custom_config = r'--oem 3 --psm 6'
+    data = pytesseract.image_to_data(image, config=custom_config, output_type=pytesseract.Output.DICT)
+
+    # Expressão regular para capturar números de telefone
+    phone_pattern = re.compile(r'\(?\d{2,3}\)?[-.\s]?\d{4,5}[-.\s]?\d{4}')
+
+    # Buscar telefone nos dados extraídos
+    for text in data['text']:
+        text = text.strip()
+        if phone_pattern.fullmatch(text):
+            return text  # Retorna o primeiro telefone encontrado
+
+    return None  # Retorna None se não encontrar telefone

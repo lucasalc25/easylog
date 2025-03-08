@@ -3,7 +3,7 @@ from tkinter import messagebox
 from ttkbootstrap import Window, ttk  # Importando ttkbootstrap para personalização do tema
 from datetime import datetime, timedelta
 from config import caminhos
-from bot import anexar_imagem, anexar_planilha, criar_pastas
+from bot import anexar_imagem, anexar_planilha, criar_pastas, gerar_contatos
 from scripts.historicos import gerar_ocorrencia, preparar_registros
 from scripts.mensagens import gerar_mensagem, preparar_envio
 from scripts.planilhas import gerar_planilha
@@ -106,9 +106,21 @@ def gerar_horas_aulas(frame_frequencia, dia_da_semana, sala, hora_aula):
 def frame_planilhas(janela, frame):
     janela.geometry("500x500")
     centralizar_janela(janela)
-    
+
+    # Campo para anexação de planilha
+    frame_alunos = ttk.Labelframe(frame, text=" Contatos ", padding=5, bootstyle="primary")
+    frame_alunos.grid(row=0, column=0, padx=5, pady=(0,10), sticky="nsew")
+    # Configurar grid para ajustar os elementos lado a lado
+    frame_alunos.grid_columnconfigure(0, weight=1)
+    frame_alunos.grid_columnconfigure(1, weight=0)
+    frame_alunos.grid_columnconfigure(2, weight=0)
+    campo_planilha = ttk.Entry(frame_alunos, width=40)
+    campo_planilha.grid(row=0, column=0, padx=(10,5), pady=(10, 15), sticky="ew")
+    ttk.Button(frame_alunos, text="Anexar", command=lambda:anexar_planilha(campo_planilha), bootstyle="success").grid(row=0, column=1, padx=5, pady=(10, 15))
+    ttk.Button(frame_alunos, text="Gerar", command=lambda:gerar_contatos(campo_planilha), bootstyle="primary").grid(row=0, column=2,padx=5, pady=(10, 15))
+
     frame_faltas = ttk.Labelframe(frame, text=" Faltas no dia", padding=5, bootstyle="primary")
-    frame_faltas.grid(row=0, column=0, padx=5, pady=(0,10), sticky="nsew")
+    frame_faltas.grid(row=1, column=0, padx=5, pady=(0,10), sticky="nsew")
     # Configurar grid para ajustar os elementos lado a lado
     frame_faltas.grid_columnconfigure(0, weight=1)
     frame_faltas.grid_columnconfigure(1, weight=1)
@@ -128,7 +140,7 @@ def frame_planilhas(janela, frame):
     ttk.Button(frame_faltas, text="Gerar", command=lambda:gerar_planilha("faltas_do_dia", data_falta, data_falta, filtro_educador, "dia_da_semana", "sala"), bootstyle="primary").grid(row=0, column=4,padx=(20,10), pady=(10, 15), sticky="n")
     
     frame_alunos_atencao = ttk.Labelframe(frame, text=" Faltas no mês ", padding=5, bootstyle="primary")
-    frame_alunos_atencao.grid(row=1, column=0, padx=5, pady=(0,10), sticky="nsew")
+    frame_alunos_atencao.grid(row=2, column=0, padx=5, pady=(0,10), sticky="nsew")
     # Configurar grid para ajustar os elementos lado a lado
     frame_alunos_atencao.grid_columnconfigure(0, weight=1)
     frame_alunos_atencao.grid_columnconfigure(1, weight=1)
@@ -147,7 +159,7 @@ def frame_planilhas(janela, frame):
     ttk.Button(frame_alunos_atencao, text="Gerar", command=lambda:gerar_planilha("faltas_do_mes", data_inicial, data_final, "Geral", "dia_da_semana", "sala"), bootstyle="primary").grid(row=1, column=5, padx=(20,10), pady=(10, 15), sticky="n")
 
     frame_frequencia = ttk.Labelframe(frame, text=" Frequência do mês", padding=5, bootstyle="primary")
-    frame_frequencia.grid(row=2, column=0, padx=5, pady=(0,10), sticky="nsew")
+    frame_frequencia.grid(row=3, column=0, padx=5, pady=(0,10), sticky="nsew")
     # Configurar grid para ajustar os elementos lado a lado
     frame_frequencia.grid_columnconfigure(0, weight=1)
     frame_frequencia.grid_columnconfigure(1, weight=1)
@@ -166,7 +178,7 @@ def frame_planilhas(janela, frame):
     # Botão na linha debaixo
     ttk.Button(frame_frequencia, text="Gerar", command=lambda: gerar_planilha("frequencia", data_inicial, data_final, filtro_educador, dia_da_semana, sala), bootstyle="primary").grid(row=2, column=4, padx=(20,10), pady=(10, 15), sticky="")
     
-    ttk.Button(frame, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=3, column=0,pady=10)
+    ttk.Button(frame, text="Voltar", command=janela.destroy, bootstyle="danger-outline", width=10).grid(row=4, column=0,pady=10)
 
 # Função para configurar a área de "Mensagens"
 def frame_mensagens(janela,frame):

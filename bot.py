@@ -8,8 +8,8 @@ import pyperclip
 from pathlib import Path
 import pandas as pd
 from config import caminhos
-from scripts.ocr import esperar_elemento, localizar_elemento, verificar_existencia
-from scripts.planilhas import filtrar_faltosos_do_mes, filtrar_faltosos_do_dia, ler_registros, ler_faltosos_dia
+from scripts.ocr import encontrar_telefone, esperar_elemento, localizar_elemento, verificar_existencia
+from scripts.planilhas import atualizar_planilha_com_telefone, filtrar_faltosos_do_mes, filtrar_faltosos_do_dia, ler_registros, ler_faltosos_dia
 
 def criar_pastas():
     # Obtém o caminho da pasta Documentos do usuário
@@ -69,8 +69,15 @@ def procurar_hub():
             time.sleep(2)
  
 
-def abrir_aba(aba):   
-    if aba == 'faltas_por_periodo':
+def abrir_aba(aba):
+    if aba == 'administrativo':
+        aba_administrativo = localizar_elemento(caminhos["aba_administrativo"])
+        pyautogui.click(aba_administrativo)
+        esperar_elemento(caminhos["abrir_cadastro_alunos"])
+        abrir_cadastro_alunos = localizar_elemento(caminhos["abrir_cadastro_alunos"])
+        pyautogui.click(abrir_cadastro_alunos)
+        esperar_elemento(caminhos["cadastro_alunos_aberto"])
+    elif aba == 'faltas_por_periodo':
         aba_pedagogico = localizar_elemento(caminhos["aba_pedagogico"])
         pyautogui.click(aba_pedagogico)
         esperar_elemento(caminhos["abrir_faltas_por_periodo"])
@@ -183,14 +190,12 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
             pyautogui.press('enter')
             time.sleep(1)
 
-            esperar_elemento(caminhos["contratos"])
             pesquisa_aluno = localizar_elemento(caminhos["pesquisa_aluno"])
             pyautogui.click(pesquisa_aluno)
     
             pyautogui.hotkey('ctrl','a')
             time.sleep(1)
 
-            # Pressionar Enter para enviar a imagem
             pyautogui.press('backspace')
             time.sleep(1)
 
@@ -238,7 +243,86 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
             else:
                 messagebox.showerror("Oops!", f"Desculpe! Devido a um erro, só consegui registrar {ocorrencias_registradas} ocorrências :(")
 
-    messagebox.showinfo("Concluído!", "Histórico registrado para todos os alunos!")           
+    messagebox.showinfo("Concluído!", "Histórico registrado para todos os alunos!")
+
+def gerar_contatos(campo_planilha):
+    """Coleta telefones do sistema e atualiza a planilha."""
+    arquivo_alunos = campo_planilha.get()
+
+    if len(arquivo_alunos) == 0:
+        messagebox.showinfo("Oops!", "Insira uma planilha de nomes para o envio das mensagens!")
+        return
+
+    messagebox.showinfo("Aviso!", "Certifique-se de ter feito login no HUB!")
+
+    repeticoes = 0
+    while not localizar_elemento(caminhos["hub_aberto"]):
+        if repeticoes > 1:
+            pyautogui.keyDown('alt')
+            repetir_tecla('tab', total_repeticoes=repeticoes)
+            pyautogui.keyUp('alt')
+        else:
+            pyautogui.hotkey('alt', 'tab')
+
+        repeticoes += 1
+        time.sleep(2)
+
+    # Ler os contatos
+    alunos = ler_registros(arquivo_alunos)
+    contatos_coletados = 0
+
+    for aluno in alunos:
+        try:
+            abrir_aba("aba_administrativo")
+
+            nome_aluno = aluno['Aluno']
+            pyperclip.copy(nome_aluno)
+
+            pesquisa_aluno = localizar_elemento(caminhos["pesquisa_aluno"])
+            pyautogui.click(pesquisa_aluno)
+
+            pyautogui.hotkey('ctrl', 'a')
+            time.sleep(1)
+            pyautogui.press('backspace')
+            time.sleep(1)
+
+            pyautogui.hotkey('ctrl', 'v')
+            pyautogui.press('enter')
+            pyautogui.press('enter')
+            time.sleep(3)
+
+            esperar_elemento(caminhos["cadastro_aluno_encontrado"])
+            cadastro_aluno_encontrado = localizar_elemento(caminhos["cadastro_aluno_encontrado"])
+            pyautogui.doubleClick(cadastro_aluno_encontrado)
+
+            esperar_elemento(caminhos["cadastro_aluno"])
+
+            telefone = encontrar_telefone()
+
+            if telefone:
+                atualizar_planilha_com_telefone(arquivo_alunos, nome_aluno, telefone)
+                contatos_coletados += 1
+                print(f"Telefone detectado para {nome_aluno}")
+
+                pyautogui.press('esc')
+                time.sleep(2)
+
+                esperar_elemento(caminhos["cadastro_alunos"])
+
+                pyautogui.press('esc')
+                time.sleep(2)
+
+            else:
+                print(f"Nenhum telefone detectado para {nome_aluno}")
+
+        except Exception as e:
+            print(f"Erro ao processar {nome_aluno}: {e}")
+            if contatos_coletados == 0:
+                messagebox.showerror("Oops!", "Erro! Nenhum telefone coletado.")
+            else:
+                messagebox.showerror("Oops!", f"Erro! Apenas {contatos_coletados} telefones foram inseridos na planilha.")
+
+    messagebox.showinfo("Concluído!", "Todos os telefones foram inseridos na planilha!")
 
 def gerar_planilha_com_educadores(data_falta, filtro_educador):
     abrir_aba("faltas_por_periodo")

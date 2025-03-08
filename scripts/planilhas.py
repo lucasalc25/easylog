@@ -272,6 +272,25 @@ def ajustar_largura_colunas(arquivo, data_falta, mes_atual):
     # Salvar o arquivo depois de ajustar as larguras
     wb.save(arquivo)
 
+def atualizar_planilha_com_telefone(arquivo_excel, nome_aluno, telefone):
+    """Atualiza a planilha do Excel com o telefone encontrado para o aluno correspondente."""
+    df = pd.read_excel(arquivo_excel)
+
+    # Criar a coluna "Celular" se não existir
+    if "Celular" not in df.columns:
+        df["Celular"] = ""
+
+    # Procurar o aluno na planilha e atualizar o telefone
+    for i, row in df.iterrows():
+        if row["Aluno"] == nome_aluno:
+            if pd.isna(row["Celular"]) or row["Celular"] == "":
+                df.at[i, "Celular"] = telefone
+                df.to_excel(arquivo_excel, index=False)
+                print(f"Telefone atualizado para {nome_aluno}: {telefone}")
+            else:
+                print(f"Telefone já existente para {nome_aluno}: {row['Celular']}")
+            return
+
 def gerar_planilha(tipo, campo_data_inicial, campo_data_final, campo_filtro_educador, campo_dia_da_semana, campo_sala):
     from bot import gerar_faltosos_do_dia, gerar_faltosos_do_mes, gerar_frequencia
 
