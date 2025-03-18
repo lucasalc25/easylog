@@ -75,22 +75,21 @@ def encontrar_telefone():
     Retorna:
     - O número de telefone encontrado (string) ou None se não encontrar.
     """
+    # Captura a tela e salva como imagem
+    caminho_print = caminhos["print_telefones"]
+    pyautogui.screenshot(caminho_print, region=(488, 600, 135, 50))
     
-    # Captura da tela na região especificada
-    screenshot = ImageGrab.grab(bbox=(348, 597, 583, 652))
-    image = cv2.cvtColor(cv2.array(screenshot), cv2.COLOR_RGB2BGR)
+    # Abre a imagem completa
+    imagem = Image.open(caminho_print)
 
-    # Configuração do Tesseract
-    custom_config = r'--oem 3 --psm 6'
-    data = pytesseract.image_to_data(image, config=custom_config, output_type=pytesseract.Output.DICT)
+    # Usar o pytesseract para extrair o texto da imagem
+    texto_extraido = pytesseract.image_to_string(imagem)
+    print("Texto extraído da imagem:", texto_extraido)
 
-    # Expressão regular para capturar números de telefone
-    phone_pattern = re.compile(r'\(?\d{2,3}\)?[-.\s]?\d{4,5}[-.\s]?\d{4}')
-
-    # Buscar telefone nos dados extraídos
-    for text in data['text']:
-        text = text.strip()
-        if phone_pattern.fullmatch(text):
-            return text  # Retorna o primeiro telefone encontrado
+    # Se encontrou telefones, retorna o primeiro corrigido
+    if texto_extraido:
+        telefone_corrigido = texto_extraido.replace('(02', '(92')  # Corrige erro comum no DDD
+        telefone_corrigido = texto_extraido.replace('(62', '(92')  # Corrige erro comum no DDD
+        return telefone_corrigido
 
     return None  # Retorna None se não encontrar telefone

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 import pandas as pd
 from pathlib import Path
 import openpyxl
@@ -97,9 +97,6 @@ def filtrar_faltosos_do_dia(planilha_faltosos_do_dia, data_falta):
     # Mesclar as duas planilhas com base na coluna 'aluno'
     df_mesclado = pd.merge(df_faltosos, df_educadores, on='Aluno', how='left')
 
-    # Remover linhas duplicadas
-    df_mesclado = df_mesclado.drop_duplicates(subset=['Celular'])
-
     # Transferir telefones residenciais para a coluna celular quando não houver
     df_mesclado['Celular'] = df_mesclado['Celular'].fillna(df_mesclado['Tel Residencial'])
 
@@ -111,11 +108,25 @@ def filtrar_faltosos_do_dia(planilha_faltosos_do_dia, data_falta):
     # Deixar a coluna observação vazia
     df_mesclado['Observação'] = ''
 
+    # **Remover linhas duplicadas com base na coluna "Código"**
+    df_mesclado = df_mesclado.drop_duplicates(subset=['Contrato'], keep='first')
+
     # Selecionar as colunas finais
     df_final = df_mesclado[['Contrato', 'Aluno', 'Observação', 'Educador', 'Celular']]
+    
+    df_final['Celular'] = df_final['Celular'].fillna('')
+
+    # **Identificar apenas telefones duplicados**
+    df_final['Duplicado'] = df_final.duplicated(subset=['Celular'], keep=False)
+
+    # **Adicionar "Telefone repetido" apenas nas linhas duplicadas**
+    df_final.loc[df_final['Duplicado'], 'Observação'] += "Telefone repetido"
 
     # Adicionar "Funcionário" na coluna "Observação" onde a coluna "Educador" contém "Sangela"
     df_final.loc[df_final['Educador'].str.contains('Sangela', na=False), 'Observação'] = 'Funcionário'
+
+    # Remover a coluna tel_residencial
+    df_final = df_final.drop(columns=['Duplicado'])
 
     caminho_saida = Path.home() / "Documents" / "EasyLog" / f"faltosos_{data_falta}.xlsx"
 
@@ -263,7 +274,15 @@ def ajustar_largura_colunas(arquivo, data_falta, mes_atual):
             "B": 40.5,
             "C": 15.0,
         }
-        
+    elif arquivo == Path.home() / "Documents" / "EasyLog" / "contatos_coletados.xlsx":
+        # Definir larguras específicas para as colunas
+        colunas_largura = {
+            "A": 10.0,
+            "B": 40.0,
+            "C": 50.0,
+            "D": 12.0,
+            "E": 18.0
+        }
 
     # Ajustar a largura das colunas conforme o dicionário
     for coluna, largura in colunas_largura.items():
@@ -272,7 +291,7 @@ def ajustar_largura_colunas(arquivo, data_falta, mes_atual):
     # Salvar o arquivo depois de ajustar as larguras
     wb.save(arquivo)
 
-def atualizar_planilha_com_telefone(arquivo_excel, nome_aluno, telefone):
+def atualizar_planilha_com_telefones(arquivo_excel, telefones_por_aluno):
     """Atualiza a planilha do Excel com o telefone encontrado para o aluno correspondente."""
     df = pd.read_excel(arquivo_excel)
 
@@ -280,16 +299,27 @@ def atualizar_planilha_com_telefone(arquivo_excel, nome_aluno, telefone):
     if "Celular" not in df.columns:
         df["Celular"] = ""
 
-    # Procurar o aluno na planilha e atualizar o telefone
-    for i, row in df.iterrows():
-        if row["Aluno"] == nome_aluno:
-            if pd.isna(row["Celular"]) or row["Celular"] == "":
-                df.at[i, "Celular"] = telefone
-                df.to_excel(arquivo_excel, index=False)
-                print(f"Telefone atualizado para {nome_aluno}: {telefone}")
-            else:
-                print(f"Telefone já existente para {nome_aluno}: {row['Celular']}")
-            return
+    # Flag para verificar se houve atualização
+    atualizado = False
+
+    # Percorre os telefones coletados
+    for nome_aluno, telefone in telefones_por_aluno.items():
+        for i, row in df.iterrows():
+            if row["Aluno"] == nome_aluno:
+                if pd.isna(row["Celular"]) or row["Celular"] == "":
+                    telefone_filtrado = re.split(r"[,\s]+", telefone)
+                    df.at[i, "Celular"] = telefone_filtrado[0].replace("(02)","(92)").replace("(62)","(92)")
+                    atualizado = True
+                    print(f"Telefone atualizado para {nome_aluno}: {telefone}")
+                else:
+                    print(f"Telefone já existente para {nome_aluno}: {row['Celular']}")
+
+    # Salvar a planilha apenas se houve alteração
+    if atualizado:
+        caminho_destino = Path.home() / "Documents" / "EasyLog" / "contatos_coletados.xlsx"
+        df.to_excel(caminho_destino, index=False)
+        ajustar_largura_colunas(caminho_destino, "data_falta", "mes_atual")
+        print("Planilha de contatos atualizada!")
 
 def gerar_planilha(tipo, campo_data_inicial, campo_data_final, campo_filtro_educador, campo_dia_da_semana, campo_sala):
     from bot import gerar_faltosos_do_dia, gerar_faltosos_do_mes, gerar_frequencia

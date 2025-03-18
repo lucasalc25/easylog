@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 from config import caminhos
 from scripts.ocr import encontrar_telefone, esperar_elemento, localizar_elemento, verificar_existencia
-from scripts.planilhas import atualizar_planilha_com_telefone, filtrar_faltosos_do_mes, filtrar_faltosos_do_dia, ler_registros, ler_faltosos_dia
+from scripts.planilhas import atualizar_planilha_com_telefones, filtrar_faltosos_do_mes, filtrar_faltosos_do_dia, ler_registros, ler_faltosos_dia
 
 def criar_pastas():
     # Obtém o caminho da pasta Documentos do usuário
@@ -166,15 +166,16 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
             nome_aluno = aluno['Aluno']  # Nome do aluno
             observacao = aluno['Observacao']
 
-            # Verifica se a coluna "Observação" está preenchida
-            if not observacao:
-                print(f"\nObservação não encontrada para {nome_aluno}. Pulando para o próximo aluno.")
-                continue  # Pula para o próximo aluno se houver observação
-            
-            print("\nTitulo da ocorrência:", titulo_ocorrencia)
-            if "<Observação da Planilha>" in descricao_ocorrencia:
+            print(f'\nIniciando registro de {nome_aluno}...')
+            print("\nTítulo da ocorrência:", titulo_ocorrencia)
+            print("\nDescrição inicial:", descricao_ocorrencia)
+
+            # Sempre usar a descrição da planilha, se houver
+            if observacao and observacao.strip():  
                 descricao_ocorrencia = observacao
-                print("\nDescrição da ocorrência:", descricao_ocorrencia)
+            else:
+                print(f"\nObservação não encontrada para {nome_aluno}. Pulando para o próximo aluno.")
+                continue  # Pula para o próximo aluno se não houver observação
 
             pyperclip.copy(nome_aluno)
 
@@ -189,6 +190,7 @@ def registrar_ocorrencias(arquivo_alunos, data, titulo_ocorrencia, descricao_oco
             pyautogui.press('enter')
             time.sleep(1)
 
+            esperar_elemento(caminhos["contratos"])
             pesquisa_aluno = localizar_elemento(caminhos["pesquisa_aluno"])
             pyautogui.click(pesquisa_aluno)
     
@@ -268,24 +270,34 @@ def gerar_contatos(campo_planilha):
 
     # Ler os contatos
     alunos = ler_registros(arquivo_alunos)
-    contatos_coletados = 0
+    telefones_coletados = 0
+    # Dicionário global para armazenar os telefones antes de atualizar a planilha
+    # Dicionário global para armazenar os telefones antes de atualizar a planilha
+    telefones_por_aluno = {}
 
     for aluno in alunos:
         try:
-            abrir_aba("aba_administrativo")
-
             nome_aluno = aluno['Aluno']
             pyperclip.copy(nome_aluno)
 
+            pyautogui.press('alt')
+            time.sleep(1)
+            pyautogui.press('enter')
+            time.sleep(1)
+            pyautogui.press('enter')
+            time.sleep(1)
+
+            esperar_elemento(caminhos["cadastro_alunos_aberto"])
             pesquisa_aluno = localizar_elemento(caminhos["pesquisa_aluno"])
             pyautogui.click(pesquisa_aluno)
-
-            pyautogui.hotkey('ctrl', 'a')
+    
+            pyautogui.hotkey('ctrl','a')
             time.sleep(1)
+
             pyautogui.press('backspace')
             time.sleep(1)
 
-            pyautogui.hotkey('ctrl', 'v')
+            pyautogui.hotkey('ctrl','v')
             pyautogui.press('enter')
             pyautogui.press('enter')
             time.sleep(3)
@@ -294,19 +306,20 @@ def gerar_contatos(campo_planilha):
             cadastro_aluno_encontrado = localizar_elemento(caminhos["cadastro_aluno_encontrado"])
             pyautogui.doubleClick(cadastro_aluno_encontrado)
 
-            esperar_elemento(caminhos["cadastro_aluno"])
+            esperar_elemento(caminhos["cadastro_aluno_aberto"])
 
-            telefone = encontrar_telefone()
-
-            if telefone:
-                atualizar_planilha_com_telefone(arquivo_alunos, nome_aluno, telefone)
-                contatos_coletados += 1
-                print(f"Telefone detectado para {nome_aluno}")
-
+            # Captura os telefones encontrados para o aluno atual
+            telefones_encontrados = encontrar_telefone_para_aluno()
+            
+            if telefones_encontrados:
+                # Guarda apenas o primeiro telefone da lista no dicionário
+                telefones_por_aluno[nome_aluno] = telefones_encontrados[0]
+                print(f"Telefone detectado para {nome_aluno}: {telefones_encontrados[0]}")
+                    
                 pyautogui.press('esc')
                 time.sleep(2)
 
-                esperar_elemento(caminhos["cadastro_alunos"])
+                esperar_elemento(caminhos["cadastro_alunos_aberto"])
 
                 pyautogui.press('esc')
                 time.sleep(2)
@@ -316,12 +329,30 @@ def gerar_contatos(campo_planilha):
 
         except Exception as e:
             print(f"Erro ao processar {nome_aluno}: {e}")
-            if contatos_coletados == 0:
+            if telefones_coletados == 0:
                 messagebox.showerror("Oops!", "Erro! Nenhum telefone coletado.")
             else:
-                messagebox.showerror("Oops!", f"Erro! Apenas {contatos_coletados} telefones foram inseridos na planilha.")
+                messagebox.showerror("Oops!", f"Erro! Apenas {telefones_coletados} telefones foram inseridos na planilha.")
 
+    atualizar_planilha_com_telefones(arquivo_alunos, telefones_por_aluno)
+    caminho_destino = Path.home() / "Documents" / "EasyLog" / "contatos_coletados.xlsx"
+    os.startfile(caminho_destino)
     messagebox.showinfo("Concluído!", "Todos os telefones foram inseridos na planilha!")
+
+def encontrar_telefone_para_aluno():
+    """
+    Função que encontra os telefones de um aluno.
+    Retorna uma lista de telefones encontrados para o aluno.
+    """
+    lista_telefones = []
+
+    # Aqui o seu código para encontrar os números de telefone da interface
+    telefone = encontrar_telefone()  # Esta função já está configurada para encontrar um número de telefone
+    
+    if telefone:
+        lista_telefones.append(telefone)  # Adiciona o telefone encontrado à lista
+
+    return lista_telefones
 
 def gerar_planilha_com_educadores(data_falta, filtro_educador):
     abrir_aba("faltas_por_periodo")
