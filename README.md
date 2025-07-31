@@ -21,8 +21,9 @@ Aplicação desktop desenvolvida em Python para automatizar tarefas operacionais
 - Interface desktop para execução rápida de tarefas
 - Automação de cliques, digitação e atalhos de teclado
 - Captura e leitura de dados na tela via OCR (Pytesseract + OpenCV)
-- Processamento e geração de relatórios com Pandas e Openpyxl
-- Organização automática de arquivos por tipo, nome ou data
+- Envio automático de mensagens via WhatsApp
+- Registro de ocorrências de alunos com base em eventos e processos da corporação
+- Leitura, tratamento e criação de relatórios com Pandas e Openpyxl
 - Manipulação robusta de diretórios e datas com Pathlib e Datetime
 - Validações, delays e simulação precisa de ações humanas
 
