@@ -1,7 +1,6 @@
 import pyautogui
 import pytesseract
 from PIL import Image
-import re
 from PIL import ImageGrab
 import cv2
 import numpy as np
