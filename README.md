@@ -1,6 +1,8 @@
 # 🧩 EasyLog
 
-Aplicação desktop desenvolvida em Python para automatizar tarefas operacionais em um sistema privado. A ferramenta auxilia na navegação por interfaces do sistema, com OCR para detectar elementos visuais na tela, automatiza interações com mouse e teclado, realiza o envio de mensagens via WhatsApp, registra ocorrências de alunos, além de tratar e organizar planilhas geradas pelo sistema corporativo, estruturando os dados para facilitar o uso posterior. Todo o processo é executado por meio de uma interface gráfica simples, voltada para reduzir o esforço manual e agilizar o fluxo de trabalho.
+Aplicação desktop desenvolvida em Python para automatizar tarefas operacionais em um sistema privado. A ferramenta auxilia na navegação por interfaces do sistema, com OCR para detectar elementos visuais na tela; automatiza interações com mouse e teclado; realiza o envio de mensagens via WhatsApp; registra ocorrências de eventos e processos corporativos; além de tratar e organizar planilhas geradas pelo sistema corporativo, estruturando os dados para facilitar o uso posterior. 
+
+Todo o processo é executado por meio de uma interface gráfica simples, voltada para reduzir o esforço manual e agilizar o fluxo de trabalho.
 
 ## ⚙️ Tecnologias utilizadas
 
@@ -53,6 +55,7 @@ Aplicação desktop desenvolvida em Python para automatizar tarefas operacionais
 ## ✅ Status
 
 Projeto finalizado e utilizado com sucesso durante minha atuação em ambiente corporativo.  
+
 Atualmente não está em desenvolvimento ativo, como citado acima, mas o código base permanece disponível para fins de estudo e exibição em portfólio.
 
 ## 📫 Contato
