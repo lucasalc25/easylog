@@ -28,17 +28,17 @@ Aplicação desktop desenvolvida em Python para automatizar tarefas operacionais
 
 ## 🔐 Acesso e limitações
 
-> Este projeto foi desenvolvido exclusivamente para um sistema privado com login obrigatório.
-> A aplicação depende de acesso autenticado ao sistema interno;
-> Não posso fornecer imagens, vídeos ou demonstrações públicas;
-> O código disponível é seguro, reutilizável e livre de dados sensíveis;
-> **Atualmente não faço mais parte da empresa**, portanto não tenho mais acesso ao ambiente de produção.
+- Este projeto foi desenvolvido exclusivamente para um sistema privado.
+- A aplicação depende de acesso autenticado ao sistema interno;
+- Não posso fornecer imagens, vídeos ou demonstrações públicas;
+- **Atualmente não faço mais parte da empresa**, portanto não tenho mais acesso ao ambiente de produção.
 
 ## 🚀 Como executar
 
 1. Clone o repositório:
 
-    git clone [https://github.com/seu-usuario/seu-repo.git](https://github.com/lucasalc25/easylog)
+    git clone [https://github.com/lucasalc25/easylog](https://github.com/lucasalc25/easylog)
+    
     cd easylog
 
 2. Instale as dependências:
@@ -52,9 +52,10 @@ Aplicação desktop desenvolvida em Python para automatizar tarefas operacionais
 ## ✅ Status
 
 Projeto finalizado e utilizado com sucesso durante minha atuação em ambiente corporativo.  
-Atualmente não está em desenvolvimento ativo como citado acima, mas o código base permanece disponível para fins de estudo e reaproveitamento.
+Atualmente não está em desenvolvimento ativo, como citado acima, mas o código base permanece disponível para fins de estudo e reaproveitamento.
 
 ## 📫 Contato
+
 <div align="start">
   <a href="https://www.linkedin.com/in/lucas-alcantara-holanda-673114213/" target="_blank">
     <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
