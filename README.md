@@ -38,16 +38,16 @@ Aplicação desktop desenvolvida em Python para automatizar tarefas operacionais
 
 1. Clone o repositório:
 
-git clone [https://github.com/seu-usuario/seu-repo.git](https://github.com/lucasalc25/easylog)
-cd easylog
+    git clone [https://github.com/seu-usuario/seu-repo.git](https://github.com/lucasalc25/easylog)
+    cd easylog
 
 2. Instale as dependências:
 
-pip install -r requirements.txt
+    pip install -r requirements.txt
 
 3. Execute a aplicação:
 
-python app.py
+    python app.py
 
 ## ✅ Status
 
