@@ -53,7 +53,7 @@ Aplicação desktop desenvolvida em Python para automatizar tarefas operacionais
 ## ✅ Status
 
 Projeto finalizado e utilizado com sucesso durante minha atuação em ambiente corporativo.  
-Atualmente não está em desenvolvimento ativo, como citado acima, mas o código base permanece disponível para fins de estudo e reaproveitamento.
+Atualmente não está em desenvolvimento ativo, como citado acima, mas o código base permanece disponível para fins de estudo e exibição em portfólio.
 
 ## 📫 Contato
 
