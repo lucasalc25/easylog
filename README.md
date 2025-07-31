@@ -7,8 +7,8 @@ Aplicação desktop desenvolvida em Python para automatizar tarefas operacionais
 - **Tkinter** – Interface gráfica
 - **PyAutoGUI** – Automação de mouse e teclado
 - **Pandas** – Manipulação de dados e planilhas
-- **Pytesseract + OpenCV (cv2)** – OCR e processamento de imagem
-- **Pillow (PIL)** – Captura e tratamento de imagens
+- **Pytesseract + OpenCV** – OCR e processamento de imagem
+- **Pillow** – Captura e tratamento de imagens
 - **Pynput** – Controle de teclado e mouse
 - **NumPy** – Suporte a operações matriciais e arrays
 - **Openpyxl** – Leitura e escrita em arquivos Excel (.xlsx)
